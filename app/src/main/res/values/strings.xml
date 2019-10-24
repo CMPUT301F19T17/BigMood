@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BigMood</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_user_moods">My Moods</string>
+    <string name="title_following">Following</string>
+    <string name="title_requests">Requests</string>
+    <string name="title_profile">Profile</string>
 </resources>
