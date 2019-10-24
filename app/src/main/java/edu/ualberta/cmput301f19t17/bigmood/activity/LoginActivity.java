@@ -1,6 +1,8 @@
 package edu.ualberta.cmput301f19t17.bigmood.activity;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +17,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Bind the toolbar in XML to the SupportActionBar of the Activity
+        Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar_login);
+        this.setSupportActionBar(toolbar);
+
+        // Get the same ActionBar and work on it
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setTitle(R.string.app_name);
 
         /**
          * DEBUG
