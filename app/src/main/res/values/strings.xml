@@ -7,4 +7,9 @@
     <string name="title_profile">Profile</string>
     <string name="title_menu_save">SAVE</string>
     <string name="title_dialog_view_mood">View Mood</string>
+    <string name="title_define">Define Your Mood</string>
+    <string name="mood_reason_hint">Explain Why</string>
+    <string name="delete_txt">Delete</string>
+    <string name="cancel_txt">Cancel</string>
+    <string name="confirm_txt">Confirm</string>
 </resources>
