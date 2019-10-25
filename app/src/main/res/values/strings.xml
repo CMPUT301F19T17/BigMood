@@ -5,4 +5,6 @@
     <string name="title_following">Following</string>
     <string name="title_requests">Requests</string>
     <string name="title_profile">Profile</string>
+    <string name="title_menu_save">SAVE</string>
+    <string name="title_dialog_view_mood">View Mood</string>
 </resources>

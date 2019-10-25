@@ -11,6 +11,12 @@ import android.widget.Button;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
+// TODO: 2019-10-24
+//  Custom app bar
+//  Fragment sizing
+//  Menus
+//  Dialog Fragment spawning
+
 public class LoginActivity extends AppCompatActivity {
 
     @Override
