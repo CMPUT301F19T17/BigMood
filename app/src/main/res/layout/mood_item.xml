@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/mood_item_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG_Date" />
+
+    <TextView
+        android:id="@+id/mood_item_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG_time" />
+
+    <TextView
+        android:id="@+id/mood_item_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG_state" />
+
+    <TextView
+        android:id="@+id/mood_item_reason"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG_reason" />
+
+    <TextView
+        android:id="@+id/mood_item_situation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG_situation" />
+
+</LinearLayout>

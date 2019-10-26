@@ -4,7 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,13 +21,18 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
+
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 public class UserMoodsFragment extends Fragment {
+    private ArrayList<Mood> moodList;
+    private ArrayAdapter<Mood> moodAdapter;
 
     private UserMoodsViewModel userMoodsViewModel;
 
@@ -42,7 +52,19 @@ public class UserMoodsFragment extends Fragment {
         });
 
         FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
-        Button debugButton = root.findViewById(R.id.debug_button_list_item);
+
+        ListView moodListView = root.findViewById(R.id.mood_list);
+
+        moodList = new ArrayList<>();
+        moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
+        moodListView.setAdapter(moodAdapter);
+
+        //TODO Cameron 10-26-2019 remove canned data
+        final Mood mockMood1 = new Mood("2019-07-25", "12:24", "Sad");
+        final Mood mockMood2 = new Mood("2019-10-20", "11:11", "Happy");
+        moodList.add(mockMood1);
+        moodList.add(mockMood2);
+        moodAdapter.notifyDataSetChanged();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,32 +76,34 @@ public class UserMoodsFragment extends Fragment {
             }
         });
 
-        debugButton.setOnClickListener(new View.OnClickListener() {
+
+        moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                final Mood mockMood = new Mood("2019-07-25", "12:24", "State");
-
-                ViewUserMoodDialogFragment fragment = ViewUserMoodDialogFragment.newInstance(mockMood);
+                ViewUserMoodDialogFragment fragment = ViewUserMoodDialogFragment.newInstance(moodList.get(i));
+                final int finalIndex = i;
                 fragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
                     @Override
                     public void onDeletePressed() {
 
-                        Toast.makeText(getContext(), "Pretend that a Mood was deleted", Toast.LENGTH_SHORT).show();
-                        
+                        moodList.remove(finalIndex);
+                        moodAdapter.notifyDataSetChanged();
+
+                        Toast.makeText(getContext(), "The Mood was deleted", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onEditPressed() {
 
-                        DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(mockMood);
+                        DefineMoodDialogFragment defineFragment =
+                                DefineMoodDialogFragment.newInstance(moodList.get(finalIndex));
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");
 
                     }
                 });
 
                 fragment.show(getFragmentManager(), "VIEW_MOOD_FRAGMENT");
-
             }
         });
 
