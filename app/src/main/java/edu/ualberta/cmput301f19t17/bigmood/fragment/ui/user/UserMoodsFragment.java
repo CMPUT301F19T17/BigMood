@@ -42,14 +42,14 @@ public class UserMoodsFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
-        final TextView textView = root.findViewById(R.id.text_user_moods);
+//        final TextView textView = root.findViewById(R.id.text_user_moods);
 
-        userMoodsViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+//        userMoodsViewModel.getText().observe(this, new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
 
         FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
 
