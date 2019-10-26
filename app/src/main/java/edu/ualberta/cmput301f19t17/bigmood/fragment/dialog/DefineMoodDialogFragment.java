@@ -261,8 +261,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
         final EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
 
         // grey-out first option of spinners, so it can be a hint for user
-
-       situationSpinner.setSelection(0, false);
+        stateSpinner.setSelection(0, false);
+        situationSpinner.setSelection(0, false);
 
         // get the Mood if we sent one in through the args bundle
         Bundle args = getArguments();
