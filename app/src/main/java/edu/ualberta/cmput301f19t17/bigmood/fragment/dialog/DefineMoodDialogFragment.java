@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -259,6 +260,10 @@ public class DefineMoodDialogFragment extends DialogFragment {
         final Spinner situationSpinner = view.findViewById(R.id.situation_spinner);
         final EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
 
+        // grey-out first option of spinners, so it can be a hint for user
+
+       situationSpinner.setSelection(0, false);
+
         // get the Mood if we sent one in through the args bundle
         Bundle args = getArguments();
         Mood mood = null;
@@ -269,8 +274,16 @@ public class DefineMoodDialogFragment extends DialogFragment {
             int statePosition = (int) args.get("STATE_POS");
             int situationPosition = (int) args.get("SITUATION_POS");
             if (mood != null) {
-                stateSpinner.setSelection(statePosition);
-                situationSpinner.setSelection(situationPosition);
+
+                // first item can't be selected because it's a hint
+                if (statePosition != 0) {
+                    stateSpinner.setSelection(statePosition);
+                }
+
+                // first item can't be selected because it's a hint
+                if (situationPosition != 0) {
+                    situationSpinner.setSelection(situationPosition);
+                }
             }
         }
 
