@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="states_res">
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Angry</item>
+        <item>Disgusted</item>
+        <item>Afraid</item>
+        <item>Surprised</item>
+    </string-array>
+    <string-array name="situations_res">
+        <item>Alone</item>
+        <item>Small Group</item>
+        <item>Crowd</item>
+    </string-array>
+</resources>

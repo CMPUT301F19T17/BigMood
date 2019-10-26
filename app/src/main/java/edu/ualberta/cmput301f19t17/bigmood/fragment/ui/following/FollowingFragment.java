@@ -1,0 +1,35 @@
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.following;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
+import edu.ualberta.cmput301f19t17.bigmood.R;
+
+public class FollowingFragment extends Fragment {
+
+    private FollowingViewModel followingViewModel;
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        followingViewModel =
+                ViewModelProviders.of(this).get(FollowingViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_following, container, false);
+        final TextView textView = root.findViewById(R.id.text_following);
+        followingViewModel.getText().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                textView.setText(s);
+            }
+        });
+        return root;
+    }
+}
