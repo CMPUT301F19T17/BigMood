@@ -113,7 +113,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Set inflater view
-        View view = inflater.inflate(R.layout.fragment_define_mood, container, false);
+        View view = inflater.inflate(R.layout.dialog_define_mood, container, false);
 
         // Bind toolbar XML to view
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);

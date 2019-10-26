@@ -21,5 +21,6 @@
     <string name="delete_txt">Delete</string>
     <string name="cancel_txt">Cancel</string>
     <string name="confirm_txt">Confirm</string>
+    <string name="title_activity_sign_up">Create Account</string>
 
 </resources>
