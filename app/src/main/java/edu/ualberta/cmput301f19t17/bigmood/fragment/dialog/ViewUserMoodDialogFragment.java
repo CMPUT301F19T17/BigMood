@@ -16,11 +16,22 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
 
     // Define new listener
-    private @NonNull OnClickListener listener;
+    private @NonNull OnButtonPressListener listener;
 
+    /**
+     * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
+     */
+    public interface OnButtonPressListener {
+        void onDeletePressed();
+        void onEditPressed();
+    }
+
+    /**
+     * This is the default constructor. Since this dialog has buttons, we set a default listener to avoid a crash if for some reason it is not overridden. This should not happen in the code, but it is here as a good measure.
+     */
     public ViewUserMoodDialogFragment() {
 
-        this.listener = new OnClickListener() {
+        this.listener = new OnButtonPressListener() {
             @Override
             public void onDeletePressed() {
                 this.logError();
@@ -32,20 +43,24 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
             }
 
             private void logError() {
-                Log.e(HomeActivity.LOG_TAG, "ViewUserMoodDialogFragment.OnClickListener is NOT IMPLEMENTED");
+                Log.e(HomeActivity.LOG_TAG, "ViewUserMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED");
             }
         };
 
     }
 
+    /**
+     * This method creates a new instance of a ViewMoodDialogFragment for the purposes of viewing a Mood. This method should be used instead of the base constructor as the mood must get put into the arguments Bundle of the Fragment.
+     * @param mood The user mood to view
+     * @return     A new instance of ViewUserMoodDialogFragment.
+     */
     public static ViewUserMoodDialogFragment newInstance(Mood mood) {
 
         // Define new Bundle for storing arguments
         Bundle args = new Bundle();
 
         // Put arguments in Bundle
-        // TODO: 2019-10-25 Uncomment when mood implements parcelable
-//        args.putParcelable(Mood.TAG_MOOD_OBJECT, mood);
+        args.putParcelable(Mood.TAG_MOOD_OBJECT, mood);
 
         // Create new stock fragment and set arguments
         ViewUserMoodDialogFragment fragment = new ViewUserMoodDialogFragment();
@@ -55,11 +70,19 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
 
     }
 
-    // Set the OnClickListener. If this is not called the default listener will be the default as specified above.
-    public void setOnClickListener(@NonNull OnClickListener listener) {
+    /**
+     * This sets the OnButtonPressListener for the edit and delete actions.
+     * @param listener The listener to set
+     */
+    public void setOnButtonPressListener(@NonNull OnButtonPressListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * This method overrides the method from the superclass. It is responsible for creating a new dialog. In this case it is an AlertDialog. Specifically we set the buttons on the dialog and the listener.
+     * @param view This is the view that the Dialog has to attach to. We presume this has already been created.
+     * @return     Fully built dialog
+     */
     @Override
     protected Dialog buildDialog(View view) {
 
@@ -69,8 +92,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
         // Build and return the dialog. We set the onClick listeners for each button to point to a different method in our interface which take different parameters
         return builder
                 .setView(view)
-                .setTitle(this.getString(R.string.title_dialog_view_mood))
-                .setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                .setPositiveButton(this.getText(R.string.menu_option_edit), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -79,7 +101,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
 
                     }
                 })
-                .setNeutralButton("DELETE", new DialogInterface.OnClickListener() {
+                .setNeutralButton(this.getText(R.string.menu_option_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -90,4 +112,6 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
                 })
                 .create();
     }
+
+
 }

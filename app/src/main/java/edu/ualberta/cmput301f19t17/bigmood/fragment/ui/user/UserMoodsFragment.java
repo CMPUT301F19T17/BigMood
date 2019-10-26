@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewMoodDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 public class UserMoodsFragment extends Fragment {
@@ -55,10 +58,27 @@ public class UserMoodsFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Mood mockMood = new Mood();
+                final Mood mockMood = new Mood("2019-07-25", "12:24", "State");
 
-                DefineMoodDialogFragment fragment = DefineMoodDialogFragment.newInstance(mockMood);
-                fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
+                ViewUserMoodDialogFragment fragment = ViewUserMoodDialogFragment.newInstance(mockMood);
+                fragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
+                    @Override
+                    public void onDeletePressed() {
+
+                        Toast.makeText(getContext(), "Pretend that a Mood was deleted", Toast.LENGTH_SHORT).show();
+                        
+                    }
+
+                    @Override
+                    public void onEditPressed() {
+
+                        DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(mockMood);
+                        defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");
+
+                    }
+                });
+
+                fragment.show(getFragmentManager(), "VIEW_MOOD_FRAGMENT");
 
             }
         });

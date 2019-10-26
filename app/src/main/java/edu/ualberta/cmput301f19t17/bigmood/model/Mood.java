@@ -8,8 +8,6 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Date;
-
 /**
  * This class is used to represent a user's mood.
  * It is able to hold the date, time, emotional state,
@@ -33,6 +31,7 @@ public class Mood implements Parcelable {
 
     /**
      * This constructor is required for Parcelable. It is used to create a Mood by passing it as a Parcel.
+     *
      * @param in the information that is brought in
      */
     protected Mood(Parcel in) {
@@ -47,8 +46,9 @@ public class Mood implements Parcelable {
 
     /**
      * This method is required for Parcelable. It is used to pass a Mood to another Fragment or Activity.
+     *
      * @param out the parcel we are passing out
-     * @param i TODO find out what i is for
+     * @param i   TODO find out what i is for
      */
     @Override
     public void writeToParcel(Parcel out, int i) {
@@ -62,6 +62,7 @@ public class Mood implements Parcelable {
         //TODO write image to parcelable, need to do more research for how to do this
         //out.writeParcelable(image);
     }
+
     public static final Creator<Mood> CREATOR = new Creator<Mood>() {
         @Override
         public Mood createFromParcel(Parcel in) {
@@ -80,10 +81,12 @@ public class Mood implements Parcelable {
     }
 
     //CONSTRUCTOR
+
     /**
      * This is the minimal constructor with just the minimal elements needed to make a mood.
-     * @param date The date that the mood was felt. This is the current date, not inputted by the user.
-     * @param time The time that the mood was felt. This is the current time, not inputted by the user.
+     *
+     * @param date  The date that the mood was felt. This is the current date, not inputted by the user.
+     * @param time  The time that the mood was felt. This is the current time, not inputted by the user.
      * @param state The emotional state that created the mood. This is inputted by the user.
      */
     public Mood(@NonNull String date, @NonNull String time, @NonNull String state) {
@@ -91,15 +94,17 @@ public class Mood implements Parcelable {
         this.time = time;
         this.state = state;
     }
+
     /**
      * This is the overloaded constructor, with all available elements to make a mood.
-     * @param date The date that the mood was felt. This is the current date, not inputted by the user.
-     * @param time The time that the mood was felt. This is the current time, not inputted by the user.
-     * @param state The emotional state that created the mood. This is inputted by the user.
-     * @param reason The reason why the user felt the mood. This is inputted by the user.
+     *
+     * @param date      The date that the mood was felt. This is the current date, not inputted by the user.
+     * @param time      The time that the mood was felt. This is the current time, not inputted by the user.
+     * @param state     The emotional state that created the mood. This is inputted by the user.
+     * @param reason    The reason why the user felt the mood. This is inputted by the user.
      * @param situation The social situation that the mood happened in. This is inputted by the user.
-     * @param location The location that the mood happened at. This is inputted by the user.
-     * @param image An image representing the mood. This is inputted by the user.
+     * @param location  The location that the mood happened at. This is inputted by the user.
+     * @param image     An image representing the mood. This is inputted by the user.
      */
     public Mood(@NonNull String date, @NonNull String time, @NonNull String state,
                 @Nullable String reason, @Nullable String situation,
@@ -115,8 +120,10 @@ public class Mood implements Parcelable {
 
 
     //GETTERS
+
     /**
      * Gets the date that the mood was added.
+     *
      * @return date.
      */
     public String getDate() {
@@ -125,6 +132,7 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the time that the mood was added.
+     *
      * @return time.
      */
     public String getTime() {
@@ -133,6 +141,7 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the emotional state of the mood.
+     *
      * @return emotional state.
      */
     public String getState() {
@@ -141,6 +150,7 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the reason why the mood was felt.
+     *
      * @return reason why mood was felt.
      */
     public String getReason() {
@@ -149,6 +159,7 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the social situation that the mood was felt in.
+     *
      * @return social situation.
      */
     public String getSituation() {
@@ -157,6 +168,7 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the location that the mood happened at.
+     *
      * @return location.
      */
     public Pair<Double, Double> getLocation() {
@@ -165,6 +177,7 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the Bitmap of the image that represents the mood.
+     *
      * @return image
      */
     public Bitmap getImage() {
@@ -180,13 +193,16 @@ public class Mood implements Parcelable {
 
     /**
      * Changes the emotional state of the mood.
+     *
      * @param state The new emotional state.
      */
     public void setState(String state) {
         this.state = state;
     }
+
     /**
      * Changes the reason why the mood was felt.
+     *
      * @param reason the new reason.
      */
     public void setReason(String reason) {
@@ -195,6 +211,7 @@ public class Mood implements Parcelable {
 
     /**
      * Changes the social situation of the mood.
+     *
      * @param situation the new social situation
      */
     public void setSituation(String situation) {
@@ -203,6 +220,7 @@ public class Mood implements Parcelable {
 
     /**
      * Changes the location of the mood.
+     *
      * @param location the new location
      */
     public void setLocation(Pair<Double, Double> location) {
@@ -211,8 +229,11 @@ public class Mood implements Parcelable {
 
     /**
      * Changes the image associated with the mood.
+     *
      * @param image the new image
      */
     public void setImage(Bitmap image) {
         this.image = image;
     }
+
+}

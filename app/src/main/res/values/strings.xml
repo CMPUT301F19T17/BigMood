@@ -1,15 +1,25 @@
 <resources>
     <string name="app_name">BigMood</string>
+
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_user_moods">My Moods</string>
     <string name="title_following">Following</string>
     <string name="title_requests">Requests</string>
     <string name="title_profile">Profile</string>
-    <string name="title_menu_save">SAVE</string>
+
     <string name="title_dialog_view_mood">View Mood</string>
+    <string name="title_dialog_add_mood">Add Mood</string>
+    <string name="title_dialog_edit_mood">Edit Mood</string>
+
+    <string name="title_menu_save">SAVE</string>
+    <string name="menu_option_edit">EDIT</string>
+    <string name="menu_option_delete">DELETE</string>
+
     <string name="title_define">Define Your Mood</string>
     <string name="mood_reason_hint">Explain Why</string>
+
     <string name="delete_txt">Delete</string>
     <string name="cancel_txt">Cancel</string>
     <string name="confirm_txt">Confirm</string>
+
 </resources>
