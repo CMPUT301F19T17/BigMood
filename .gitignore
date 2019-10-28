@@ -32,3 +32,6 @@ hs_err_pid*
 /captures
 .externalNativeBuild
 .cxx
+
+# Google Services API
+google-services.json

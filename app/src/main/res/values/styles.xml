@@ -9,14 +9,14 @@
     </style>
 
     <!-- For Fullscreen Dialogs -->
-    <style name="AppTheme.FullScreenDialog" parent="AppTheme">
+    <style name="AppTheme_FullScreenDialog" parent="AppTheme">
         <item name="android:windowIsFloating">false</item>
         <item name="actionMenuTextColor">@color/colorAccent</item>
         <!--        <item name="android:windowBackground">@android:color/white</item>-->
     </style>
 
     <!-- Defining animations for a slide in/out dialog -->
-    <style name="AppTheme.Slide">
+    <style name="AppTheme_Slide">
         <item name="android:windowEnterAnimation">@anim/slide_up</item>
         <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
