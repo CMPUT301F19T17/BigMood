@@ -59,15 +59,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
     }
 
     /**
-     * This method sets the OnButtonPressListener for the save action.
-     * @param listener This is the listener that will be set for this fragment.
-     */
-    public void setOnButtonPressListener(OnButtonPressListener listener) {
-        this.listener = listener;
-    }
-
-    /**
-     * This method creates a new instance of a DefineMoodDialog for the purposes of editing a Mood. Because we have a Mood to prepopulate we must specify it in here so it can be added to the fragment's arguments.
+     * This method creates a new instance of a DefineMoodDialog for the purposes of editing a Mood.
+     * Because we have a Mood to prepopulate we must specify it in here so it can be added to the fragment's arguments.
      * @param mood The mood to edit
      * @return A new instance of a DefineMoodDialogFragment
      */
@@ -85,6 +78,14 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
         return fragment;
 
+    }
+
+    /**
+     * This method sets the OnButtonPressListener for the save action.
+     * @param listener This is the listener that will be set for this fragment.
+     */
+    public void setOnButtonPressListener(OnButtonPressListener listener) {
+        this.listener = listener;
     }
 
     /**

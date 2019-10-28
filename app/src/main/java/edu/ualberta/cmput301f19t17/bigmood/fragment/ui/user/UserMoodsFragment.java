@@ -1,6 +1,7 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.user;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class UserMoodsFragment extends Fragment {
 
         FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
 
-        ListView moodListView = root.findViewById(R.id.mood_list);
+        final ListView moodListView = root.findViewById(R.id.mood_list);
 
         moodList = new ArrayList<>();
         moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
@@ -71,6 +72,16 @@ public class UserMoodsFragment extends Fragment {
             public void onClick(View v) {
 
                 DefineMoodDialogFragment fragment = DefineMoodDialogFragment.newInstance();
+                fragment.setOnButtonPressListener(
+                        new DefineMoodDialogFragment.OnButtonPressListener() {
+                            @Override
+                            public void onSavePressed(Mood mood) {
+                                //TODO add mood to moodlist
+                                Log.d("Save Pressed", "Adding Mood");
+                                moodList.add(mood);
+                                moodAdapter.notifyDataSetChanged();
+                            }
+                        });
                 fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
 
             }
@@ -95,9 +106,19 @@ public class UserMoodsFragment extends Fragment {
 
                     @Override
                     public void onEditPressed() {
+                        final Mood moodToEdit = moodList.get(finalIndex);
 
-                        DefineMoodDialogFragment defineFragment =
-                                DefineMoodDialogFragment.newInstance(moodList.get(finalIndex));
+                        DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
+                        defineFragment.setOnButtonPressListener(
+                                        new DefineMoodDialogFragment.OnButtonPressListener() {
+                                    @Override
+                                    public void onSavePressed(Mood mood) {
+                                        //TODO Cameron Oct 28, 2019 add location and image
+                                        moodToEdit.setState(mood.getState());
+                                        moodToEdit.setReason(mood.getReason());
+                                        moodToEdit.setSituation(mood.getSituation());
+                                    }
+                                });
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");
 
                     }
@@ -106,7 +127,6 @@ public class UserMoodsFragment extends Fragment {
                 fragment.show(getFragmentManager(), "VIEW_MOOD_FRAGMENT");
             }
         });
-
 
         return root;
     }
