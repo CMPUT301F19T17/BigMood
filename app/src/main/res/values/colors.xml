@@ -4,7 +4,15 @@
     <color name="colorPrimaryDark">#757575</color>
     <color name="colorAccent">#018577</color>
     <color name="colorUnselected">#737373</color>
-<!--    <color name="colorPrimary">#008577</color>-->
-<!--    <color name="colorPrimaryDark">#00574B</color>-->
-<!--    <color name="colorAccent">#D81B60</color>-->
+    <!--    <color name="colorPrimary">#008577</color>-->
+    <!--    <color name="colorPrimaryDark">#00574B</color>-->
+    <!--    <color name="colorAccent">#D81B60</color>-->
+
+    <color name="colorHappy">#C5B317</color>
+    <color name="colorSad">#4352D1</color>
+    <color name="colorAnger">#E65021</color>
+    <color name="colorDisgust">#48C54D</color>
+    <color name="colorFear">#804DE0</color>
+    <color name="colorSurprise">#E2608C</color>
+
 </resources>
