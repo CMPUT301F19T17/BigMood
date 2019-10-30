@@ -1,33 +1,18 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
@@ -246,115 +231,4 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
 
     }
-
-
-   @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        //make the attributes pan up when the soft keyboard appears while typing
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-
-        // initializations
-        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_define_mood, null);
-        final Spinner stateSpinner = view.findViewById(R.id.state_spinner);
-        final Spinner situationSpinner = view.findViewById(R.id.situation_spinner);
-        final EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
-
-        // grey-out first option of spinners, so it can be a hint for user
-        stateSpinner.setSelection(0, false);
-        situationSpinner.setSelection(0, false);
-
-        // get the Mood if we sent one in through the args bundle
-        Bundle args = getArguments();
-        Mood mood = null;
-        int moodPosition = -1;
-        if (args != null) {
-            mood = (Mood) args.get("RIDE");
-            moodPosition = (int) args.get("MOOD_POS");
-            int statePosition = (int) args.get("STATE_POS");
-            int situationPosition = (int) args.get("SITUATION_POS");
-            if (mood != null) {
-
-                // first item can't be selected because it's a hint
-                if (statePosition != 0) {
-                    stateSpinner.setSelection(statePosition);
-                }
-
-                // first item can't be selected because it's a hint
-                if (situationPosition != 0) {
-                    situationSpinner.setSelection(situationPosition);
-                }
-            }
-        }
-
-        //set up the AlertDialog itself
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final Mood finalMood = mood;
-        final int finalMoodPosition = moodPosition;
-        return builder
-                .setTitle(getString(R.string.title_define))
-                .setView(view)
-                .setNegativeButton(getString(R.string.delete_txt), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //cant delete a non-existent mood
-                        if (finalMood != null) {
-                            //delete the mood
-                           // ArrayList<Mood> moodDataList = listener.getMoodDataList();
-                           // ArrayAdapter<Mood> moodArrayAdapter = listener.getMoodArrayAdapter();
-                           // moodDataList.remove(finalMoodPosition);
-                           // moodArrayAdapter.notifyDataSetChanged();
-                        }
-                    }
-                })
-                .setNeutralButton(getString(R.string.cancel_txt), null)
-                .setPositiveButton(getString(R.string.confirm_txt), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (finalMood != null) {
-                            // edit the existing mood
-
-                            //TODO Cameron 10-26-2019 Implement Images and location editing.
-                          //  ArrayList<Mood> moodDataList = listener.getMoodDataList();
-                            //ArrayAdapter<Mood> moodArrayAdapter = listener.getMoodArrayAdapter();
-
-                            String state = stateSpinner.getSelectedItem().toString();
-                            String situation = situationSpinner.getSelectedItem().toString();
-                            String reason = reasonEditText.getText().toString();
-
-                            // the data is fine, so we can edit the ride object without fear
-                            finalMood.setState(state);
-                            finalMood.setSituation(situation);
-                            finalMood.setReason(reason);
-                          //  moodArrayAdapter.notifyDataSetChanged();
-                        }
-                        else {
-                            // add a new mood
-
-                            //get the date and time
-                            Date calendarDate = Calendar.getInstance().getTime();
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.CANADA);
-                            String date = dateFormat.format(calendarDate);
-                            dateFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
-                            String time = dateFormat.format(calendarDate);
-
-                            String state = stateSpinner.getSelectedItem().toString();
-                            String situation = situationSpinner.getSelectedItem().toString();
-                            String reason = reasonEditText.getText().toString();
-                            //TODO Cameron 10-26-2019 Currently dummy data, implement
-                            Pair<Double, Double> location = new Pair<>(0.0, 0.0);
-                            Bitmap image = Bitmap.createBitmap(20,20, Bitmap.Config.ARGB_8888);
-
-                            if (situation.equals("") || reason.equals("") || location == null || image == null) {
-                              //  listener.addNewMood(new Mood(date, time, state), situation, reason);
-                            }
-                            else {
-                               // listener.addNewMood(new Mood(date, time, state, reason, situation, location, image));
-                            }
-                        }
-                    }
-                })
-                .show();
-    }
-
 }
