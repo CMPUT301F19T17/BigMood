@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="states_res">
+        <item><font face = "sans_serif" color ="#a9a9a9"><i>Select a state...</i></font></item>
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Angry</item>
+        <item>Disgusted</item>
+        <item>Afraid</item>
+        <item>Surprised</item>
+    </string-array>
+    <string-array name="situations_res">
+        <item><font face = "sans_serif" color ="#a9a9a9"><i>Select a social situation...</i></font></item>
+        <item>Alone</item>
+        <item>With one person</item>
+        <item>With two or more people</item>
+        <item>With a crowd</item>
+    </string-array>
+</resources>
