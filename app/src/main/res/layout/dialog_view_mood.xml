@@ -131,6 +131,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/placeholder_situation"
         android:textColor="@android:color/black"
+        android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_label_social_situation" />
 
@@ -156,6 +157,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/placeholder_reason"
         android:textColor="@android:color/black"
+        android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_label_reason" />
 
