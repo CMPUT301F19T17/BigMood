@@ -7,12 +7,20 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
@@ -119,9 +127,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Bind toolbar XML to view
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
-        // Find TextView. We might have to convert this to a private field
-        TextView textView = (TextView) view.findViewById(R.id.debug_textview);
-
         // Example of inflating the fields
 
         // This will be NULL if the fragment was constructed without a mood to "edit". So therefore we need to check this when populating in all the views.
@@ -135,9 +140,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
             // If a Mood object is not received, this object was not created using the newInstance() methods. Instead of crashing, we log a message
             if (mood != null) {
-
-                // Inflate TextViews here. One is here as an example
-                textView.setText(mood.getDate());
 
             } else {
 
@@ -185,21 +187,52 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
+        final View finalView = view;
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
         // This is where the core of the input validation will happen -- that is when the user tries to press Save.
         this.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_save) {
+                    //save was pressed
 
-                    Log.d(HomeActivity.LOG_TAG, "SAVE clicked");
+                    Spinner stateSpinner = finalView.findViewById(R.id.state_spinner);
 
-                    Mood exampleMood = new Mood("yyyy-MM-dd", "HH:MM", "myState");
+                    //TODO Cameron Oct30 2019 Research to see if there is a better way to ensure the
+                    // user did not leave the spinner in the first position, and fix if available
+                    if (stateSpinner.getSelectedItemPosition()==0) {
+                        Toast.makeText(DefineMoodDialogFragment.this.getContext(),
+                                "You must enter an emotional state!", Toast.LENGTH_SHORT).show();
 
-                    // TODO: 2019-10-25 Implement Field Checking
-                    // If everything is all good, then handle save and dismiss the dialog.
-                    DefineMoodDialogFragment.this.listener.onSavePressed(exampleMood);
-                    DefineMoodDialogFragment.this.dismiss();
+                        Log.e("SPINNER ERROR", "The State Spinner was left empty");
+                    }
+                    else {
+                        //get date and time
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:MM", Locale.CANADA);
+
+                        Date dateTime = new Date();
+                        String dateString = dateFormat.format(dateTime);
+                        String timeString = timeFormat.format(dateTime);
+
+                        Spinner situationSpinner = finalView.findViewById(R.id.situation_spinner);
+                        EditText reasonEditText = finalView.findViewById(R.id.reason_edit_text);
+                        // we have everything that is required to create a mood
+                        Mood mood = new Mood(dateString, timeString, stateSpinner.getSelectedItem().toString());
+
+                        //if any of the data is filled in, we update the mood to fill in more information
+                        if (situationSpinner.getSelectedItemPosition()!=0) {
+                            mood.setSituation(situationSpinner.getSelectedItem().toString());
+                        }
+                        if (reasonEditText.getText().toString().equals("")) {
+                            mood.setReason(reasonEditText.getText().toString());
+                        }
+                        //TODO add image, location
+
+                        // add the mood and dismiss the fragment
+                        DefineMoodDialogFragment.this.listener.onSavePressed(mood);
+                        DefineMoodDialogFragment.this.dismiss();
+                    }
                     return true;
 
                 }
