@@ -41,7 +41,7 @@
         app:srcCompat="@drawable/ic_image_black_24dp" />
 
     <TextView
-        android:id="@+id/textView_placeholder_mood"
+        android:id="@+id/textView_placeholder_state"
         android:layout_width="59dp"
         android:layout_height="19dp"
         android:layout_marginStart="8dp"
