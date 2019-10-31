@@ -15,47 +15,211 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_close_black_24dp" />
+        app:navigationIcon="@drawable/ic_close_black_24dp"
+        />
+
+
+    <ImageView
+        android:id="@+id/reason_image_view"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_view_mood"
+        app:layout_constraintEnd_toStartOf="@id/state_topper_text_view"
+        tools:srcCompat="@tools:sample/avatars"
+        />
 
     <TextView
-        android:id="@+id/debug_textview_mood"
+        android:id="@+id/state_topper_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_view_mood" />
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/emotional_state_txt"
+        app:layout_constraintBaseline_toBaselineOf="@+id/situation_topper_text_view"
+        app:layout_constraintEnd_toStartOf="@id/situation_topper_text_view"
+        app:layout_constraintStart_toEndOf="@id/reason_image_view" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/state_holder_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="@+id/debug_textview_mood"
-        app:layout_constraintTop_toBottomOf="@+id/debug_textview_mood" />
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="holds the state"
+        app:layout_constraintBaseline_toBaselineOf="@+id/situation_holder_text_view"
+        app:layout_constraintEnd_toStartOf="@id/situation_holder_text_view"
+        app:layout_constraintStart_toEndOf="@id/reason_image_view" />
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="0dp"
+        android:id="@+id/situation_topper_text_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/textView3"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textView2"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/social_situation_txt"
+        app:layout_constraintBottom_toTopOf="@id/situation_holder_text_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView2" />
+        app:layout_constraintStart_toEndOf="@id/state_topper_text_view"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_view_mood"
+        />
+
+    <TextView
+        android:id="@+id/situation_holder_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="holds the situation"
+        app:layout_constraintTop_toBottomOf="@id/situation_topper_text_view"
+        app:layout_constraintBottom_toTopOf="@id/time_topper_text_view"
+        app:layout_constraintStart_toEndOf="@id/state_holder_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/date_topper_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/date_txt"
+        app:layout_constraintTop_toBottomOf="@id/reason_image_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/time_topper_text_view"
+        app:layout_constraintBottom_toTopOf="@id/date_holder_text_view"
+        />
+
+    <TextView
+        android:id="@+id/date_holder_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="holds the date"
+        app:layout_constraintTop_toBottomOf="@id/date_topper_text_view"
+        app:layout_constraintBottom_toTopOf="@id/reason_topper_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/time_holder_text_view"
+        />
+
+    <TextView
+        android:id="@+id/time_topper_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/time_txt"
+        app:layout_constraintBaseline_toBaselineOf="@+id/date_topper_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/date_topper_text_view" />
+
+    <TextView
+        android:id="@+id/time_holder_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="holds the time"
+        app:layout_constraintBaseline_toBaselineOf="@+id/date_holder_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/date_holder_text_view" />
+
+
+    <TextView
+        android:id="@+id/reason_topper_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/reason_txt"
+        app:layout_constraintBottom_toTopOf="@id/reason_holder_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date_holder_text_view"
+        />
+
+    <TextView
+        android:id="@+id/reason_holder_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="holds the reason"
+        app:layout_constraintTop_toBottomOf="@id/reason_topper_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/display_image_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/display_location_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/display_image_text_view"
+        tools:srcCompat="@tools:sample/avatars"
+        />
+
+    <TextView
+        android:id="@+id/display_image_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/image_txt"
+        app:layout_constraintBottom_toBottomOf="@+id/display_image_view"
+        app:layout_constraintTop_toBottomOf="@id/reason_holder_text_view"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/display_location_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/display_image_view"
+        app:layout_constraintTop_toBottomOf="@+id/display_location_text_view"
+        tools:srcCompat="@tools:sample/avatars"
+        />
+
+    <TextView
+        android:id="@+id/display_location_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="@string/location_txt"
+        app:layout_constraintBottom_toBottomOf="@+id/display_location_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/display_image_view"
+        app:layout_constraintTop_toBottomOf="@id/reason_holder_text_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

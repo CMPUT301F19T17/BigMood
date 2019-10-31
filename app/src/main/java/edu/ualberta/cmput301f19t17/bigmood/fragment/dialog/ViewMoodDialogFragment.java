@@ -109,13 +109,19 @@ public class ViewMoodDialogFragment extends DialogFragment {
         });
 
         // Find all views and inflate them with the info
-        // TODO: 2019-10-25 INFLATE VIEWS
-        TextView textView = view.findViewById(R.id.debug_textview_mood);
+        TextView stateTextView = view.findViewById(R.id.state_holder_text_view);
+        TextView situationTextView = view.findViewById(R.id.situation_holder_text_view);
+        TextView dateTextView = view.findViewById(R.id.date_holder_text_view);
+        TextView timeTextView = view.findViewById(R.id.time_holder_text_view);
+        TextView reasonTextView = view.findViewById(R.id.reason_holder_text_view);
 
         // Set all Date, time, and mood details
-        // TODO: 2019-10-25 POPULATE INFO
-        textView.setText(mood.getDate());
-
+        // TODO: 2019-10-31 add location and image
+        stateTextView.setText(mood.getState());
+        situationTextView.setText(mood.getSituation());
+        dateTextView.setText(mood.getDate());
+        timeTextView.setText(mood.getTime());
+        reasonTextView.setText(mood.getReason());
         return this.buildDialog(view);
 
     }

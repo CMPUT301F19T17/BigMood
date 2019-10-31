@@ -42,31 +42,13 @@ public class UserMoodsFragment extends Fragment {
         userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
-
-//        final TextView textView = root.findViewById(R.id.text_user_moods);
-
-//        userMoodsViewModel.getText().observe(this, new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-
-        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
-
+        
         final ListView moodListView = root.findViewById(R.id.mood_list);
-
         moodList = new ArrayList<>();
         moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
         moodListView.setAdapter(moodAdapter);
 
-        //TODO Cameron 10-26-2019 remove canned data
-        final Mood mockMood1 = new Mood("2019-07-25", "12:24", "Sad");
-        final Mood mockMood2 = new Mood("2019-10-20", "11:11", "Happy");
-        moodList.add(mockMood1);
-        moodList.add(mockMood2);
-        moodAdapter.notifyDataSetChanged();
-
+        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +58,6 @@ public class UserMoodsFragment extends Fragment {
                         new DefineMoodDialogFragment.OnButtonPressListener() {
                             @Override
                             public void onSavePressed(Mood mood) {
-                                //TODO add mood to moodlist
                                 Log.d("Save Pressed", "Adding Mood");
                                 moodList.add(mood);
                                 moodAdapter.notifyDataSetChanged();

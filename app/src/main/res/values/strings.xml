@@ -22,5 +22,14 @@
     <string name="cancel_txt">Cancel</string>
     <string name="confirm_txt">Confirm</string>
     <string name="title_activity_sign_up">Create Account</string>
+    <string name="add_image_btn">Tap to Add Image</string>
+    <string name="image_txt">Image</string>
+    <string name="add_location_btn">Tap to add Location</string>
+    <string name="location_txt">Location</string>
+    <string name="emotional_state_txt">Emotional State</string>
+    <string name="date_txt">Date</string>
+    <string name="time_txt">Time</string>
+    <string name="social_situation_txt">Social Situation</string>
+    <string name="reason_txt">Reason</string>
 
 </resources>
