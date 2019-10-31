@@ -154,10 +154,35 @@ public class ViewMoodDialogFragment extends DialogFragment {
         stateTextView.setText(mood.getState());
         dateTextView.setText(mood.getDate());
         timeTextView.setText(mood.getTime());
-        situationTextView.setText(mood.getSituation());
-        reasonTextView.setText(mood.getReason());
-        //photoImageView.setImageBitmap(mood.getImage());
-        //locationImageView.setImageBitmap("bitmap");
+
+        if (mood.getSituation() == null) {
+            TextView situationLabel = view.findViewById(R.id.textView_label_social_situation);
+            situationLabel.setVisibility(View.GONE);
+            situationTextView.setVisibility(View.GONE);
+        }else{
+            situationTextView.setText(mood.getSituation());
+        }
+        if (mood.getReason() == null) {
+            TextView reasonLabel = view.findViewById(R.id.textView_label_reason);
+            reasonLabel.setVisibility(View.GONE);
+            reasonTextView.setVisibility(View.GONE);
+        }else{
+            reasonTextView.setText(mood.getReason());
+        }
+        if (mood.getImage() == null) {
+            TextView imageLabel = view.findViewById(R.id.textView_label_image);
+            imageLabel.setVisibility(View.GONE);
+            photoImageView.setVisibility(View.GONE);
+        }else{
+            //photoImageView.setImageBitmap(mood.getImage());
+        }
+        if (mood.getLocation() == null) {
+            TextView locationLabel = view.findViewById(R.id.textView_label_location);
+            locationLabel.setVisibility(View.GONE);
+            locationImageView.setVisibility(View.GONE);
+        }else{
+            //locationImageView.setImageBitmap("bitmap");
+        }
 
         return this.buildDialog(view);
 
