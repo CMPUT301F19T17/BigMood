@@ -42,8 +42,8 @@
 
     <TextView
         android:id="@+id/textView_placeholder_state"
-        android:layout_width="59dp"
-        android:layout_height="19dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
