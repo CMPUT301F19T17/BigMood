@@ -209,7 +209,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
                     else {
                         //get date and time
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
-                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:MM", Locale.CANADA);
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
 
                         Date dateTime = new Date();
                         String dateString = dateFormat.format(dateTime);
