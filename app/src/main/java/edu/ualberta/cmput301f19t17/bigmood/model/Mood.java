@@ -8,6 +8,8 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import edu.ualberta.cmput301f19t17.bigmood.R;
+
 /**
  * This class is used to represent a user's mood.
  * It is able to hold the date, time, emotional state,
@@ -84,6 +86,8 @@ public class Mood implements Parcelable {
 
     /**
      * This is the minimal constructor with just the minimal elements needed to make a mood.
+     * It also initializes values to defaults in case the getters are called before they are
+     * given real values, so as to avoid creating an Exception.
      *
      * @param date  The date that the mood was felt. This is the current date, not inputted by the user.
      * @param time  The time that the mood was felt. This is the current time, not inputted by the user.
@@ -93,6 +97,9 @@ public class Mood implements Parcelable {
         this.date = date;
         this.time = time;
         this.state = state;
+        reason = "";
+        situation = "";
+        //TODO Cameron Oct 31 2019 initialize location and image
     }
 
     /**
@@ -150,10 +157,14 @@ public class Mood implements Parcelable {
 
     /**
      * Gets the reason why the mood was felt.
-     *
+     * May not have been initialized, since it is not necessary.
+     * In this case, we return an empty string
      * @return reason why mood was felt.
      */
     public String getReason() {
+        if (reason.length()==0) {
+            return "";
+        }
         return reason;
     }
 

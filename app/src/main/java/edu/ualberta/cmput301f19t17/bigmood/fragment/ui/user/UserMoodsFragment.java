@@ -1,6 +1,7 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.user;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,43 +43,26 @@ public class UserMoodsFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
-//        final TextView textView = root.findViewById(R.id.text_user_moods);
-
-//        userMoodsViewModel.getText().observe(this, new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-
-        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
-
-        ListView moodListView = root.findViewById(R.id.mood_list);
-
+        final ListView moodListView = root.findViewById(R.id.mood_list);
         moodList = new ArrayList<>();
         moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
         moodListView.setAdapter(moodAdapter);
 
-        //TODO Cameron 10-26-2019 remove canned data
-        final Mood mockMood1 = new Mood("2019-07-25", "12:24", "Sad", null, null, null, null);
-        final Mood mockMood2 = new Mood("2019-10-20", "11:11", "Happy", null, null, null, null);
-        final Mood mockMood3 = new Mood("2019-10-21", "12:12", "Anger", null, null, null, null);
-        final Mood mockMood4 = new Mood("2019-10-22", "13:13", "Disgust", null, null, null, null);
-        final Mood mockMood5 = new Mood("2019-10-23", "14:14", "Fear", "Just watched a horror film", "Alone", null, null);
-        final Mood mockMood6 = new Mood("2019-10-24", "15:15", "Surprise", null, null, null, null);
-        moodList.add(mockMood1);
-        moodList.add(mockMood2);
-        moodList.add(mockMood3);
-        moodList.add(mockMood4);
-        moodList.add(mockMood5);
-        moodList.add(mockMood6);
-        moodAdapter.notifyDataSetChanged();
-
+        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 DefineMoodDialogFragment fragment = DefineMoodDialogFragment.newInstance();
+                fragment.setOnButtonPressListener(
+                        new DefineMoodDialogFragment.OnButtonPressListener() {
+                            @Override
+                            public void onSavePressed(Mood mood) {
+                                Log.d("Save Pressed", "Adding Mood");
+                                moodList.add(mood);
+                                moodAdapter.notifyDataSetChanged();
+                            }
+                        });
                 fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
 
             }
@@ -103,9 +87,22 @@ public class UserMoodsFragment extends Fragment {
 
                     @Override
                     public void onEditPressed() {
+                        final Mood moodToEdit = moodList.get(finalIndex);
 
-                        DefineMoodDialogFragment defineFragment =
-                                DefineMoodDialogFragment.newInstance(moodList.get(finalIndex));
+                        DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
+                       // View view = defineFragment.getView();
+                        //Spinner stateSpinner = view.findViewById(R.id.state_spinner);
+                        //Spinner
+                        defineFragment.setOnButtonPressListener(
+                                        new DefineMoodDialogFragment.OnButtonPressListener() {
+                                    @Override
+                                    public void onSavePressed(Mood mood) {
+                                        //TODO Cameron Oct 28, 2019 add location and image
+                                        moodToEdit.setState(mood.getState());
+                                        moodToEdit.setReason(mood.getReason());
+                                        moodToEdit.setSituation(mood.getSituation());
+                                    }
+                                });
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");
 
                     }
@@ -114,7 +111,6 @@ public class UserMoodsFragment extends Fragment {
                 fragment.show(getFragmentManager(), "VIEW_MOOD_FRAGMENT");
             }
         });
-
 
         return root;
     }
