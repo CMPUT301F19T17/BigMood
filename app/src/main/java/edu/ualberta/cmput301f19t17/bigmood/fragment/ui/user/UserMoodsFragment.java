@@ -42,7 +42,7 @@ public class UserMoodsFragment extends Fragment {
         userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
-        
+
         final ListView moodListView = root.findViewById(R.id.mood_list);
         moodList = new ArrayList<>();
         moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
