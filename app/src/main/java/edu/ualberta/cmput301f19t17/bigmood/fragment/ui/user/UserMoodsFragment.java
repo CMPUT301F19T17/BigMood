@@ -62,8 +62,18 @@ public class UserMoodsFragment extends Fragment {
         //TODO Cameron 10-26-2019 remove canned data
         final Mood mockMood1 = new Mood("2019-07-25", "12:24", "Sad");
         final Mood mockMood2 = new Mood("2019-10-20", "11:11", "Happy");
+        final Mood mockMood3 = new Mood("2019-10-21", "12:12", "Anger");
+        final Mood mockMood4 = new Mood("2019-10-22", "13:13", "Disgust");
+        final Mood mockMood5 = new Mood("2019-10-23", "14:14", "Fear");
+        final Mood mockMood6 = new Mood("2019-10-24", "15:15", "Surprise");
+        mockMood5.setSituation("Alone");
+        mockMood5.setReason("Just watched a horror film");
         moodList.add(mockMood1);
         moodList.add(mockMood2);
+        moodList.add(mockMood3);
+        moodList.add(mockMood4);
+        moodList.add(mockMood5);
+        moodList.add(mockMood6);
         moodAdapter.notifyDataSetChanged();
 
         fab.setOnClickListener(new View.OnClickListener() {

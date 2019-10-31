@@ -43,7 +43,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
             }
 
             private void logError() {
-                Log.e(HomeActivity.LOG_TAG, "ViewUserMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED");
+                Log.e(HomeActivity.LOG_TAG, "ViewMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED");
             }
         };
 
@@ -52,7 +52,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
     /**
      * This method creates a new instance of a ViewMoodDialogFragment for the purposes of viewing a Mood. This method should be used instead of the base constructor as the mood must get put into the arguments Bundle of the Fragment.
      * @param mood The user mood to view
-     * @return     A new instance of ViewUserMoodDialogFragment.
+     * @return     A new instance of ViewMoodDialogFragment.
      */
     public static ViewUserMoodDialogFragment newInstance(Mood mood) {
 
@@ -87,7 +87,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
     protected Dialog buildDialog(View view) {
 
         // Define new AlertDialog.Builder so we can display a custom dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         // Build and return the dialog. We set the onClick listeners for each button to point to a different method in our interface which take different parameters
         return builder
