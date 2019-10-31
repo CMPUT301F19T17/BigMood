@@ -32,4 +32,20 @@
     <string name="social_situation_txt">Social Situation</string>
     <string name="reason_txt">Reason</string>
 
+    <string name="label_emotional_state">Emotional State</string>
+    <string name="placeholder_state">State</string>
+    <string name="label_date">Date</string>
+    <string name="label_time">Time</string>
+    <string name="placeholder_date">yyyy-MM-dd</string>
+    <string name="placeholder_time">HH:mm</string>
+    <string name="label_social_situation">Social Situation</string>
+    <string name="placeholder_situation">Situation</string>
+    <string name="label_reason">Reason</string>
+    <string name="placeholder_reason">Reason</string>
+    <string name="label_image">Image</string>
+    <string name="label_location">Location</string>
+    <string name="description_placeholder_emote">where mood emote goes</string>
+    <string name="description_placeholder_photo">where photograph goes</string>
+    <string name="description_placeholder_location">where map goes</string>
+
 </resources>
