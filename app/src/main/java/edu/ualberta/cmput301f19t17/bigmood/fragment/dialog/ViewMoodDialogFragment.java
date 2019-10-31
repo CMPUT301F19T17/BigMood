@@ -2,10 +2,11 @@ package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -109,19 +110,80 @@ public class ViewMoodDialogFragment extends DialogFragment {
         });
 
         // Find all views and inflate them with the info
-        TextView stateTextView = view.findViewById(R.id.state_holder_text_view);
-        TextView situationTextView = view.findViewById(R.id.situation_holder_text_view);
-        TextView dateTextView = view.findViewById(R.id.date_holder_text_view);
-        TextView timeTextView = view.findViewById(R.id.time_holder_text_view);
-        TextView reasonTextView = view.findViewById(R.id.reason_holder_text_view);
+        // TODO: 2019-10-25 INFLATE VIEWS
+        ImageView emoteImageView = view.findViewById(R.id.imageView_placeholder_emote);
+        TextView stateTextView = view.findViewById(R.id.textView_placeholder_state);
+        TextView dateTextView = view.findViewById(R.id.textView_placeholder_date);
+        TextView timeTextView = view.findViewById(R.id.textView_placeholder_time);
+        TextView situationTextView = view.findViewById(R.id.textView_placeholder_situation);
+        TextView reasonTextView = view.findViewById(R.id.textView_placeholder_reason);
+        ImageView photoImageView = view.findViewById(R.id.imageView_placeholder_photo);
+        ImageView locationImageView = view.findViewById(R.id.imageView_placeholder_location);
 
         // Set all Date, time, and mood details
-        // TODO: 2019-10-31 add location and image
+        // TODO: 2019-10-25 POPULATE INFO
+
+
+        switch (mood.getState().toLowerCase()) {
+            case "happy":
+                Drawable happyEmote = getResources().getDrawable(R.drawable.ic_happy);
+                emoteImageView.setImageDrawable(happyEmote);
+                break;
+            case "sad":
+                Drawable sadEmote = getResources().getDrawable(R.drawable.ic_sad);
+                emoteImageView.setImageDrawable(sadEmote);
+                break;
+            case "anger":
+                Drawable angerEmote = getResources().getDrawable(R.drawable.ic_anger);
+                emoteImageView.setImageDrawable(angerEmote);
+                break;
+            case "disgust":
+                Drawable disgustEmote = getResources().getDrawable(R.drawable.ic_disgust);
+                emoteImageView.setImageDrawable(disgustEmote);
+                break;
+            case "fear":
+                Drawable fearEmote = getResources().getDrawable(R.drawable.ic_fear);
+                emoteImageView.setImageDrawable(fearEmote);
+                break;
+            case "surprise":
+                Drawable surpriseEmote = getResources().getDrawable(R.drawable.ic_surprise);
+                emoteImageView.setImageDrawable(surpriseEmote);
+                break;
+        }
+
         stateTextView.setText(mood.getState());
-        situationTextView.setText(mood.getSituation());
         dateTextView.setText(mood.getDate());
         timeTextView.setText(mood.getTime());
-        reasonTextView.setText(mood.getReason());
+
+        if (mood.getSituation() == null) {
+            TextView situationLabel = view.findViewById(R.id.textView_label_social_situation);
+            situationLabel.setVisibility(View.GONE);
+            situationTextView.setVisibility(View.GONE);
+        }else{
+            situationTextView.setText(mood.getSituation());
+        }
+        if (mood.getReason() == null) {
+            TextView reasonLabel = view.findViewById(R.id.textView_label_reason);
+            reasonLabel.setVisibility(View.GONE);
+            reasonTextView.setVisibility(View.GONE);
+        }else{
+            reasonTextView.setText(mood.getReason());
+        }
+        if (mood.getImage() == null) {
+            TextView imageLabel = view.findViewById(R.id.textView_label_image);
+            imageLabel.setVisibility(View.GONE);
+            photoImageView.setVisibility(View.GONE);
+        }else{
+            //photoImageView.setImageBitmap(mood.getImage());
+        }
+        if (mood.getLocation() == null) {
+            TextView locationLabel = view.findViewById(R.id.textView_label_location);
+            locationLabel.setVisibility(View.GONE);
+            locationImageView.setVisibility(View.GONE);
+        }else{
+            //locationImageView.setImageBitmap("bitmap");
+        }
+
         return this.buildDialog(view);
 
     }
