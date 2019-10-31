@@ -90,6 +90,9 @@ public class UserMoodsFragment extends Fragment {
                         final Mood moodToEdit = moodList.get(finalIndex);
 
                         DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
+                       // View view = defineFragment.getView();
+                        //Spinner stateSpinner = view.findViewById(R.id.state_spinner);
+                        //Spinner
                         defineFragment.setOnButtonPressListener(
                                         new DefineMoodDialogFragment.OnButtonPressListener() {
                                     @Override

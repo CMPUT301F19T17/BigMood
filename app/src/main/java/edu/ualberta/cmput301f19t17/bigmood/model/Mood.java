@@ -8,6 +8,8 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import edu.ualberta.cmput301f19t17.bigmood.R;
+
 /**
  * This class is used to represent a user's mood.
  * It is able to hold the date, time, emotional state,
