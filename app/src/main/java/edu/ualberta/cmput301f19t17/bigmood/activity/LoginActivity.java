@@ -1,21 +1,15 @@
 package edu.ualberta.cmput301f19t17.bigmood.activity;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import edu.ualberta.cmput301f19t17.bigmood.R;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-// TODO: 2019-10-24
-//  Custom app bar
-//  Fragment sizing
-//  Menus
-//  Dialog Fragment spawning
+import edu.ualberta.cmput301f19t17.bigmood.R;
 
 public class LoginActivity extends AppCompatActivity {
 
