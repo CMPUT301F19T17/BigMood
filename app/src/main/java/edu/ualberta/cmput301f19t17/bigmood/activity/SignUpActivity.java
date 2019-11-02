@@ -1,11 +1,11 @@
 package edu.ualberta.cmput301f19t17.bigmood.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
