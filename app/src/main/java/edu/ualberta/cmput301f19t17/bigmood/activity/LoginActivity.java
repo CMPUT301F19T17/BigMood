@@ -4,63 +4,71 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
-import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private TextInputLayout textInputUsername;
+    private TextInputLayout textInputPassword;
+
+    private AppViewModel appViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Bind the toolbar in XML to the SupportActionBar of the Activity
-        Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar_login);
-        this.setSupportActionBar(toolbar);
+        this.appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
 
-        // Get the same ActionBar and work on it
-        ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setTitle(R.string.app_name);
+        this.textInputUsername = (TextInputLayout) this.findViewById(R.id.text_input_username);
+        this.textInputPassword = (TextInputLayout) this.findViewById(R.id.text_input_password);
 
-        /**
-         * DEBUG
-         */
+        Button buttonLogin = (Button) this.findViewById(R.id.button_login);
 
-        Button debugButtonLogin = this.findViewById(R.id.debug_button_login);
-        Button debugButtonSignUp = this.findViewById(R.id.debug_button_sign_up);
-
-        debugButtonLogin.setOnClickListener(new View.OnClickListener() {
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                boolean failed = false;
+
+                String username = LoginActivity.this.textInputUsername.getEditText().getText().toString().trim();
+                String password = LoginActivity.this.textInputPassword.getEditText().getText().toString();
+
+                if (username.isEmpty()) {
+                    LoginActivity.this.textInputUsername.setError("Username cannot be empty.");
+                    failed = true;
+                } else {
+                    LoginActivity.this.textInputUsername.setError(null);
+                }
+
+                if (password.isEmpty()) {
+                    LoginActivity.this.textInputPassword.setError("Password cannot be empty.");
+                    failed = true;
+                } else {
+                    LoginActivity.this.textInputPassword.setError(null);
+                }
+
+                if (failed)
+                    return;
+
+                // DEBUG FOR NOW //
+                Toast.makeText(LoginActivity.this, "\"Logged In\"", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 LoginActivity.this.startActivity(intent);
 
-            }
-        });
-
-        debugButtonSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-//                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-//                LoginActivity.this.startActivity(intent);
-
-                Repository repo = Repository.getInstance();
-                repo.debug();
 
             }
         });
 
-
-        /**
-         * DEBUG
-         */
 
     }
+
 }

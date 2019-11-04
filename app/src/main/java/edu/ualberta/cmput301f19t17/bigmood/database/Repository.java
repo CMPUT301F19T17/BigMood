@@ -445,21 +445,4 @@ public class Repository {
 
     }
 
-    public void debug() {
-
-        this.registerUser("yes", "p", "f", "l")
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(HomeActivity.LOG_TAG, "Register success");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(HomeActivity.LOG_TAG, "Register failure: " + e.toString());
-                    }
-                });
-    }
-
 }
