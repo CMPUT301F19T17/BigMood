@@ -19,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppViewModel;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
@@ -30,10 +31,12 @@ public class UserMoodsFragment extends Fragment {
     private ArrayAdapter<Mood> moodAdapter;
 
     private UserMoodsViewModel userMoodsViewModel;
+    private AppViewModel appViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
+        appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
@@ -52,12 +55,10 @@ public class UserMoodsFragment extends Fragment {
                         new DefineMoodDialogFragment.OnButtonPressListener() {
                             @Override
                             public void onSavePressed(Mood mood) {
-                                //TODO call database method for saving
                                 Log.d("Save Pressed", "Adding Mood");
                                 moodList.add(mood);
                                 moodAdapter.notifyDataSetChanged();
-                                Repository repository = Repository.getInstance();
-                                repository.createMood(repository.getUser(), mood);
+                                appViewModel.getRepository().createMood(appViewModel.getCurrentUser(), mood);
                             }
                         });
                 fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
@@ -93,9 +94,7 @@ public class UserMoodsFragment extends Fragment {
                                     public void onSavePressed(Mood mood) {
 
                                         // TODO Cameron Oct 28, 2019 add location and image
-                                        //  Call database method for editing
-                                        Repository repository = Repository.getInstance();
-                                        repository.createMood(repository.getUser(), mood);
+                                        appViewModel.getRepository().updateMood(appViewModel.getCurrentUser(), mood);
                                     }
                                 });
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");
