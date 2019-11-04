@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -51,9 +52,12 @@ public class UserMoodsFragment extends Fragment {
                         new DefineMoodDialogFragment.OnButtonPressListener() {
                             @Override
                             public void onSavePressed(Mood mood) {
+                                //TODO call database method for saving
                                 Log.d("Save Pressed", "Adding Mood");
                                 moodList.add(mood);
                                 moodAdapter.notifyDataSetChanged();
+                                Repository repository = Repository.getInstance();
+                                repository.createMood(repository.getUser(), mood);
                             }
                         });
                 fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
@@ -90,7 +94,8 @@ public class UserMoodsFragment extends Fragment {
 
                                         // TODO Cameron Oct 28, 2019 add location and image
                                         //  Call database method for editing
-
+                                        Repository repository = Repository.getInstance();
+                                        repository.createMood(repository.getUser(), mood);
                                     }
                                 });
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");

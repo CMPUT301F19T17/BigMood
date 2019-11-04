@@ -178,16 +178,27 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
-        // TODO: 2019-11-03 Nectarios: FIX THIS
-//        this.stateSpinner.setAdapter(new ArrayAdapter<EmotionalState>(this.getContext(), android.R.layout.simple_spinner_item, EmotionalState.values()));
+        //TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
+        ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(this.getContext(),
+                android.R.layout.simple_spinner_item, EmotionalState.values());
+        stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        this.stateSpinner.setAdapter(stateAdapter);
+
+        ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(this.getContext(),
+                android.R.layout.simple_spinner_item, SocialSituation.values());
+        situationAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        this.situationSpinner.setAdapter(situationAdapter);
 
         // Here we populate values in the fragment if we have a mood and set the appropriate title.
         if (this.moodToEdit != null) {
 
             this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
-
-            // TODO: 2019-11-03 POPULATE VALUES
-
+            //populate values
+            this.stateSpinner.setSelection(this.moodToEdit.getState().getStateCode());
+            this.situationSpinner.setSelection(this.moodToEdit.getSituation().getSituationCode());
+            EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
+            reasonEditText.setText(this.moodToEdit.getReason());
+            //TODO add location and image
         } else {
 
             this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
@@ -200,47 +211,45 @@ public class DefineMoodDialogFragment extends DialogFragment {
         this.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.action_save) {
-                    // SAVE was pressed
+            if (item.getItemId() == R.id.action_save) {
 
-                    // TODO: 2019-11-03 Nectarios: REDO with enumerations and new datatypes
-//                    EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
-//
-//                    // TODO Cameron Oct30 2019 Research to see if there is a better way to ensure the
-//                    //  user did not leave the spinner in the first position, and fix if available
-//                    if (stateSpinner.getSelectedItemPosition() == 0) {
-//
-//                        Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
-//                        Log.e("SPINNER ERROR", "The State Spinner was left empty");
-//
-//                    } else {
-//
-//                        EmotionalState emotionalState = EmotionalState.findByStateCode(0);
-//                        Calendar calendar = Calendar.getInstance();
-//
-//                        //if any of the data is filled in, we update the mood to fill in more information
-//                        if (situationSpinner.getSelectedItemPosition() != 0) {
-//                            mood.setSituation(situationSpinner.getSelectedItem().toString());
-//                        }
-//                        if (reasonEditText.getText().toString().equals("")) {
-//                            mood.setReason(reasonEditText.getText().toString());
-//                        }
-//                        //TODO add image, location
-//
-//                        // add the mood and dismiss the fragment
-//                    }
+                // SAVE was pressed
 
-                    // Canned data for now TODO
-                    Mood mood = new Mood(EmotionalState.HAPPINESS, Calendar.getInstance(), SocialSituation.CROWD, "Reason", new GeoPoint(12.345, 67.89), null);
+                // TODO Cameron Oct30 2019 Research to see if there is a better way to ensure the
+                //  user did not leave the spinner in the first position, and fix if available
+                // TODO 2019-11-03 cameron removed since i dont believe there is a way to set a preset
+                //  for the spinner programmatically, which is necessary for setting it with an ArrayAdapter,
+                //  as above.
+  /*              if (stateSpinner.getSelectedItemPosition() == 0) {
 
-                    DefineMoodDialogFragment.this.listener.onSavePressed(mood);
-                    DefineMoodDialogFragment.this.dismiss();
-                    return true;
+                    Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
+                    Log.e("SPINNER ERROR", "The State Spinner was left empty");
 
+                } else {*/
+                EmotionalState emotionalState = EmotionalState.findByStateCode(stateSpinner.getSelectedItemPosition());
+                SocialSituation socialSituation = SocialSituation.findBySituationCode(situationSpinner.getSelectedItemPosition());
+                Calendar calendar;
+                if (moodToEdit != null) {
+                    calendar = moodToEdit.getDatetime();
                 }
+                else {
+                    calendar = Calendar.getInstance();
+                }
+                EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
+                String reason = reasonEditText.getText().toString();
+                //}
 
-                // Base case
-                return false;
+                // TODO add image, location - canned for now
+                Mood mood = new Mood(emotionalState, calendar, socialSituation, reason, new GeoPoint(54.54, 143.49), null);
+                // add the mood to the list and dismiss the fragment
+                DefineMoodDialogFragment.this.listener.onSavePressed(mood);
+                DefineMoodDialogFragment.this.dismiss();
+                return true;
+
+            }
+
+            // Base case
+            return false;
 
             }
         });
