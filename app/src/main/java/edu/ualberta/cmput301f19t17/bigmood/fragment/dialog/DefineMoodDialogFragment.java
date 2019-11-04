@@ -7,9 +7,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,20 +17,24 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Locale;
+import com.google.firebase.firestore.GeoPoint;
+
+import java.util.Calendar;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
-
+import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 public class DefineMoodDialogFragment extends DialogFragment {
 
-    private Toolbar toolbar;
     private OnButtonPressListener listener;
+    private Mood moodToEdit = null;
+
+    private Toolbar toolbar;
+    private Spinner stateSpinner;
+    private Spinner situationSpinner;
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -48,7 +52,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
             @Override
             public void onSavePressed(Mood mood) {
 
-                Log.e(HomeActivity.LOG_TAG, "DefineMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED");
+                throw new UnsupportedOperationException("DefineMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED. use setOnButtonPressListener() to set one.");
 
             }
         };
@@ -97,7 +101,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
     }
 
     /**
-     * of the on*()methods, this is the first. When we first want to create the dialog we set the theme to the fullscreen theme so that the edges match the parent.
+     * of the on*()methods, this is the first. When we first want to create the dialog we set the theme to the fullscreen theme so that the edges match the parent. Here we also check for the existence of a mood in the arguments bundle and set it to our instance variable.
      * @param savedInstanceState a bundle that holds the state of the fragment
      */
     @Override
@@ -105,6 +109,23 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
         super.onCreate(savedInstanceState);
         this.setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme_FullScreenDialog);
+
+        // Get the arguments bundle. This will be NULL if the fragment was constructed without a mood to "edit".
+        Bundle args = this.getArguments();
+
+        // Check if the arguments are null.
+        if (args != null) {
+
+            // Get mood. If we have arguments we probably have a mood object but we check just in case.
+            Mood mood = args.getParcelable(Mood.TAG_MOOD_OBJECT);
+
+            // If a Mood object is not received, this object was not created using the newInstance() methods. We throw an exception if this is the case.
+            if (mood != null)
+                this.moodToEdit = mood;
+            else
+                throw new IllegalArgumentException("Something went wrong with creating the view. Received an argument bundle but not a proper Mood. Did you use the newInstance() methods?");
+
+        }
 
     }
 
@@ -127,27 +148,9 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Bind toolbar XML to view
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
-        // Example of inflating the fields
-
-        // This will be NULL if the fragment was constructed without a mood to "edit". So therefore we need to check this when populating in all the views.
-        Bundle args = this.getArguments();
-
-        // We have to check if the arguments were provided since in the less verbose newInstance() we don't set arguments for the purposes of adding a new mood.
-        if (args != null) {
-
-            // Get mood. If we have arguments we probably have a mood object but we check just in case.
-            Mood mood = args.getParcelable(Mood.TAG_MOOD_OBJECT);
-
-            // If a Mood object is not received, this object was not created using the newInstance() methods. Instead of crashing, we log a message
-            if (mood != null) {
-
-            } else {
-
-                Log.e(HomeActivity.LOG_TAG, "DefineMoodFragment was not provided args, did you use the newInstance() methods?");
-
-            }
-
-        }
+        // Find and bind spinners
+        this.stateSpinner = view.findViewById(R.id.state_spinner);
+        this.situationSpinner = view.findViewById(R.id.situation_spinner);
 
         // Return view that has been created
         return view;
@@ -159,21 +162,9 @@ public class DefineMoodDialogFragment extends DialogFragment {
      * @param savedInstanceState A bundle that holds the state of the fragment
      */
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
-
-        // Set the title depending on what state the fragment is in. As in onCreateView, we have to check if the arguments exist and if the mood object exists to avoid a potential error.
-        if (this.getArguments() != null) {
-
-            if (this.getArguments().getParcelable(Mood.TAG_MOOD_OBJECT) != null)
-                this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
-
-        } else {
-
-            this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
-
-        }
 
         // Inflate Menu resource onto the toolbar
         this.toolbar.inflateMenu(R.menu.define_mood);
@@ -187,52 +178,63 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
-        final View finalView = view;
+        // TODO: 2019-11-03 Nectarios: FIX THIS
+//        this.stateSpinner.setAdapter(new ArrayAdapter<EmotionalState>(this.getContext(), android.R.layout.simple_spinner_item, EmotionalState.values()));
+
+        // Here we populate values in the fragment if we have a mood and set the appropriate title.
+        if (this.moodToEdit != null) {
+
+            this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
+
+            // TODO: 2019-11-03 POPULATE VALUES
+
+        } else {
+
+            this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
+
+        }
+
+
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
         // This is where the core of the input validation will happen -- that is when the user tries to press Save.
         this.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_save) {
-                    //save was pressed
+                    // SAVE was pressed
 
-                    Spinner stateSpinner = finalView.findViewById(R.id.state_spinner);
+                    // TODO: 2019-11-03 Nectarios: REDO with enumerations and new datatypes
+//                    EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
+//
+//                    // TODO Cameron Oct30 2019 Research to see if there is a better way to ensure the
+//                    //  user did not leave the spinner in the first position, and fix if available
+//                    if (stateSpinner.getSelectedItemPosition() == 0) {
+//
+//                        Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
+//                        Log.e("SPINNER ERROR", "The State Spinner was left empty");
+//
+//                    } else {
+//
+//                        EmotionalState emotionalState = EmotionalState.findByStateCode(0);
+//                        Calendar calendar = Calendar.getInstance();
+//
+//                        //if any of the data is filled in, we update the mood to fill in more information
+//                        if (situationSpinner.getSelectedItemPosition() != 0) {
+//                            mood.setSituation(situationSpinner.getSelectedItem().toString());
+//                        }
+//                        if (reasonEditText.getText().toString().equals("")) {
+//                            mood.setReason(reasonEditText.getText().toString());
+//                        }
+//                        //TODO add image, location
+//
+//                        // add the mood and dismiss the fragment
+//                    }
 
-                    //TODO Cameron Oct30 2019 Research to see if there is a better way to ensure the
-                    // user did not leave the spinner in the first position, and fix if available
-                    if (stateSpinner.getSelectedItemPosition()==0) {
-                        Toast.makeText(DefineMoodDialogFragment.this.getContext(),
-                                "You must enter an emotional state!", Toast.LENGTH_SHORT).show();
+                    // Canned data for now TODO
+                    Mood mood = new Mood(EmotionalState.HAPPINESS, Calendar.getInstance(), SocialSituation.CROWD, "Reason", new GeoPoint(12.345, 67.89), null);
 
-                        Log.e("SPINNER ERROR", "The State Spinner was left empty");
-                    }
-                    else {
-                        //get date and time
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
-                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
-
-                        Date dateTime = new Date();
-                        String dateString = dateFormat.format(dateTime);
-                        String timeString = timeFormat.format(dateTime);
-
-                        Spinner situationSpinner = finalView.findViewById(R.id.situation_spinner);
-                        EditText reasonEditText = finalView.findViewById(R.id.reason_edit_text);
-                        // we have everything that is required to create a mood
-                        Mood mood = new Mood(dateString, timeString, stateSpinner.getSelectedItem().toString());
-
-                        //if any of the data is filled in, we update the mood to fill in more information
-                        if (situationSpinner.getSelectedItemPosition()!=0) {
-                            mood.setSituation(situationSpinner.getSelectedItem().toString());
-                        }
-                        if (reasonEditText.getText().toString().equals("")) {
-                            mood.setReason(reasonEditText.getText().toString());
-                        }
-                        //TODO add image, location
-
-                        // add the mood and dismiss the fragment
-                        DefineMoodDialogFragment.this.listener.onSavePressed(mood);
-                        DefineMoodDialogFragment.this.dismiss();
-                    }
+                    DefineMoodDialogFragment.this.listener.onSavePressed(mood);
+                    DefineMoodDialogFragment.this.dismiss();
                     return true;
 
                 }

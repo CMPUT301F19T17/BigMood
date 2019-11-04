@@ -15,7 +15,7 @@ import java.util.Map;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
-import edu.ualberta.cmput301f19t17.bigmood.model.TestMood;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 /**
  * This class is solely responsible for converting Firestore data to model objects and vice versa.
@@ -73,7 +73,7 @@ class FirestoreConversion {
      * @param document A Firestore DocumentSnapshot containing the ID and Mood information.
      * @return         Returns a Mood object converted from the data
      */
-    static TestMood MoodFromFirestore(DocumentSnapshot document) throws IllegalArgumentException {
+    static Mood MoodFromFirestore(DocumentSnapshot document) throws IllegalArgumentException {
 
         // Since we accept a DocumentSnapshot we have no guarantee that it exists, unlike a QueryDocumentSnapshot (direct subclass of DocumentSnapshot). So we have to make sure to check this.
         if (! document.exists())
@@ -127,7 +127,7 @@ class FirestoreConversion {
 
         // Since we are getting a new mood from the database, we have to associate an ID with it in order to edit or delete it at a different time. So we have to use the constructor that has the firestoreId
         // TODO: 2019-11-01 Nectarios: Replace with factory?
-        return new TestMood(document.getId(), state, datetime, situation, reason, location, image);
+        return new Mood(document.getId(), state, datetime, situation, reason, location, image);
 
     }
 
@@ -174,7 +174,7 @@ class FirestoreConversion {
      * @param mood Mood object to convert into a Firestore compatible Map.
      * @return     Returns a Map object converted from the Mood.
      */
-    static Map<String, Object> MoodToFirestore(TestMood mood) {
+    static Map<String, Object> MoodToFirestore(Mood mood) {
 
         // Create new Hash Map to store all the values
         Map<String, Object> data = new HashMap<>();

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -47,8 +48,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                LoginActivity.this.startActivity(intent);
+//                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+//                LoginActivity.this.startActivity(intent);
+
+                Repository repo = Repository.getInstance();
+                repo.debug();
 
             }
         });

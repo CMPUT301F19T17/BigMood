@@ -1,9 +1,13 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,8 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
-import edu.ualberta.cmput301f19t17.bigmood.model.TestMood;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 /**
  * This class handles all the database requests coming from the application. It implements methods for interacting with the collections and documents that this application should need. All methods return a Task<T>, where T is the applicable return type. Since these are asynchronous you must make sure to add an OnSuccessListener() and an OnFailureListener() to the tasks you get back so that you can give feedback to the user.
@@ -210,16 +215,16 @@ public class Repository {
      * @param user The User whose moods we will retrieve.
      * @return     Returns a Task of type List<Mood>. If the task succeeds you can iterate over the List in the OnSuccessListener.
      */
-    public Task<List<TestMood>> getUserMoods(User user) {
+    public Task<List<Mood>> getUserMoods(User user) {
 
         return db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
                 .get()
-                .continueWith(new Continuation<QuerySnapshot, List<TestMood>>() {
+                .continueWith(new Continuation<QuerySnapshot, List<Mood>>() {
                     @Override
-                    public List<TestMood> then(@NonNull Task<QuerySnapshot> task) throws Exception {
+                    public List<Mood> then(@NonNull Task<QuerySnapshot> task) throws Exception {
 
                         // Will propagate error
                         QuerySnapshot snapshot = task.getResult();
@@ -227,7 +232,7 @@ public class Repository {
                         if (snapshot == null)
                             return null;
 
-                        List<TestMood> moodList = new ArrayList<>();
+                        List<Mood> moodList = new ArrayList<>();
 
                         for (QueryDocumentSnapshot doc : snapshot)
                             moodList.add( FirestoreConversion.MoodFromFirestore(doc) );
@@ -244,7 +249,7 @@ public class Repository {
      * @param user The current User. We will use their information to get the applicable moods for the users they are following.
      * @return     Returns a Task of type List<Mood>. If the task succeeds you can iterate over the List in the OnSuccessListener.
      */
-    public Task<List<TestMood>> getFollowerMoods(User user) {
+    public Task<List<Mood>> getFollowerMoods(User user) {
 
         throw new IllegalArgumentException("This method is not implemented yet");
 
@@ -256,7 +261,7 @@ public class Repository {
      * @param mood The Mood we are trying to post to the database. The mood passed in should be a NEW mood and NOT have a firestoreId.
      * @return     Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
      */
-    public Task<Void> createMood(User user, TestMood mood) {
+    public Task<Void> createMood(User user, Mood mood) {
 
         // Since the Firestore ID is final in the class, we can assume that if it has one, it came from the database. We don't want to add another duplicate mood to the database if it already exists. In other words we play it safe
         if (mood.getFirestoreId() != null)
@@ -286,7 +291,7 @@ public class Repository {
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
      * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
      */
-    public Task<Void> deleteMood(User user, TestMood mood) {
+    public Task<Void> deleteMood(User user, Mood mood) {
 
         // Any mood that is passed into this task has to have a FirestoreId. If it doesn't, then this mood was not created as valid.
         if (mood.getFirestoreId() == null)
@@ -298,6 +303,27 @@ public class Repository {
                 .collection(FirestoreMapping.COLLECTION_MOODS)
                 .document(mood.getFirestoreId())
                 .delete();
+
+    }
+
+    /**
+     * this method attempts to modify a Mood in the database given the parameters.
+     * @param user The User where we would find the given Mood.
+     * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
+     * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     */
+    public Task<Void> updateMood(User user, Mood mood) {
+
+        // Any mood that is passed into this task has to have a FirestoreId. If it doesn't, then this mood was not created as valid.
+        if (mood.getFirestoreId() == null)
+            throw new IllegalArgumentException("This mood cannot be new -- it must be created from the database");
+
+        return db
+                .collection(FirestoreMapping.COLLECTION_USERS)
+                .document(user.getUsername())
+                .collection(FirestoreMapping.COLLECTION_MOODS)
+                .document(mood.getFirestoreId())
+                .update(FirestoreConversion.MoodToFirestore(mood));
 
     }
 
@@ -417,6 +443,23 @@ public class Repository {
                 .document(request.getFirestoreId())
                 .delete();
 
+    }
+
+    public void debug() {
+
+        this.registerUser("yes", "p", "f", "l")
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(HomeActivity.LOG_TAG, "Register success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(HomeActivity.LOG_TAG, "Register failure: " + e.toString());
+                    }
+                });
     }
 
 }

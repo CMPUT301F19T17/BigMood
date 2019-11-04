@@ -80,20 +80,17 @@ public class UserMoodsFragment extends Fragment {
 
                     @Override
                     public void onEditPressed() {
-                        final Mood moodToEdit = moodList.get(finalIndex);
+                        Mood moodToEdit = moodList.get(finalIndex);
 
                         DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
-                       // View view = defineFragment.getView();
-                        //Spinner stateSpinner = view.findViewById(R.id.state_spinner);
-                        //Spinner
                         defineFragment.setOnButtonPressListener(
                                         new DefineMoodDialogFragment.OnButtonPressListener() {
                                     @Override
                                     public void onSavePressed(Mood mood) {
-                                        //TODO Cameron Oct 28, 2019 add location and image
-                                        moodToEdit.setState(mood.getState());
-                                        moodToEdit.setReason(mood.getReason());
-                                        moodToEdit.setSituation(mood.getSituation());
+
+                                        // TODO Cameron Oct 28, 2019 add location and image
+                                        //  Call database method for editing
+
                                     }
                                 });
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");

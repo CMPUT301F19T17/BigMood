@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.model;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -7,19 +8,22 @@ import androidx.annotation.Nullable;
  */
 public enum SocialSituation {
 
-    ONE (0),
-    SEVERAL (1),
-    CROWD (2),
+    ALONE (0, "Alone"),
+    ONE (1, "One person"),
+    SEVERAL (2, "Two to several people"),
+    CROWD (3, "Crowd"),
     ;
 
     private int situationCode;
+    private String displayName;
 
     /**
      * Constructor that allows each state to be associated with a code.
      * @param situationCode
      */
-    SocialSituation(int situationCode) {
+    SocialSituation(int situationCode, String displayName) {
         this.situationCode = situationCode;
+        this.displayName = displayName;
     }
 
     /**
@@ -28,6 +32,12 @@ public enum SocialSituation {
      */
     public int getSituationCode() {
         return situationCode;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.displayName;
     }
 
     /**
@@ -45,5 +55,6 @@ public enum SocialSituation {
         return null;
 
     }
+
 
 }

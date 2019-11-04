@@ -1,16 +1,22 @@
 package edu.ualberta.cmput301f19t17.bigmood.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -64,8 +70,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
             moodHolder.date = convertView.findViewById(R.id.mood_item_date);
             moodHolder.time = convertView.findViewById(R.id.mood_item_time);
             moodHolder.state = convertView.findViewById(R.id.mood_item_state);
-            moodHolder.reason = convertView.findViewById(R.id.mood_item_reason);
-            moodHolder.situation = convertView.findViewById(R.id.mood_item_situation);
+            moodHolder.image = convertView.findViewById(R.id.mood_item_emoticon);
 
             // Cache views for that row using setTag on the full row view
             convertView.setTag(moodHolder);
@@ -82,11 +87,47 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
         Mood currentMood = this.getItem(position);
 
         // Set each of the fields in the row. For the date and time, we get the already formatted string from the Ride object. For the distance we do some manual formatting with the distance data.
-        moodHolder.date.setText(currentMood.getDate());
-        moodHolder.time.setText(currentMood.getTime());
-        moodHolder.state.setText(currentMood.getState());
-        moodHolder.reason.setText(currentMood.getReason());
-        moodHolder.situation.setText(currentMood.getReason());
+
+        Date date = currentMood.getDatetime().getTime();
+        
+        moodHolder.state.setText(currentMood.getState().name()); // TODO: 2019-11-03 Nectarios: FIX
+        moodHolder.date.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(date));
+        moodHolder.time.setText(new SimpleDateFormat("HH:mm", Locale.CANADA).format(date));
+
+        // Set image based on enum
+        Resources res = this.getContext().getResources();
+        Drawable emoticon;
+
+        switch (currentMood.getState()) {
+            case HAPPINESS:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_happy);
+                break;
+
+            case SADNESS:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_sad);
+                break;
+
+            case ANGER:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_anger);
+                break;
+
+            case DISGUST:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_disgust);
+                break;
+
+            case FEAR:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_fear);
+                break;
+
+            case SURPRISE:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_surprise);
+                break;
+
+            default:
+                emoticon = res.getDrawable(R.drawable.ic_placeholder_image_black_24dp);
+        }
+
+        moodHolder.image.setImageDrawable(emoticon);
 
         // Return the created/reused view as per the method signature
         return convertView;
@@ -102,8 +143,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
         TextView date;
         TextView time;
         TextView state;
-        TextView reason;
-        TextView situation;
+        ImageView image;
     }
 }
 

@@ -20,8 +20,7 @@ public class RequestsFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        requestsViewModel =
-                ViewModelProviders.of(this).get(RequestsViewModel.class);
+        requestsViewModel = ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
         final TextView textView = root.findViewById(R.id.text_requests);
         requestsViewModel.getText().observe(this, new Observer<String>() {
