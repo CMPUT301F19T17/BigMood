@@ -163,8 +163,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/textview_label_location"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textview_placeholder_reason"
-                app:layout_constraintBottom_toBottomOf="@id/imageview_placeholder_photo" />
+                app:layout_constraintTop_toBottomOf="@+id/textview_placeholder_reason"/>
 
 
             <ImageView
