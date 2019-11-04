@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SignUpActivity">
+    tools:context=".activity.SignUpActivity"
+    android:focusableInTouchMode="true" >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_activity_sign_up"
