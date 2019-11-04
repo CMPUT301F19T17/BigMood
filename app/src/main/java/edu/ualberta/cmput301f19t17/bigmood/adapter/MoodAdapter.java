@@ -96,37 +96,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
 
         // Set image based on enum
         Resources res = this.getContext().getResources();
-        Drawable emoticon;
-
-        switch (currentMood.getState()) {
-            case HAPPINESS:
-                emoticon = res.getDrawable(R.drawable.ic_emoticon_happy);
-                break;
-
-            case SADNESS:
-                emoticon = res.getDrawable(R.drawable.ic_emoticon_sad);
-                break;
-
-            case ANGER:
-                emoticon = res.getDrawable(R.drawable.ic_emoticon_anger);
-                break;
-
-            case DISGUST:
-                emoticon = res.getDrawable(R.drawable.ic_emoticon_disgust);
-                break;
-
-            case FEAR:
-                emoticon = res.getDrawable(R.drawable.ic_emoticon_fear);
-                break;
-
-            case SURPRISE:
-                emoticon = res.getDrawable(R.drawable.ic_emoticon_surprise);
-                break;
-
-            default:
-                emoticon = res.getDrawable(R.drawable.ic_placeholder_image_black_24dp);
-        }
-
+        Drawable emoticon = res.getDrawable(currentMood.getState().getDrawableId());
         moodHolder.image.setImageDrawable(emoticon);
 
         // Return the created/reused view as per the method signature
