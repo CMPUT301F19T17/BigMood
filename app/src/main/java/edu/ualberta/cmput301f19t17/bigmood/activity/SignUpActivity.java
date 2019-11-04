@@ -6,15 +6,20 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
 public class SignUpActivity extends AppCompatActivity {
 
+    AppViewModel appViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
+        this.appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
 
         // get Toolbar
         Toolbar toolbar = this.findViewById(R.id.toolbar_activity_sign_up);
