@@ -2,16 +2,21 @@ package edu.ualberta.cmput301f19t17.bigmood.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -58,11 +63,40 @@ public class LoginActivity extends AppCompatActivity {
                 if (failed)
                     return;
 
-                // DEBUG FOR NOW //
-                Toast.makeText(LoginActivity.this, "\"Logged In\"", Toast.LENGTH_SHORT).show();
+                // TODO: 2019-11-04 Nectarios: ScrollView
 
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                LoginActivity.this.startActivity(intent);
+                LoginActivity.this.appViewModel.getRepository().validateUser(username, password)
+                        .addOnSuccessListener(new OnSuccessListener<User>() {
+                            @Override
+                            public void onSuccess(User user) {
+
+                                // According to
+                                if (user == null) {
+                                    Toast.makeText(LoginActivity.this, "Username/password incorrect.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                // Set user in the ViewModel
+                                LoginActivity.this.appViewModel.setCurrentUser(user);
+
+                                // Go to the home screen
+                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                LoginActivity.this.startActivity(intent);
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                                Toast.makeText(LoginActivity.this, "Failed to log in. Please try again.", Toast.LENGTH_SHORT).show();
+
+                                Log.d(HomeActivity.LOG_TAG, "User Validation failed: " + e.toString());
+
+                            }
+                        });
+
+
 
 
             }

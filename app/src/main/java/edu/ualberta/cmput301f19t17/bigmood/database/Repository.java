@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -153,58 +154,66 @@ public class Repository {
      * This method handles our """authentication""". It basically validates a username and password against the database and if it is successful it returns a constructed User object that is used as the token for """authentication""".
      * @param username Username of the user to validate
      * @param password Password of the use to validate
-     * @return         Returns a task of type Void. The task will succeed if there is a valid username and password combination in the database. In the OnSuccessListener you can then extract the user object to use and store as an authentication "token".
+     * @return         Returns a task of type User. The task will succeed if there is a valid username and password combination in the database. In the OnSuccessListener you can then extract the user object to use and store as an authentication "token".
      */
     public Task<User> validateUser(final String username, final String password) {
 
-        // Define the reference to the user document from the username argument
-        final DocumentReference userRef = db
-                .collection(FirestoreMapping.COLLECTION_USERS)
-                .document(username);
-
-        // Define the reference to the credential document that's stored under the user's document.
-        final DocumentReference credentialRef = userRef
-                .collection(FirestoreMapping.COLLECTION_PRIVATE)
-                .document(FirestoreMapping.DOCUMENT_CREDENTIAL);
-
-
+        // Queue up a task to get the user document
         Task<DocumentSnapshot> userTask = db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(username)
                 .get();
 
-        // Define the reference to the credential document that's stored under the user's document.
-        Task<DocumentSnapshot> credentialTask = userRef
+        // Queue up a task to get the credential document of the user.
+        Task<DocumentSnapshot> credentialTask = db
+                .collection(FirestoreMapping.COLLECTION_USERS)
+                .document(username)
                 .collection(FirestoreMapping.COLLECTION_PRIVATE)
                 .document(FirestoreMapping.DOCUMENT_CREDENTIAL)
                 .get();
 
-        // Here we run a transaction in order to support reading two documents at once. Specifically, we have to read the credential document and the user document
-        return db
-                .runTransaction(new Transaction.Function<User>() {
-                    @Nullable
-                    @Override
-                    public User apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+        // Define a task list containing
+        Task<List<DocumentSnapshot>> allTasks = Tasks.whenAllSuccess(userTask, credentialTask);
 
-                        // Get the user associated with the username. It may not exist so we have to check that.
-                        DocumentSnapshot userDocument = transaction.get(userRef);
+        // Define a continuation to actually verify the data
+        return allTasks.continueWith(new Continuation<List<DocumentSnapshot>, User>() {
+            @Override
+            public User then(@NonNull Task<List<DocumentSnapshot>> task) throws Exception {
 
-                        // If the document does not exist we shouldn't bother with anything past this so we return null.
-                        if (! userDocument.exists())
-                            return null;
+                // If any of the two tasks failed, .getResult() will propagate an error.
+                List<DocumentSnapshot> taskList = task.getResult();
 
-                        // Get the password stored in the database. Don't freak out. It's fine.
-                        String dbPassword = (String) transaction.get(credentialRef).get(FirestoreMapping.FIELD_CREDENTIAL_PASSWORD);
+                // Check all the documents in the list exist. I am not sure if this is entirely necessary but just to be sure I included it.
+                for (DocumentSnapshot doc : taskList)
+                    if (doc == null)
+                        throw new IllegalArgumentException("One or more documents are null in the task list. This should not happen.");
 
-                        // We validate the user's password here, and if it succeeds we return a user object.
-                        // Okay, stop yelling at me. I know this is an eternal sin to do this but here me out. Firstly, we have no custom authentication server to dish out JWTs, and secondly, for the purposes of our app (basically school demonstration) using Firebase's Authentication would be way too overkill and cumbersome to demo. This app is not supposed to be public, which is why I am committing this unpardonable sin. I'm so sorry. It hurts me as well.
-                        if (dbPassword.equals(password))
-                            return FirestoreConversion.UserFromFirestore(userDocument);
-                        else
-                            return null;
+                // Since the task list is evaluated in the order we listed them in the first element is the user document. If the user document does not exist then the username/password combo does not match anything. In that case we return null.
+                DocumentSnapshot userDoc = taskList.get(0);
+                if (! userDoc.exists())
+                    return null;
 
-                    }
-                });
+                // Just to be safe (and to avoid an error), if the password document does not exist we have to throw an error. We assume that the username exists but since they have no password this user is in an illegal state and should not exist in the DB.
+                DocumentSnapshot passwordDoc = taskList.get(1);
+                if (! passwordDoc.exists())
+                    throw new IllegalStateException(String.format("User '%s' does not have a password document in the database. This user is in an invalid state and must be recreated. Please delete this user in the Firebase console.", taskList.get(0).getId()));
+
+                // Get the password stored in the database. Don't freak out. It's fine.
+                String dbPassword = passwordDoc.getString(FirestoreMapping.FIELD_CREDENTIAL_PASSWORD);
+
+                // We validate the user's password here, and if it succeeds we return a user object.
+                // Okay, stop yelling at me. I know this is an eternal sin to do this but here me out. Firstly, we have no custom authentication server to dish out JWTs, and secondly, for the purposes of our app (basically school demonstration) using Firebase's Authentication would be way too overkill and cumbersome to demo. This app is not supposed to be public, which is why I am committing this unpardonable sin. I'm so sorry. It hurts me as well.
+                if (dbPassword.equals(password))
+                    return new User(
+                            username,
+                            userDoc.getString(FirestoreMapping.FIELD_USER_FIRSTNAME),
+                            userDoc.getString(FirestoreMapping.FIELD_USER_LASTNAME)
+                    );
+                else
+                    return null;
+
+            }
+        });
 
     }
 
