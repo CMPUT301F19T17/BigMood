@@ -170,9 +170,9 @@
         android:textColor="@android:color/black"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/textView_label_location"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_placeholder_reason" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_placeholder_reason"
+        app:layout_constraintBottom_toBottomOf="@id/imageView_placeholder_photo"/>
 
     <TextView
         android:id="@+id/textView_label_location"
@@ -186,7 +186,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/textView_label_image"
-        app:layout_constraintTop_toTopOf="@+id/textView_label_image" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_placeholder_reason"
+        app:layout_constraintBottom_toBottomOf="@id/imageView_placeholder_location"/>
 
     <ImageView
         android:id="@+id/imageView_placeholder_photo"
@@ -196,6 +197,7 @@
         android:contentDescription="@string/description_placeholder_photo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_label_image"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:srcCompat="@drawable/ic_image_black_24dp" />
 
     <ImageView
@@ -207,6 +209,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView_placeholder_photo"
         app:layout_constraintTop_toBottomOf="@+id/textView_label_location"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:srcCompat="@drawable/ic_image_black_24dp" />
 
 
