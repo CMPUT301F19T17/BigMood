@@ -2,6 +2,7 @@ package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -80,14 +85,14 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
         // If null, raise exception
         if (args == null)
-            throw new RuntimeException("ViewMoodDialogFragment was not properly provided arguments, did you use the newInstance() Methods?");
+            throw new IllegalArgumentException("ViewMoodDialogFragment was not properly provided arguments, did you use the newInstance() method?");
 
         // Get Mood. This can be null if the user did not use the newInstance() methods.
         Mood mood = args.getParcelable(Mood.TAG_MOOD_OBJECT);
 
         // If null, raise exception
         if (mood == null)
-            throw new RuntimeException("ViewMoodDialogFragment was not provided a Mood object in the arguments bundle, did you use the newInstance() methods?");
+            throw new IllegalArgumentException("ViewMoodDialogFragment was not provided a Mood object in the arguments bundle, did you use the newInstance() method?");
 
         // At this point we should be in the point in execution where we have a mood to view, so we have to populate all the fields.
 
@@ -111,72 +116,77 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
         // TODO: 2019-10-31 add location and image
         // Find all views and inflate them with the info
-        ImageView emoteImageView = view.findViewById(R.id.imageView_placeholder_emote);
-        TextView stateTextView = view.findViewById(R.id.textView_placeholder_state);
-        TextView dateTextView = view.findViewById(R.id.textView_placeholder_date);
-        TextView timeTextView = view.findViewById(R.id.textView_placeholder_time);
-        TextView situationTextView = view.findViewById(R.id.textView_placeholder_situation);
-        TextView reasonTextView = view.findViewById(R.id.textView_placeholder_reason);
-        ImageView photoImageView = view.findViewById(R.id.imageView_placeholder_photo);
-        ImageView locationImageView = view.findViewById(R.id.imageView_placeholder_location);
+        TextView stateTextView = view.findViewById(R.id.textview_placeholder_state);
+        ImageView emoteImageView = view.findViewById(R.id.imageview_placeholder_emote);
+        TextView dateTextView = view.findViewById(R.id.textview_placeholder_date);
+        TextView timeTextView = view.findViewById(R.id.textview_placeholder_time);
+        TextView situationTextView = view.findViewById(R.id.textview_placeholder_situation);
+        TextView reasonTextView = view.findViewById(R.id.textview_placeholder_reason);
+        ImageView photoImageView = view.findViewById(R.id.imageview_placeholder_photo);
+        ImageView locationImageView = view.findViewById(R.id.imageview_placeholder_location);
 
-        // TODO: 2019-10-31 implement with ENUM for mood states
-        // Set all Date, time, and mood details
-        switch (mood.getState().toUpperCase()) {
-            case "HAPPY":
-                Drawable happyEmote = getResources().getDrawable(R.drawable.ic_happy);
-                emoteImageView.setImageDrawable(happyEmote);
+        // Set state to the nice name defined by the enumeration
+        stateTextView.setText(mood.getState().toString());
+
+        // Set image based on enum
+        Resources res = this.getContext().getResources();
+        Drawable emoticon;
+
+        switch (mood.getState()) {
+            case HAPPINESS:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_happy);
                 break;
-            case "SAD":
-                Drawable sadEmote = getResources().getDrawable(R.drawable.ic_sad);
-                emoteImageView.setImageDrawable(sadEmote);
+
+            case SADNESS:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_sad);
                 break;
-            case "ANGER":
-                Drawable angerEmote = getResources().getDrawable(R.drawable.ic_anger);
-                emoteImageView.setImageDrawable(angerEmote);
+
+            case ANGER:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_anger);
                 break;
-            case "DISGUST":
-                Drawable disgustEmote = getResources().getDrawable(R.drawable.ic_disgust);
-                emoteImageView.setImageDrawable(disgustEmote);
+
+            case DISGUST:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_disgust);
                 break;
-            case "FEAR":
-                Drawable fearEmote = getResources().getDrawable(R.drawable.ic_fear);
-                emoteImageView.setImageDrawable(fearEmote);
+
+            case FEAR:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_fear);
                 break;
-            case "SURPRISE":
-                Drawable surpriseEmote = getResources().getDrawable(R.drawable.ic_surprise);
-                emoteImageView.setImageDrawable(surpriseEmote);
+
+            case SURPRISE:
+                emoticon = res.getDrawable(R.drawable.ic_emoticon_surprise);
                 break;
+
+            default:
+                emoticon = res.getDrawable(R.drawable.ic_placeholder_image_black_24dp);
         }
 
-        dateTextView.setText(mood.getDate());
-        timeTextView.setText(mood.getTime());
-        stateTextView.setText(mood.getState());
+        emoteImageView.setImageDrawable(emoticon);
 
-        if (mood.getSituation().equals("")) {
-            TextView situationLabel = view.findViewById(R.id.textView_label_social_situation);
-            situationLabel.setVisibility(View.GONE);
-            situationTextView.setVisibility(View.GONE);
-        }else{
-            situationTextView.setText(mood.getSituation());
-        }
-        if (mood.getReason().equals("")) {
-            TextView reasonLabel = view.findViewById(R.id.textView_label_reason);
-            reasonLabel.setVisibility(View.GONE);
-            reasonTextView.setVisibility(View.GONE);
-        }else{
+        // Set date and time
+        Calendar calendar = mood.getDatetime();
+        dateTextView.setText( new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(calendar.getTime()) );
+        timeTextView.setText( new SimpleDateFormat("HH:mm", Locale.CANADA).format(calendar.getTime()) );
+
+        // If the mood has a social situation, add it. If not, let it take the default value in the resource layout.
+        if (mood.getSituation() != null)
+            situationTextView.setText(mood.getSituation().toString());
+
+        // If the mood has a state, add it. If not, let it take the default value in the resource layout.
+        if (! mood.getReason().equals(""))
             reasonTextView.setText(mood.getReason());
-        }
+        
         if (mood.getImage() == null) {
             // draw "no picture" image
-        }else{
+        } else {
             //photoImageView.setImageBitmap(mood.getImage());
         }
         if (mood.getLocation() == null) {
             // draw "no location" image
-        }else{
+        } else {
             //locationImageView.setImageBitmap("bitmap");
         }
+
         return this.buildDialog(view);
 
     }

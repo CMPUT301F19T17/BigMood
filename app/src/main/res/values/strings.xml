@@ -18,6 +18,13 @@
     <string name="title_define">Define Your Mood</string>
     <string name="mood_reason_hint">Explain Why</string>
 
+    <string name="emotional_state_happiness">Happy</string>
+    <string name="emotional_state_sadness">Sad</string>
+    <string name="emotional_state_fear">Angry</string>
+    <string name="emotional_state_disgust">Disgusted</string>
+    <string name="emotional_state_anger">Afraid</string>
+    <string name="emotional_state_surprise">Surprised</string>
+
     <string name="delete_txt">Delete</string>
     <string name="cancel_txt">Cancel</string>
     <string name="confirm_txt">Confirm</string>
@@ -39,13 +46,15 @@
     <string name="placeholder_date">yyyy-MM-dd</string>
     <string name="placeholder_time">HH:mm</string>
     <string name="label_social_situation">Social Situation</string>
-    <string name="placeholder_situation">Situation</string>
+    <string name="placeholder_situation">No situation provided</string>
     <string name="label_reason">Reason</string>
-    <string name="placeholder_reason">Reason</string>
+    <string name="placeholder_reason">No reason provided</string>
     <string name="label_image">Image</string>
     <string name="label_location">Location</string>
     <string name="description_placeholder_emote">where mood emote goes</string>
     <string name="description_placeholder_photo">where photograph goes</string>
     <string name="description_placeholder_location">where map goes</string>
+    <string name="error_no_emotional_state">Please enter an emotional state.</string>
+
 
 </resources>

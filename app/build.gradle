@@ -11,7 +11,9 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        vectorDrawables.useSupportLibrary = true
+        vectorDrawables.useSupportLibrary true
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -30,11 +32,16 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
 
+    implementation 'com.google.firebase:firebase-firestore:21.2.1'
+    implementation 'com.google.firebase:firebase-storage:19.1.0'
+
+    implementation 'com.android.support:multidex:1.0.3'
+
     implementation 'com.google.android.material:material:1.0.0'
 
 //    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.3.1'
 
@@ -42,3 +49,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.navigation:navigation-runtime:2.1.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
