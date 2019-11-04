@@ -3,29 +3,33 @@ package edu.ualberta.cmput301f19t17.bigmood.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import edu.ualberta.cmput301f19t17.bigmood.R;
+
 /**
  * This Enumeration defines the categories for an emotional state. It also is associated with a stateCode so that we can store an enumeration in a database.
  */
 public enum EmotionalState {
 
-    HAPPINESS (0, "Happy"),            // R.string.emotional_state_happiness
-    SADNESS (1, "Sad"),                // R.string.emotional_state_sadness
-    FEAR (2, "Angry"),                 // R.string.emotional_state_anger
-    DISGUST (3, "Disgusted"),          // R.string.emotional_state_disgust
-    ANGER (4, "Afraid"),               // R.string.emotional_state_fear
-    SURPRISE (5, "Surprised"),         // R.string.emotional_state_surprise
+    HAPPINESS (0, "Happy", R.drawable.ic_emoticon_happy),
+    SADNESS (1, "Sad", R.drawable.ic_emoticon_sad),
+    FEAR (2, "Angry", R.drawable.ic_emoticon_fear),
+    DISGUST (3, "Disgusted", R.drawable.ic_emoticon_disgust),
+    ANGER (4, "Afraid", R.drawable.ic_emoticon_anger),
+    SURPRISE (5, "Surprised", R.drawable.ic_emoticon_surprise),
     ;
 
     private int stateCode;
     private String displayName;
+    private int drawableId;
 
     /**
      * Constructor that allows each state to be associated with a code.
      * @param stateCode The stateCode the EmotionalState should be associated with
      */
-    EmotionalState(int stateCode, String displayName) {
+    EmotionalState(int stateCode, String displayName, int drawableId) {
         this.stateCode = stateCode;
         this.displayName = displayName;
+        this.drawableId = drawableId;
     }
 
     /**
@@ -34,6 +38,14 @@ public enum EmotionalState {
      */
     public int getStateCode() {
         return this.stateCode;
+    }
+
+    /**
+     * Returns a resource id of the drawable representing the state
+     * @return The resource ID of the drawable vector image representing the state.
+     */
+    public int getDrawableId() {
+        return this.drawableId;
     }
 
     @NonNull
@@ -56,6 +68,7 @@ public enum EmotionalState {
         return null;
 
     }
+
 
 
 }
