@@ -113,6 +113,7 @@ public class Mood implements Parcelable {
 
         // We clone this as to enforce that the time is mutable.
         return (Calendar) datetime.clone();
+
     }
 
     /**
