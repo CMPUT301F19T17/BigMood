@@ -14,19 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
-import edu.ualberta.cmput301f19t17.bigmood.activity.AppViewModel;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
-import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
-import edu.ualberta.cmput301f19t17.bigmood.database.User;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -36,15 +32,12 @@ public class UserMoodsFragment extends Fragment {
     private ArrayAdapter<Mood> moodAdapter;
 
     private UserMoodsViewModel userMoodsViewModel;
-    private AppViewModel appViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
-        appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
+        final AppPreferences appPreferences = AppPreferences.getInstance();
 
-        //TODO cameron 2019-11-03 remove dummy user
-        appViewModel.setCurrentUser(new User("CMPUT301", "CMPUT", "301"));
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
@@ -62,16 +55,29 @@ public class UserMoodsFragment extends Fragment {
                 fragment.setOnButtonPressListener(
                         new DefineMoodDialogFragment.OnButtonPressListener() {
                             @Override
-                            public void onSavePressed(Mood mood) {
+                            public void onSavePressed(final Mood mood) {
                                 Log.d("Save Pressed", "Adding Mood");
-                                if (appViewModel.getCurrentUser() != null) {
-                                    appViewModel.getRepository().createMood(appViewModel.getCurrentUser(), mood);
-                                    moodList.add(mood);
-                                    moodAdapter.notifyDataSetChanged();
+                                //TODO dont update local list directly
+                                if (appPreferences.getCurrentUser() != null) {
+                                    appPreferences.getRepository().createMood(appPreferences.getCurrentUser(), mood)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            moodList.add(mood);
+                                            moodAdapter.notifyDataSetChanged();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("SAVING", "FAILED TO SAVE TO FIRESTORE");
+                                        }
+                                    });
+
                                 }
-                                else {
-                                    Log.e("User Error", "USER IS NULL");
-                                }
+                                else
+                                    throw new IllegalStateException("USER IS NULL");
+
                             }
                         });
                 fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
@@ -89,9 +95,28 @@ public class UserMoodsFragment extends Fragment {
                 fragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
                     @Override
                     public void onDeletePressed() {
-                        appViewModel.getRepository().deleteMood(appViewModel.getCurrentUser(), moodList.get(finalIndex));
-                        moodList.remove(finalIndex);
-                        moodAdapter.notifyDataSetChanged();
+                        if (appPreferences.getCurrentUser() != null) {
+                            appPreferences.getRepository().deleteMood(
+                                    appPreferences.getCurrentUser(), moodList.get(finalIndex))
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //TODO dont update local list directly
+                                    moodList.remove(finalIndex);
+                                    moodAdapter.notifyDataSetChanged();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("DELETING", "FAILED TO DELETE FROM FIRESTORE");
+
+                                }
+                            });
+
+                        }
+                        else
+                            throw new IllegalStateException("USER IS NULL");
 
                         Toast.makeText(getContext(), "The Mood was deleted", Toast.LENGTH_SHORT).show();
                     }
@@ -106,7 +131,23 @@ public class UserMoodsFragment extends Fragment {
                                     @Override
                                     public void onSavePressed(Mood mood) {
                                         // TODO Cameron Oct 28, 2019 add location and image
-                                        appViewModel.getRepository().updateMood(appViewModel.getCurrentUser(), mood);
+                                        if (appPreferences.getCurrentUser() != null)
+                                            appPreferences.getRepository().updateMood(
+                                                    appPreferences.getCurrentUser(), mood)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d("EDITING", "EDIT SUCCESSFUL");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("EDITING", "FAILED TO EDIT MOOD IN FIRESTORE");
+                                                        }
+                                                    });
+                                        else
+                                            throw new IllegalStateException("USER IS NULL");
                                     }
                                 });
                         defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");

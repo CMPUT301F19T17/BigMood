@@ -50,5 +50,23 @@ public class HomeActivityTest {
 
     }
 
+    @Test
+    public void checkEditMood() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+
+        solo.clickOnView(fab);
+        solo.pressSpinnerItem(0, 3); //disgusted
+        solo.pressSpinnerItem(1, 2); //two to several
+        solo.enterText((EditText) solo.getView(R.id.reason_edit_text), "I am grossed out");
+
+        solo.clickOnView(solo.getView(R.id.action_save));
+
+        solo.clickInList(0); //select the mood we just created
+
+        solo.clickOnButton("EDIT");
+    }
+
 
 }

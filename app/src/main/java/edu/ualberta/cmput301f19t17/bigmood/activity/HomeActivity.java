@@ -19,14 +19,14 @@ public class HomeActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = "BigMoodLogger";
 
-    private AppViewModel appViewModel;
+    private AppPreferences appPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        this.appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
+        this.appPreferences = AppPreferences.getInstance();
 
         // Bind the toolbar in XML to the SupportActionBar of the Activity
         Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar_home);

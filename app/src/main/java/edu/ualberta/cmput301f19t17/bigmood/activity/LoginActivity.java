@@ -23,14 +23,14 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout textInputUsername;
     private TextInputLayout textInputPassword;
 
-    private AppViewModel appViewModel;
+    private AppPreferences appPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        this.appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
+        this.appPreferences = AppPreferences.getInstance();
 
         this.textInputUsername = (TextInputLayout) this.findViewById(R.id.text_input_username);
         this.textInputPassword = (TextInputLayout) this.findViewById(R.id.text_input_password);
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO: 2019-11-04 Nectarios: ScrollView
 
-                LoginActivity.this.appViewModel.getRepository().validateUser(username, password)
+                LoginActivity.this.appPreferences.getRepository().validateUser(username, password)
                         .addOnSuccessListener(new OnSuccessListener<User>() {
                             @Override
                             public void onSuccess(User user) {
@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
 
                                 // Set user in the ViewModel
-                                LoginActivity.this.appViewModel.setCurrentUser(user);
+                                LoginActivity.this.appPreferences.setCurrentUser(user);
 
                                 // Go to the home screen
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);

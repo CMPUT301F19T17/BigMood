@@ -15,8 +15,8 @@ public class User {
      * @param firstName First name of user
      * @param lastName  Last name of user
      */
-    //TODO REMOVE PUBLIC CONSTRUCTOR
-    public User(String username, String firstName, String lastName) {
+
+    User(String username, String firstName, String lastName) {
 
         if (username == null || firstName == null || lastName == null)
             throw new IllegalArgumentException("All of username, firstName, and lastName must not be null.");
