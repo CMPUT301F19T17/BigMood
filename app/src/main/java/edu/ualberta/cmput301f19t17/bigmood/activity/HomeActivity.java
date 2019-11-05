@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -19,14 +18,10 @@ public class HomeActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = "BigMoodLogger";
 
-    private AppViewModel appViewModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        this.appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
 
         // Bind the toolbar in XML to the SupportActionBar of the Activity
         Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar_home);
@@ -60,7 +55,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         Log.d(HomeActivity.LOG_TAG, "Back navigation (Hardware) from " + this.getClass().getSimpleName());
-        this.finish();
 
     }
 
@@ -69,9 +63,8 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
 
         Log.d(HomeActivity.LOG_TAG, "Back navigation (Software) from " + this.getClass().getSimpleName());
-        this.finish();
 
-        return true;
+        return false;
 
     }
 }
