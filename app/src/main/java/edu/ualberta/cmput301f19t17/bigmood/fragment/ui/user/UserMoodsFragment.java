@@ -14,6 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppViewModel;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
+import edu.ualberta.cmput301f19t17.bigmood.database.User;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -37,6 +42,9 @@ public class UserMoodsFragment extends Fragment {
 
         userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
         appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
+
+        //TODO cameron 2019-11-03 remove dummy user
+        appViewModel.setCurrentUser(new User("CMPUT301", "CMPUT", "301"));
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
@@ -56,9 +64,14 @@ public class UserMoodsFragment extends Fragment {
                             @Override
                             public void onSavePressed(Mood mood) {
                                 Log.d("Save Pressed", "Adding Mood");
-                                moodList.add(mood);
-                                moodAdapter.notifyDataSetChanged();
-                                appViewModel.getRepository().createMood(appViewModel.getCurrentUser(), mood);
+                                if (appViewModel.getCurrentUser() != null) {
+                                    appViewModel.getRepository().createMood(appViewModel.getCurrentUser(), mood);
+                                    moodList.add(mood);
+                                    moodAdapter.notifyDataSetChanged();
+                                }
+                                else {
+                                    Log.e("User Error", "USER IS NULL");
+                                }
                             }
                         });
                 fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
@@ -76,7 +89,7 @@ public class UserMoodsFragment extends Fragment {
                 fragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
                     @Override
                     public void onDeletePressed() {
-
+                        appViewModel.getRepository().deleteMood(appViewModel.getCurrentUser(), moodList.get(finalIndex));
                         moodList.remove(finalIndex);
                         moodAdapter.notifyDataSetChanged();
 
@@ -92,7 +105,6 @@ public class UserMoodsFragment extends Fragment {
                                         new DefineMoodDialogFragment.OnButtonPressListener() {
                                     @Override
                                     public void onSavePressed(Mood mood) {
-
                                         // TODO Cameron Oct 28, 2019 add location and image
                                         appViewModel.getRepository().updateMood(appViewModel.getCurrentUser(), mood);
                                     }
