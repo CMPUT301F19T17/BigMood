@@ -34,7 +34,7 @@ public class HomeActivityTest {
     }
 
     @Test
-    public void checkUserMoodsFragment() {
+    public void checkAddMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
