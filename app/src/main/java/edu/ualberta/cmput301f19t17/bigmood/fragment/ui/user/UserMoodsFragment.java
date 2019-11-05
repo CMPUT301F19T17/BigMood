@@ -3,6 +3,9 @@ package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.user;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppViewModel;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
@@ -32,7 +36,10 @@ public class UserMoodsFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
+        this.userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
+
+        // Enable options menu
+        this.setHasOptionsMenu(true);
 
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
@@ -103,5 +110,35 @@ public class UserMoodsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    /**
+     * This method gets called when the fragment needs to assemble menu options.
+     * @param menu     The options menu in which you place your items.
+     * @param inflater The menu inflater
+     */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+
+        inflater.inflate(R.menu.fragment_user_moods, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+
+    }
+
+    /**
+     * This method gets called when a menu item in the toolbar is clicked. We only have one item here so we only check one
+     * @param item The menu item that was selected. This value must never be null.
+     * @return     Return false to allow normal menu processing to proceed, true to consume it here.
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.action_filter)
+            Toast.makeText(this.getContext(), "Display Filter Menu", Toast.LENGTH_SHORT).show();
+        else if (item.getItemId() == R.id.action_maps_user)
+            Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
+
+        return super.onOptionsItemSelected(item);
     }
 }
