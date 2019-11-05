@@ -1,14 +1,18 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
@@ -18,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
@@ -59,6 +65,7 @@ public class FirestoreRepository implements Repository {
      * @param username Username string of the user to look up
      * @return         Returns an asynchronous Task of type Boolean. The Boolean is true if the user exists and false otherwise.
      */
+    @Override
     public Task<Boolean> userExists(final String username) {
 
         return db
@@ -90,6 +97,7 @@ public class FirestoreRepository implements Repository {
      * @param lastName  Last name iof the user to register.
      * @return          Returns A Task of type Void. The task will succeed if the writes were successful and fail otherwise (if the username is not unique for example).
      */
+    @Override
     public Task<Void> registerUser(String username, String password, String firstName, String lastName) {
 
         // Check if the username, password, firstName, and lastName are at least one character.
@@ -148,6 +156,7 @@ public class FirestoreRepository implements Repository {
      * @param password Password of the use to validate
      * @return         Returns a task of type User. The task will succeed if there is a valid username and password combination in the database. In the OnSuccessListener you can then extract the user object to use and store as an authentication "token".
      */
+    @Override
     public Task<User> validateUser(final String username, final String password) {
 
         // Queue up a task to get the user document
@@ -216,12 +225,33 @@ public class FirestoreRepository implements Repository {
      * @param user The User whose moods we will retrieve.
      * @return     Returns a Task of type List<Mood>. If the task succeeds you can iterate over the List in the OnSuccessListener.
      */
-    public Task<List<Mood>> getUserMoods(User user) {
+    @Override
+    public Task<List<Mood>> getUserMoods(User user, final MoodsListener listener) {
 
-        return db
+        CollectionReference userMoodsRef = db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
-                .collection(FirestoreMapping.COLLECTION_MOODS)
+                .collection(FirestoreMapping.COLLECTION_MOODS);
+
+        userMoodsRef
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        if (listener == null)
+                            return;
+
+                        List<Mood> moodList = new ArrayList<>();
+
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots)
+                            moodList.add( FirestoreConversion.MoodFromFirestore(doc) );
+
+                        listener.onUpdate(moodList);
+
+                    }
+                });
+
+        return userMoodsRef
                 .get()
                 .continueWith(new Continuation<QuerySnapshot, List<Mood>>() {
                     @Override
@@ -250,7 +280,8 @@ public class FirestoreRepository implements Repository {
      * @param user The current User. We will use their information to get the applicable moods for the users they are following.
      * @return     Returns a Task of type List<Mood>. If the task succeeds you can iterate over the List in the OnSuccessListener.
      */
-    public Task<List<Mood>> getFollowerMoods(User user) {
+    @Override
+    public Task<List<Mood>> getFollowingMoods(User user, MoodsListener listener) {
 
         throw new IllegalArgumentException("This method is not implemented yet");
 
@@ -262,6 +293,7 @@ public class FirestoreRepository implements Repository {
      * @param mood The Mood we are trying to post to the database. The mood passed in should be a NEW mood and NOT have a firestoreId.
      * @return     Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
      */
+    @Override
     public Task<Void> createMood(User user, Mood mood) {
 
         // Since the Firestore ID is final in the class, we can assume that if it has one, it came from the database. We don't want to add another duplicate mood to the database if it already exists. In other words we play it safe
@@ -292,6 +324,7 @@ public class FirestoreRepository implements Repository {
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
      * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
      */
+    @Override
     public Task<Void> deleteMood(User user, Mood mood) {
 
         // Any mood that is passed into this task has to have a FirestoreId. If it doesn't, then this mood was not created as valid.
@@ -313,6 +346,7 @@ public class FirestoreRepository implements Repository {
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
      * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
      */
+    @Override
     public Task<Void> updateMood(User user, Mood mood) {
 
         // Any mood that is passed into this task has to have a FirestoreId. If it doesn't, then this mood was not created as valid.
@@ -335,7 +369,8 @@ public class FirestoreRepository implements Repository {
      * @param user The User whose Requests we will retrieve.
      * @return     Returns a Task of type List<Request>. If the task succeeds you can iterate over the List in the OnSuccessListener.
      */
-    public Task<List<Request>> getUserRequests(User user) {
+    @Override
+    public Task<List<Request>> getUserRequests(User user, RequestsListener listener) {
 
         return db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
@@ -366,6 +401,7 @@ public class FirestoreRepository implements Repository {
      * @param request The Request we are trying to post to the database. The Request passed in should be a NEW request and the destination user exists.
      * @return        Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
      */
+    @Override
     public Task<Void> createRequest(Request request) {
 
         if (request.getFirestoreId() != null)
@@ -394,6 +430,7 @@ public class FirestoreRepository implements Repository {
      * @param request The Request to accept. The Request passed in should be an OLD Request and MUST have a firestoreId.
      * @return        Returns a Task of type Void. The task will succeed if it was able to complete the transaction of deleting the request and adding to the correct follower list.
      */
+    @Override
     public Task<Void> acceptRequest(Request request) {
 
         // If this document comes from the database (and we will know that for sure because we reference it by ID) then we know that both the "from" and "to" user exists. Therefore we don't have to do any user checking on the client side as we can be sure that both users exists to be able to complete the transaction.
@@ -433,6 +470,7 @@ public class FirestoreRepository implements Repository {
      * @param request The Request to decline. The Request passed in should be an OLD Request and MUST have a firestoreId.
      * @return        Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
      */
+    @Override
     public Task<Void> declineRequest(Request request) {
 
         // If this document comes from the database (and we will know that for sure because we reference it by ID) then we know that both the "from" and "to" user exists. Therefore we don't have to do any user checking on the client side as we can be sure that both users exists to be able to complete the transaction.
