@@ -39,7 +39,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
      */
     public interface OnButtonPressListener {
-        void onSavePressed(Mood mood);
+        void onSavePressed(Mood moodToSave);
     }
 
     /**
@@ -49,7 +49,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
         this.listener = new OnButtonPressListener() {
             @Override
-            public void onSavePressed(Mood mood) {
+            public void onSavePressed(Mood moodToSave) {
 
                 throw new UnsupportedOperationException("DefineMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED. use setOnButtonPressListener() to set one.");
 
@@ -192,12 +192,14 @@ public class DefineMoodDialogFragment extends DialogFragment {
         if (this.moodToEdit != null) {
 
             this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
+
             //populate values
             this.stateSpinner.setSelection(this.moodToEdit.getState().getStateCode());
             this.situationSpinner.setSelection(this.moodToEdit.getSituation().getSituationCode());
             EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
             reasonEditText.setText(this.moodToEdit.getReason());
             //TODO add location and image
+
         } else {
 
             this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
@@ -219,27 +221,52 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 // TODO 2019-11-03 cameron removed since i dont believe there is a way to set a preset
                 //  for the spinner programmatically, which is necessary for setting it with an ArrayAdapter,
                 //  as above.
-  /*              if (stateSpinner.getSelectedItemPosition() == 0) {
+//                if (stateSpinner.getSelectedItemPosition() == 0) {
+//
+//                    Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
+//                    Log.e("SPINNER ERROR", "The State Spinner was left empty");
+//
+//                } else {
 
-                    Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
-                    Log.e("SPINNER ERROR", "The State Spinner was left empty");
-
-                } else {*/
                 EmotionalState emotionalState = EmotionalState.findByStateCode(stateSpinner.getSelectedItemPosition());
                 SocialSituation socialSituation = SocialSituation.findBySituationCode(situationSpinner.getSelectedItemPosition());
+
                 Calendar calendar;
-                if (moodToEdit != null) {
+
+                if (moodToEdit != null)
                     calendar = moodToEdit.getDatetime();
-                }
-                else {
+                else
                     calendar = Calendar.getInstance();
-                }
+
                 EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
                 String reason = reasonEditText.getText().toString();
-                //}
+//                }
 
                 // TODO add image, location - canned for now
-                Mood mood = new Mood(emotionalState, calendar, socialSituation, reason, new GeoPoint(54.54, 143.49), null);
+
+                Mood mood;
+
+                if (DefineMoodDialogFragment.this.moodToEdit != null)
+                    mood = new Mood(
+                            DefineMoodDialogFragment.this.moodToEdit.getFirestoreId(),
+                            emotionalState,
+                            calendar,
+                            socialSituation,
+                            reason,
+                            new GeoPoint(32.32, 142.22),
+                            null
+                    );
+
+                else
+                    mood = new Mood(
+                            emotionalState,
+                            calendar,
+                            socialSituation,
+                            reason,
+                            new GeoPoint(32.32, 142.22),
+                            null
+                    );
+
                 // add the mood to the list and dismiss the fragment
                 DefineMoodDialogFragment.this.listener.onSavePressed(mood);
                 DefineMoodDialogFragment.this.dismiss();

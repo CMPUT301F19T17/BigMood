@@ -22,8 +22,8 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
      */
     public interface OnButtonPressListener {
-        void onDeletePressed();
-        void onEditPressed();
+        void onDeletePressed(Mood moodToDelete);
+        void onEditPressed(Mood moodToEdit);
     }
 
     /**
@@ -33,12 +33,12 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
 
         this.listener = new OnButtonPressListener() {
             @Override
-            public void onDeletePressed() {
+            public void onDeletePressed(Mood moodToDelete) {
                 this.logError();
             }
 
             @Override
-            public void onEditPressed() {
+            public void onEditPressed(Mood moodToEdit) {
                 this.logError();
             }
 
@@ -97,7 +97,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
 
                         Log.d(HomeActivity.LOG_TAG, "EDIT button clicked");
-                        ViewUserMoodDialogFragment.this.listener.onEditPressed();
+                        ViewUserMoodDialogFragment.this.listener.onEditPressed(ViewUserMoodDialogFragment.this.moodToView);
 
                     }
                 })
@@ -106,7 +106,7 @@ public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
 
                         Log.d(HomeActivity.LOG_TAG, "DELETE button clicked");
-                        ViewUserMoodDialogFragment.this.listener.onDeletePressed();
+                        ViewUserMoodDialogFragment.this.listener.onDeletePressed(ViewUserMoodDialogFragment.this.moodToView);
 
                     }
                 })

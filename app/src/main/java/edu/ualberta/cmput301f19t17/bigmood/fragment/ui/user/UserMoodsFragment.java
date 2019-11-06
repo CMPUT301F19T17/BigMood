@@ -21,163 +21,190 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
+import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 public class UserMoodsFragment extends Fragment {
+
+    private UserMoodsViewModel userMoodsViewModel;
+    private AppPreferences appPreferences;
+
     private ArrayList<Mood> moodList;
     private ArrayAdapter<Mood> moodAdapter;
 
-    private UserMoodsViewModel userMoodsViewModel;
-
-    private View menuItemFilter;
-
-    private PopupMenu menu;
-
     private EmotionalState filter = null;
 
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    private View menuItemFilter;
+    private PopupMenu menu;
 
-        userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
-        final AppPreferences appPreferences = AppPreferences.getInstance();
+    private ListenerRegistration listenerRegistration;
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
         // Enable options menu
         this.setHasOptionsMenu(true);
 
-        View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
+        // Set ViewModel and App Preferences
+        this.userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
+        this.appPreferences = AppPreferences.getInstance();
 
-        final ListView moodListView = root.findViewById(R.id.mood_list);
-        moodList = new ArrayList<>();
-        moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
+        // Initialize a new ArrayList
+        this.moodList = new ArrayList<>();
+        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
+
+        ListView moodListView = root.findViewById(R.id.mood_list);
+        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
+
         moodListView.setAdapter(moodAdapter);
 
-        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
+        this.listenerRegistration = this.appPreferences
+                .getRepository()
+                .getUserMoods(
+                        this.appPreferences.getCurrentUser(),
+                        new MoodsListener() {
+                            @Override
+                            public void onUpdate(List<Mood> moodList) {
+
+                                UserMoodsFragment.this.moodList.clear();
+                                UserMoodsFragment.this.moodList.addAll(moodList);
+                                UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
+
+                            }
+                        });
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                DefineMoodDialogFragment fragment = DefineMoodDialogFragment.newInstance();
-                fragment.setOnButtonPressListener(
+                DefineMoodDialogFragment addMoodFragment = DefineMoodDialogFragment.newInstance();
+                addMoodFragment.setOnButtonPressListener(
                         new DefineMoodDialogFragment.OnButtonPressListener() {
                             @Override
-                            public void onSavePressed(final Mood mood) {
-                                Log.d("Save Pressed", "Adding Mood");
-                                //TODO dont update local list directly
-                                if (appPreferences.getCurrentUser() != null) {
-                                    appPreferences.getRepository().createMood(appPreferences.getCurrentUser(), mood)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            moodList.add(mood);
-                                            moodAdapter.notifyDataSetChanged();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.e("SAVING", "FAILED TO SAVE TO FIRESTORE");
-                                        }
-                                    });
+                            public void onSavePressed(Mood moodToSave) {
 
-                                }
-                                else
-                                    throw new IllegalStateException("USER IS NULL");
+                                // Create the mood using the repository.
+                                UserMoodsFragment.this.appPreferences.getRepository()
+                                        .createMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToSave)
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                                // Show UI feedback if deletion failed
+                                                Toast.makeText(UserMoodsFragment.this.getContext(), "Failed to add Mood. Please try again.", Toast.LENGTH_SHORT).show();
+                                                Log.e(HomeActivity.LOG_TAG, "Mood failed to save (add) with exception: " + e.toString());
+
+                                            }
+                                        });
 
                             }
-                        });
-                fragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_ADD");
+                        });  // End setOnButtonPressListener
+
+                addMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_ADD");
 
             }
-        });
+        }); // End setOnClickListener
 
 
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                ViewUserMoodDialogFragment fragment = ViewUserMoodDialogFragment.newInstance(moodList.get(i));
-                final int finalIndex = i;
-                fragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
+                // Create dialog and set the button press listener for delete and edit
+                ViewUserMoodDialogFragment viewUserFragment = ViewUserMoodDialogFragment.newInstance(moodList.get(i));
+                viewUserFragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
                     @Override
-                    public void onDeletePressed() {
-                        if (appPreferences.getCurrentUser() != null) {
-                            appPreferences.getRepository().deleteMood(
-                                    appPreferences.getCurrentUser(), moodList.get(finalIndex))
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    //TODO dont update local list directly
-                                    moodList.remove(finalIndex);
-                                    moodAdapter.notifyDataSetChanged();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.e("DELETING", "FAILED TO DELETE FROM FIRESTORE");
+                    public void onDeletePressed(Mood moodToDelete) {
 
-                                }
-                            });
+                        // If the user happens to be null, throw an error
+                        if (UserMoodsFragment.this.appPreferences.getCurrentUser() == null)
+                            throw new IllegalStateException("The current user is null, this should not happen. Did the user log in correctly?");
 
-                        }
-                        else
-                            throw new IllegalStateException("USER IS NULL");
-
-                        Toast.makeText(getContext(), "The Mood was deleted", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onEditPressed() {
-                        Mood moodToEdit = moodList.get(finalIndex);
-
-                        DefineMoodDialogFragment defineFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
-                        defineFragment.setOnButtonPressListener(
-                                        new DefineMoodDialogFragment.OnButtonPressListener() {
+                        // Use the repository to delete the mood.
+                        UserMoodsFragment.this.appPreferences.getRepository()
+                                .deleteMood( UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToDelete)
+                                .addOnFailureListener(new OnFailureListener() {
                                     @Override
-                                    public void onSavePressed(Mood mood) {
-                                        // TODO Cameron Oct 28, 2019 add location and image
-                                        if (appPreferences.getCurrentUser() != null)
-                                            appPreferences.getRepository().updateMood(
-                                                    appPreferences.getCurrentUser(), mood)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Log.d("EDITING", "EDIT SUCCESSFUL");
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("EDITING", "FAILED TO EDIT MOOD IN FIRESTORE");
-                                                        }
-                                                    });
-                                        else
-                                            throw new IllegalStateException("USER IS NULL");
+                                    public void onFailure(@NonNull Exception e) {
+
+                                        // Show UI feedback if deletion failed
+                                        Toast.makeText(UserMoodsFragment.this.getContext(), "Failed to delete Mood. Please try again.", Toast.LENGTH_SHORT).show();
+                                        Log.e(HomeActivity.LOG_TAG, "Mood failed to delete with exception: " + e.toString());
+
                                     }
                                 });
-                        defineFragment.show(getFragmentManager(), "DEFINE_MOOD_FRAGMENT_EDIT");
 
-                    }
+                    }  // End onDeletePressed
+
+                    @Override
+                    public void onEditPressed(Mood moodToEdit) {
+
+                        // If the user happens to be null, throw an error
+                        if (UserMoodsFragment.this.appPreferences.getCurrentUser() == null)
+                            throw new IllegalStateException("The current user is null, this should not happen. Did the user log in correctly?");
+
+                        // Define a dialog fragment in the edit mode and set the listener for the save button.
+                        DefineMoodDialogFragment editMoodFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
+                        editMoodFragment.setOnButtonPressListener(
+                                new DefineMoodDialogFragment.OnButtonPressListener() {
+                                    @Override
+                                    public void onSavePressed(Mood moodToSave) {
+
+                                        // Update the mood using the repository.
+                                        UserMoodsFragment.this.appPreferences.getRepository()
+                                                .updateMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToSave)
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+
+                                                        // Show UI feedback if deletion failed
+                                                        Toast.makeText(UserMoodsFragment.this.getContext(), "Failed to save Mood. Please try again.", Toast.LENGTH_SHORT).show();
+                                                        Log.e(HomeActivity.LOG_TAG, "Mood failed to save (edit) with exception: " + e.toString());
+
+                                                    }
+                                                });
+
+                                    }
+                                });
+
+                        // Show the edit fragment
+                        editMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_EDIT");
+
+                    }  // End onEditPressed
+
                 });
 
-                fragment.show(getFragmentManager(), "VIEW_MOOD_FRAGMENT");
+                // Show the view Dialog
+                viewUserFragment.show(getFragmentManager(), "FRAGMENT_VIEW_MOOD");
+
             }
-        });
+        }); // End setOnItemClickListener
 
         return root;
+
     }
 
+    /**
+     * We need to unbind the ListenerRegistration so that updates do not occur in the background, so we have to make sure we do that upon exit only.
+     */
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onDestroyView() {
+
+        this.listenerRegistration.remove();
+
+        super.onDestroyView();
 
     }
 

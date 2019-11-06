@@ -6,6 +6,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
 public interface RequestsListener {
 
-    void onUpdate(List<Request> moodList);
+    void onUpdate(List<Request> requestList);
 
 }
