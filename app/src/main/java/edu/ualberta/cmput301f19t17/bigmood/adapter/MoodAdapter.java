@@ -90,7 +90,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
 
         Date date = currentMood.getDatetime().getTime();
         
-        moodHolder.state.setText(currentMood.getState().name()); // TODO: 2019-11-03 Nectarios: FIX
+        moodHolder.state.setText(currentMood.getState().toString());
         moodHolder.date.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(date));
         moodHolder.time.setText(new SimpleDateFormat("HH:mm", Locale.CANADA).format(date));
 
