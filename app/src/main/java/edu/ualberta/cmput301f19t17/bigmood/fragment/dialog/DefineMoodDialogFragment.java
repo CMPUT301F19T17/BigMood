@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
@@ -25,9 +24,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
@@ -41,13 +44,19 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_PICK_IMAGE = 2;
-    private ImageView imageView;
+
+    private Toolbar toolbar;
+
     private OnButtonPressListener listener;
     private Mood moodToEdit = null;
 
-    private Toolbar toolbar;
     private Spinner stateSpinner;
     private Spinner situationSpinner;
+    private Spinner dateSpinner;
+    private Spinner timeSpinner;
+    private TextInputLayout reasonInputLayout;
+
+    private ImageView imageView;
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -136,7 +145,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
             if (mood != null)
                 this.moodToEdit = mood;
             else
-                throw new IllegalArgumentException("Something went wrong with creating the view. Received an argument bundle but not a proper Mood. Did you use the newInstance() methods?");
+                throw new IllegalStateException("Something went wrong with creating the view. Received an argument bundle but not a proper Mood. Did you use the newInstance() methods?");
 
         }
 
@@ -161,12 +170,117 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Bind toolbar XML to view
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
-        // Find and bind spinners
-        this.stateSpinner = view.findViewById(R.id.state_spinner);
+        // Find and bind elements
+        this.stateSpinner = view.findViewById(R.id.spinner_state);
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
+        this.reasonInputLayout = view.findViewById(R.id.tiedittext_reason);
+
+        this.imageView = view.findViewById(R.id.image);
+
+        this.dateSpinner = view.findViewById(R.id.spinner_date);
+        this.timeSpinner = view.findViewById(R.id.spinner_time);
+
+        // Return view that has been created
+        return view;
+
+    }
+
+    /**
+     * of the on*()methods, this is the third. This is executed when the view is created. Here we set onClickListeners, etc. This is where we will actually error check all the views and
+     * @param view               The view that was created and inflated
+     * @param savedInstanceState A bundle that holds the state of the fragment
+     */
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+
+        super.onViewCreated(view, savedInstanceState);
+
+        // Inflate Menu resource onto the toolbar
+        this.toolbar.inflateMenu(R.menu.define_mood);
+
+        // Set the Listener for the close button in the toolbar
+        this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(HomeActivity.LOG_TAG, "Close button clicked");
+                DefineMoodDialogFragment.this.dismiss();
+            }
+        });
+
+        // TODO 2019-11-03 Cameron removed since i don't believe there is a way to set a preset for the spinner programmatically, which is necessary for setting it with an ArrayAdapter.
+        // TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
+        final ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(
+                this.getContext(),
+                android.R.layout.simple_spinner_item,
+                EmotionalState.values()
+        );
+        stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        this.stateSpinner.setAdapter(stateAdapter);
+
+        final ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(
+                this.getContext(),
+                android.R.layout.simple_spinner_item,
+                SocialSituation.values()
+        );
+        situationAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        this.situationSpinner.setAdapter(situationAdapter);
+
+        final Calendar calendar;
+
+        // Here we populate values in the fragment if we have a mood and set the appropriate title.
+        if (this.moodToEdit != null) {
+
+            // Set title
+            this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
+
+            // Set the calendar object since we have it in the mood object.
+            calendar = this.moodToEdit.getDatetime();
+
+            // Populate state
+            int statePosition = stateAdapter.getPosition(this.moodToEdit.getState());
+            this.stateSpinner.setSelection(statePosition);
+
+            // Populate
+            if (this.moodToEdit.getSituation() == null) {
+                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation());
+                this.situationSpinner.setSelection(situationPosition);
+            }
+
+            if (! this.moodToEdit.getReason().equals(""))
+                this.reasonInputLayout.getEditText().setText(this.moodToEdit.getReason());
+
+            //TODO add location and image
+
+        } else {
+
+            // Set Title
+            this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
+
+            // Set calendar to a new calendar since it's a new mood
+            calendar = Calendar.getInstance();
+
+        }
+
+        // Set text of date spinner
+        dateSpinner.setAdapter(
+                new ArrayAdapter<String>(
+                        this.getContext(),
+                        android.R.layout.simple_spinner_item,
+                        Collections.singletonList(new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(calendar.getTime()))
+                ));
+        dateSpinner.setEnabled(false);
+
+        // Set text of time spinner
+        timeSpinner.setAdapter(
+                new ArrayAdapter<String>(
+                        this.getContext(),
+                        android.R.layout.simple_spinner_item,
+                        Collections.singletonList(new SimpleDateFormat("HH:mm", Locale.CANADA).format(calendar.getTime()))
+                ));
+        timeSpinner.setEnabled(false);
+
         // add click listener to the image to pick picture from gallery or camera
-        imageView = view.findViewById(R.id.image);
-        imageView.setOnClickListener(new View.OnClickListener() {
+        this.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String title = "Open Photo";
@@ -199,132 +313,62 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
-        // Return view that has been created
-        return view;
-
-    }
-
-    /**
-     * of the on*()methods, this is the third. This is executed when the view is created. Here we set onClickListeners, etc. This is where we will actually error check all the views and
-     * @param view               The view that was created and inflated
-     * @param savedInstanceState A bundle that holds the state of the fragment
-     */
-    @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-
-        super.onViewCreated(view, savedInstanceState);
-
-        // Inflate Menu resource onto the toolbar
-        this.toolbar.inflateMenu(R.menu.define_mood);
-
-        // Set the Listener for the close button in the toolbar
-        this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(HomeActivity.LOG_TAG, "Close button clicked");
-                DefineMoodDialogFragment.this.dismiss();
-            }
-        });
-
-        //TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
-        ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(this.getContext(),
-                android.R.layout.simple_spinner_item, EmotionalState.values());
-        stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        this.stateSpinner.setAdapter(stateAdapter);
-
-        ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(this.getContext(),
-                android.R.layout.simple_spinner_item, SocialSituation.values());
-        situationAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        this.situationSpinner.setAdapter(situationAdapter);
-
-        // Here we populate values in the fragment if we have a mood and set the appropriate title.
-        if (this.moodToEdit != null) {
-
-            this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
-
-            //populate values
-            this.stateSpinner.setSelection(this.moodToEdit.getState().getStateCode());
-            this.situationSpinner.setSelection(this.moodToEdit.getSituation().getSituationCode());
-            EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
-            reasonEditText.setText(this.moodToEdit.getReason());
-            //TODO add location and image
-
-        } else {
-
-            this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
-
-        }
-
 
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
         // This is where the core of the input validation will happen -- that is when the user tries to press Save.
         this.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-            if (item.getItemId() == R.id.action_save) {
+                if (item.getItemId() == R.id.action_save) {
 
-                // SAVE was pressed
+                    // Get emotional state and social situation
+                    EmotionalState emotionalState = stateAdapter.getItem(stateSpinner.getSelectedItemPosition());
+                    SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
 
-                // TODO Cameron Oct30 2019 Research to see if there is a better way to ensure the
-                //  user did not leave the spinner in the first position, and fix if available
-                // TODO 2019-11-03 cameron removed since i dont believe there is a way to set a preset
-                //  for the spinner programmatically, which is necessary for setting it with an ArrayAdapter,
-                //  as above.
-//                if (stateSpinner.getSelectedItemPosition() == 0) {
-//
-//                    Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
-//                    Log.e("SPINNER ERROR", "The State Spinner was left empty");
-//
-//                } else {
+                    // Get reason
+                    String reason = DefineMoodDialogFragment.this.reasonInputLayout
+                            .getEditText()
+                            .getText()
+                            .toString()
+                            .trim();
 
-                EmotionalState emotionalState = EmotionalState.findByStateCode(stateSpinner.getSelectedItemPosition());
-                SocialSituation socialSituation = SocialSituation.findBySituationCode(situationSpinner.getSelectedItemPosition());
+                    // TODO add image, location - canned for now
 
-                Calendar calendar;
+                    // Declare mood. Can be initialized as an "old" mood (with firestoreId) or a "new" mood (without firestoreId).
+                    Mood mood;
 
-                if (moodToEdit != null)
-                    calendar = moodToEdit.getDatetime();
-                else
-                    calendar = Calendar.getInstance();
+                    // If we have an old mood, pass the firestoreId along.
+                    if (DefineMoodDialogFragment.this.moodToEdit != null)
+                        mood = new Mood(
+                                DefineMoodDialogFragment.this.moodToEdit.getFirestoreId(),
+                                emotionalState,
+                                calendar,
+                                socialSituation,
+                                reason,
+                                new GeoPoint(32.32, 142.22),
+                                null
+                        );
 
-                EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
-                String reason = reasonEditText.getText().toString();
-//                }
+                    // If we don't have an old mood, we have to create a brand new one, without the firestoreId.
+                    else
+                        mood = new Mood(
+                                emotionalState,
+                                calendar,
+                                socialSituation,
+                                reason,
+                                new GeoPoint(32.32, 142.22),
+                                null
+                        );
 
-                // TODO add image, location - canned for now
+                    // Invoke the callback method with the mood and dismiss the fragment
+                    DefineMoodDialogFragment.this.listener.onSavePressed(mood);
+                    DefineMoodDialogFragment.this.dismiss();
+                    return true;
 
-                Mood mood;
+                }  // End if statement on R.id.action_save
 
-                if (DefineMoodDialogFragment.this.moodToEdit != null)
-                    mood = new Mood(
-                            DefineMoodDialogFragment.this.moodToEdit.getFirestoreId(),
-                            emotionalState,
-                            calendar,
-                            socialSituation,
-                            reason,
-                            new GeoPoint(32.32, 142.22),
-                            null
-                    );
-
-                else
-                    mood = new Mood(
-                            emotionalState,
-                            calendar,
-                            socialSituation,
-                            reason,
-                            new GeoPoint(32.32, 142.22),
-                            null
-                    );
-
-                // add the mood to the list and dismiss the fragment
-                DefineMoodDialogFragment.this.listener.onSavePressed(mood);
-                DefineMoodDialogFragment.this.dismiss();
-                return true;
-
-            }
-
-            // Base case
-            return false;
+                // Base case
+                return false;
 
             }
         });
@@ -353,6 +397,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
 
     }
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
@@ -360,13 +405,14 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
     }
 
-    private void dispatchPickImageIntent(){
+    private void dispatchPickImageIntent() {
         Intent i = new Intent(
                 Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         if (i.resolveActivity(getContext().getPackageManager()) != null) {
             startActivityForResult(i, REQUEST_PICK_IMAGE);
         }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -374,9 +420,9 @@ public class DefineMoodDialogFragment extends DialogFragment {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageView.setImageBitmap(imageBitmap);
-        } else if(requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK){
+        } else if (requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK) {
             Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
             Cursor cursor = getContext().getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
