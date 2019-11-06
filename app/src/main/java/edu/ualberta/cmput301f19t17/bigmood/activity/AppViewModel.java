@@ -2,6 +2,7 @@ package edu.ualberta.cmput301f19t17.bigmood.activity;
 
 import androidx.lifecycle.ViewModel;
 
+import edu.ualberta.cmput301f19t17.bigmood.database.FirestoreRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
@@ -19,7 +20,7 @@ public class AppViewModel extends ViewModel {
      */
     public AppViewModel() {
         this.currentUser = null;
-        this.repository = Repository.getInstance();
+        this.repository = FirestoreRepository.getInstance();
     }
 
     /**
