@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -60,7 +59,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         Log.d(HomeActivity.LOG_TAG, "Back navigation (Hardware) from " + this.getClass().getSimpleName());
-        this.finish();
 
     }
 
@@ -69,9 +67,8 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
 
         Log.d(HomeActivity.LOG_TAG, "Back navigation (Software) from " + this.getClass().getSimpleName());
-        this.finish();
 
-        return true;
+        return false;
 
     }
 }
