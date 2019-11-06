@@ -326,6 +326,32 @@ public class FirestoreRepository implements Repository {
 
     }
 
+    @Override
+    public Task<Void> deleteAllMoods(User user) {
+
+        return db
+                .collection(FirestoreMapping.COLLECTION_USERS)
+                .document(user.getUsername())
+                .collection(FirestoreMapping.COLLECTION_MOODS)
+                .get()
+                .continueWith(new Continuation<QuerySnapshot, Void>() {
+                    @Override
+                    public Void then(@NonNull Task<QuerySnapshot> task) throws Exception {
+
+                        // Will propagate error
+                        QuerySnapshot query = task.getResult();
+
+                        for (QueryDocumentSnapshot document : query)
+                            document.getReference().delete();
+
+                        return null;
+
+                    }
+                });
+
+
+    }
+
     /**
      * this method attempts to modify a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.

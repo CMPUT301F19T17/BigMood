@@ -29,6 +29,8 @@ public interface Repository {
 
     Task<Void> deleteMood(User user, Mood mood);
 
+    Task<Void> deleteAllMoods(User user);
+
     Task<Void> updateMood(User user, Mood mood);
 
     ListenerRegistration getUserRequests(User user, RequestsListener listener);
