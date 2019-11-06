@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -49,6 +50,12 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         this.arrayMoodList = moodList;
         this.originalArrayMood = moodList;
     }
+
+    @Override
+    public Mood getItem(int position){
+        return arrayMoodList.get(position);
+    }
+
 
     /**
      *  This method gets called when a row is either being created or re-created (recycled).
@@ -138,7 +145,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
                 ArrayList<Mood> filteredMoodList = new ArrayList<Mood>();
 
 
-                if (constraint == null || constraint.length() == 0) {
+
+                if (constraint.toString() == "None" || constraint.toString().length() == 0 || constraint == null) {
                     results.count = originalArrayMood.size();
                     results.values = originalArrayMood;
                 } else {
@@ -146,7 +154,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
                         Mood currentMood = originalArrayMood.get(i);
                         EmotionalState emotionalState = currentMood.getState();
                         String state = emotionalState.toString();
-                        if (state == constraint.toString()) {
+                        if (state.startsWith(constraint.toString())) {
                             filteredMoodList.add(currentMood);
                         }
                     }
@@ -157,10 +165,15 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                arrayMoodList = (ArrayList<Mood>) results.values;
-                notifyDataSetChanged();
+                if (results!=null && results.values!=null) {
+                    arrayMoodList = (ArrayList<Mood>) results.values;
+                    notifyDataSetChanged();
+                } else {
+                    arrayMoodList = originalArrayMood;
+                }
             }
 
         };

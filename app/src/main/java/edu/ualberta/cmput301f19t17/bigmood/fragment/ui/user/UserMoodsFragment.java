@@ -260,7 +260,6 @@ public class UserMoodsFragment extends Fragment {
                         else
                             UserMoodsFragment.this.filter = EmotionalState.findByStateCode(item.getItemId());
                             moodAdapter.getFilter().filter(item.getTitle());
-                            moodAdapter.notifyDataSetChanged();
 
                         // For any menu item click we set the checked state to true and return true.
                         item.setChecked(true);
