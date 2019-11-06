@@ -12,9 +12,9 @@ public enum EmotionalState {
 
     HAPPINESS (0, "Happy", R.drawable.ic_emoticon_happy),
     SADNESS (1, "Sad", R.drawable.ic_emoticon_sad),
-    FEAR (2, "Angry", R.drawable.ic_emoticon_fear),
+    FEAR (2, "Afraid", R.drawable.ic_emoticon_fear),
     DISGUST (3, "Disgusted", R.drawable.ic_emoticon_disgust),
-    ANGER (4, "Afraid", R.drawable.ic_emoticon_anger),
+    ANGER (4, "Angry", R.drawable.ic_emoticon_anger),
     SURPRISE (5, "Surprised", R.drawable.ic_emoticon_surprise),
     ;
 

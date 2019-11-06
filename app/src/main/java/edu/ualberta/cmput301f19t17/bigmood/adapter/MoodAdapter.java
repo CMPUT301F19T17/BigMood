@@ -3,22 +3,28 @@ package edu.ualberta.cmput301f19t17.bigmood.adapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 /**
@@ -27,8 +33,10 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
  * 1) Stores a collection of Ride objects in tandem with the ArrayList passed into its constructor.
  * 2) Inflates the different aspects of the row layout that are defined.
  */
-public class MoodAdapter extends ArrayAdapter<Mood> {
+public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     private final int resource;
+    private ArrayList<Mood> arrayMoodList;
+    private ArrayList<Mood> originalArrayMood;
 
     /**
      * This constructor is used to create a new MoodAdapter
@@ -39,7 +47,30 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
     public MoodAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Mood> moodList) {
         super(context, resource, moodList);
         this.resource=resource;
+        this.arrayMoodList = moodList;
+        this.originalArrayMood = moodList;
     }
+
+    /**
+     * This method overrides the default one with the filtered array list's item
+     * @param position
+     * @return
+     */
+    @Override
+    public Mood getItem(int position){
+        return arrayMoodList.get(position);
+    }
+
+    /**
+     * This method overrides the default one with the filtered array list's count
+     * @return
+     */
+
+    @Override
+    public int getCount(){
+        return arrayMoodList != null? arrayMoodList.size(): 0;
+    }
+
 
     /**
      *  This method gets called when a row is either being created or re-created (recycled).
@@ -54,7 +85,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         //This MoodHolder will hold our views while we create them
-        MoodHolder moodHolder = new MoodHolder();
+            MoodHolder moodHolder;
 
         // We test if convertView is null so we can know if we have to inflate it or not (findViewById)
         if (convertView == null) {
@@ -90,7 +121,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
 
         Date date = currentMood.getDatetime().getTime();
         
-        moodHolder.state.setText(currentMood.getState().name()); // TODO: 2019-11-03 Nectarios: FIX
+        moodHolder.state.setText(currentMood.getState().toString());
         moodHolder.date.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(date));
         moodHolder.time.setText(new SimpleDateFormat("HH:mm", Locale.CANADA).format(date));
 
@@ -114,6 +145,70 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
         TextView time;
         TextView state;
         ImageView image;
+    }
+
+    /**
+     * This class implements Filterable to enable filtering mood list by emotional state
+     */
+    @Override
+    public Filter getFilter() {
+        // Initialized a filter
+        Filter filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+
+                // Setup results for the filter
+                FilterResults results = new FilterResults();
+                ArrayList<Mood> filteredMoodList = new ArrayList<Mood>();
+
+
+                // If the user opt for "NONE" filter option, will return the original list
+                // In case something unexpected happened, it will also return the original list
+                if (constraint.toString() == "None" || constraint.toString().length() == 0 || constraint == null) {
+                    results.count = originalArrayMood.size();
+                    results.values = originalArrayMood;
+                } else {
+
+                    // Select the mood with the matching criteria and add them into the filteredMoodList
+                    for (int i = 0; i < originalArrayMood.size(); i++) {
+                        Mood currentMood = originalArrayMood.get(i);
+                        EmotionalState emotionalState = currentMood.getState();
+                        String state = emotionalState.toString();
+                        if (state.startsWith(constraint.toString())) {
+                            filteredMoodList.add(currentMood);
+                        }
+                    }
+                    results.count = filteredMoodList.size();
+                    results.values = filteredMoodList;
+                }
+
+                // return the result with its count and values (the list we choose to show)
+                return results;
+
+            }
+
+            /**
+             * This method will publish the result according to the selected filter
+             * This also tell the adapter that the current list has change, hence updating
+             * the List View
+             * @param constraint
+             * @param results
+             */
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                // If the result is not null (filter applied), assign the new filteredMoodList
+                if (results!=null && results.values!=null) {
+                    arrayMoodList = (ArrayList<Mood>) results.values;
+                    notifyDataSetChanged();
+                } else {
+                    // If no filter, or null, set the array to the original one
+                    arrayMoodList = originalArrayMood;
+                }
+            }
+
+        };
+        return filter;
     }
 }
 

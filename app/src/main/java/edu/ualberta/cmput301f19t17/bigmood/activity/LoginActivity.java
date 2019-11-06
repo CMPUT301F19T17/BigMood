@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,15 +32,33 @@ public class LoginActivity extends AppCompatActivity {
 
         this.appPreferences = AppPreferences.getInstance();
 
+        // Get ids of the textfields
         this.textInputUsername = (TextInputLayout) this.findViewById(R.id.text_input_username);
         this.textInputPassword = (TextInputLayout) this.findViewById(R.id.text_input_password);
 
+        // Get Id of button
         Button buttonLogin = (Button) this.findViewById(R.id.button_login);
 
+        // Get Id of clickable Textview
+        TextView buttonSignup = (TextView) this.findViewById(R.id.textview_button_sign_up);
+
+        // Set the textview to navigate to the sign up activity
+        buttonSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                LoginActivity.this.startActivity(intent);
+
+            }
+        });
+
+        // Set the onClickListener for the button. We want it to be able to log in the user using the repository's methods in the Preferences file.
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                // Basically creates an or switch between both the username and password
                 boolean failed = false;
 
                 String username = LoginActivity.this.textInputUsername.getEditText().getText().toString().trim();
@@ -82,6 +100,9 @@ public class LoginActivity extends AppCompatActivity {
                                 // Go to the home screen
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                 LoginActivity.this.startActivity(intent);
+
+                                // Clear password field
+                                LoginActivity.this.textInputPassword.getEditText().setText("");
 
                             }
                         })
