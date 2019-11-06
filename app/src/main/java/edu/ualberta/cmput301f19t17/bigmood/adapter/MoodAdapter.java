@@ -54,7 +54,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         //This MoodHolder will hold our views while we create them
-        MoodHolder moodHolder = new MoodHolder();
+            MoodHolder moodHolder;
 
         // We test if convertView is null so we can know if we have to inflate it or not (findViewById)
         if (convertView == null) {

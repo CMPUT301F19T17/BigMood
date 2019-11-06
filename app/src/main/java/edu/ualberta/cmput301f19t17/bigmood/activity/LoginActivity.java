@@ -101,6 +101,9 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                 LoginActivity.this.startActivity(intent);
 
+                                // Clear password field
+                                LoginActivity.this.textInputPassword.getEditText().setText("");
+
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
