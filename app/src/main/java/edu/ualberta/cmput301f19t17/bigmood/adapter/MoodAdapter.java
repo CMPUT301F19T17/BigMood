@@ -3,22 +3,27 @@ package edu.ualberta.cmput301f19t17.bigmood.adapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 /**
@@ -27,8 +32,10 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
  * 1) Stores a collection of Ride objects in tandem with the ArrayList passed into its constructor.
  * 2) Inflates the different aspects of the row layout that are defined.
  */
-public class MoodAdapter extends ArrayAdapter<Mood> {
+public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     private final int resource;
+    private ArrayList<Mood> arrayMoodList;
+    private ArrayList<Mood> originalArrayMood;
 
     /**
      * This constructor is used to create a new MoodAdapter
@@ -39,6 +46,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
     public MoodAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Mood> moodList) {
         super(context, resource, moodList);
         this.resource=resource;
+        this.arrayMoodList = moodList;
+        this.originalArrayMood = moodList;
     }
 
     /**
@@ -114,6 +123,48 @@ public class MoodAdapter extends ArrayAdapter<Mood> {
         TextView time;
         TextView state;
         ImageView image;
+    }
+
+    /**
+     * This class implements Filterable to enable filtering mood list by emotional state
+     */
+    @Override
+    public Filter getFilter() {
+
+        Filter filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                ArrayList<Mood> filteredMoodList = new ArrayList<Mood>();
+
+
+                if (constraint == null || constraint.length() == 0) {
+                    results.count = originalArrayMood.size();
+                    results.values = originalArrayMood;
+                } else {
+                    for (int i = 0; i < originalArrayMood.size(); i++) {
+                        Mood currentMood = originalArrayMood.get(i);
+                        EmotionalState emotionalState = currentMood.getState();
+                        String state = emotionalState.toString();
+                        if (state == constraint.toString()) {
+                            filteredMoodList.add(currentMood);
+                        }
+                    }
+                    results.count = filteredMoodList.size();
+                    results.values = filteredMoodList;
+                }
+                return results;
+
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                arrayMoodList = (ArrayList<Mood>) results.values;
+                notifyDataSetChanged();
+            }
+
+        };
+        return filter;
     }
 }
 

@@ -232,6 +232,8 @@ public class UserMoodsFragment extends Fragment {
                             UserMoodsFragment.this.filter = null;
                         else
                             UserMoodsFragment.this.filter = EmotionalState.findByStateCode(item.getItemId());
+                            moodAdapter.getFilter().filter(item.getTitle());
+                            moodAdapter.notifyDataSetChanged();
 
                         // For any menu item click we set the checked state to true and return true.
                         item.setChecked(true);
@@ -248,6 +250,7 @@ public class UserMoodsFragment extends Fragment {
 
                 if (this.filter == state)
                     menuItem.setChecked(true);
+
             }
 
             // If the filter happens to be null, that means that there is no filter, so we set the checked state of the "None" item.
