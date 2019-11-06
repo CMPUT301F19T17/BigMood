@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
@@ -57,22 +58,23 @@ public class UserMoodsFragment extends Fragment {
                             @Override
                             public void onSavePressed(final Mood mood) {
                                 Log.d("Save Pressed", "Adding Mood");
-                                //TODO dont update local list directly
                                 if (appPreferences.getCurrentUser() != null) {
+                                    //create the mood in FireStore
                                     appPreferences.getRepository().createMood(appPreferences.getCurrentUser(), mood)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            moodList.add(mood);
-                                            moodAdapter.notifyDataSetChanged();
+                                            //if we have successfully added the mood, we want to update the moodList
+                                            updateMoodList(appPreferences);
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Log.e("SAVING", "FAILED TO SAVE TO FIRESTORE");
+                                            Log.e("SAVING FAILED", "FAILED TO SAVE TO FIRESTORE");
                                         }
                                     });
+
 
                                 }
                                 else
@@ -101,9 +103,7 @@ public class UserMoodsFragment extends Fragment {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    //TODO dont update local list directly
-                                    moodList.remove(finalIndex);
-                                    moodAdapter.notifyDataSetChanged();
+                                    updateMoodList(appPreferences);
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -130,7 +130,6 @@ public class UserMoodsFragment extends Fragment {
                                         new DefineMoodDialogFragment.OnButtonPressListener() {
                                     @Override
                                     public void onSavePressed(Mood mood) {
-                                        // TODO Cameron Oct 28, 2019 add location and image
                                         if (appPreferences.getCurrentUser() != null)
                                             appPreferences.getRepository().updateMood(
                                                     appPreferences.getCurrentUser(), mood)
@@ -138,6 +137,7 @@ public class UserMoodsFragment extends Fragment {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Log.d("EDITING", "EDIT SUCCESSFUL");
+                                                            updateMoodList(appPreferences);
                                                         }
                                                     })
                                                     .addOnFailureListener(new OnFailureListener() {
@@ -160,5 +160,23 @@ public class UserMoodsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void updateMoodList(AppPreferences appPreferences) {
+        appPreferences.getRepository().getUserMoods(appPreferences.getCurrentUser())
+                .addOnSuccessListener(new OnSuccessListener<List<Mood>>() {
+                    @Override
+                    public void onSuccess(List<Mood> moods) {
+                        moodList.clear();
+                        moodList.addAll(moods);
+                        moodAdapter.notifyDataSetChanged();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("SAVING FAILED", "Could not update the list.");
+                    }
+                });
     }
 }
