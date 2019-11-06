@@ -23,15 +23,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
-import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
-import edu.ualberta.cmput301f19t17.bigmood.database.FirestoreRepository;
-import edu.ualberta.cmput301f19t17.bigmood.database.User;
-import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;

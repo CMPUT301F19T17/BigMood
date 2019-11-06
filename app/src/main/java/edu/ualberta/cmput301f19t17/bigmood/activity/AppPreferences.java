@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.activity;
 
+import edu.ualberta.cmput301f19t17.bigmood.database.FirestoreRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
@@ -37,7 +38,7 @@ public class AppPreferences {
      */
     private AppPreferences() {
         this.currentUser = null;
-        this.repository = Repository.getInstance();
+        this.repository = FirestoreRepository.getInstance();
     }
 
     public void setCurrentUser(User user) {
