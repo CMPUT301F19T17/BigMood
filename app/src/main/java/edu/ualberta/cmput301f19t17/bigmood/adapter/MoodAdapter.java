@@ -51,9 +51,24 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         this.originalArrayMood = moodList;
     }
 
+    /**
+     * This method overrides the default one with the filtered array list's item
+     * @param position
+     * @return
+     */
     @Override
     public Mood getItem(int position){
         return arrayMoodList.get(position);
+    }
+
+    /**
+     * This method overrides the default one with the filtered array list's count
+     * @return
+     */
+
+    @Override
+    public int getCount(){
+        return arrayMoodList != null? arrayMoodList.size(): 0;
     }
 
 
@@ -137,19 +152,24 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
      */
     @Override
     public Filter getFilter() {
-
+        // Initialized a filter
         Filter filter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
+
+                // Setup results for the filter
                 FilterResults results = new FilterResults();
                 ArrayList<Mood> filteredMoodList = new ArrayList<Mood>();
 
 
-
+                // If the user opt for "NONE" filter option, will return the original list
+                // In case something unexpected happened, it will also return the original list
                 if (constraint.toString() == "None" || constraint.toString().length() == 0 || constraint == null) {
                     results.count = originalArrayMood.size();
                     results.values = originalArrayMood;
                 } else {
+
+                    // Select the mood with the matching criteria and add them into the filteredMoodList
                     for (int i = 0; i < originalArrayMood.size(); i++) {
                         Mood currentMood = originalArrayMood.get(i);
                         EmotionalState emotionalState = currentMood.getState();
@@ -161,17 +181,28 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
                     results.count = filteredMoodList.size();
                     results.values = filteredMoodList;
                 }
+
+                // return the result with its count and values (the list we choose to show)
                 return results;
 
             }
 
+            /**
+             * This method will publish the result according to the selected filter
+             * This also tell the adapter that the current list has change, hence updating
+             * the List View
+             * @param constraint
+             * @param results
+             */
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
+                // If the result is not null (filter applied), assign the new filteredMoodList
                 if (results!=null && results.values!=null) {
                     arrayMoodList = (ArrayList<Mood>) results.values;
                     notifyDataSetChanged();
                 } else {
+                    // If no filter, or null, set the array to the original one
                     arrayMoodList = originalArrayMood;
                 }
             }

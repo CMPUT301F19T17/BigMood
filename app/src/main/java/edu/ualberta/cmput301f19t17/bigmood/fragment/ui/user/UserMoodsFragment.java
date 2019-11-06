@@ -245,7 +245,6 @@ public class UserMoodsFragment extends Fragment {
                 // Add all emotional states to the menu
                 for (EmotionalState state : EmotionalState.values())
                     this.menu.getMenu().add(R.id.group_filter, state.getStateCode(), Menu.NONE, state.toString());
-
                 // Set the checkable state of the group
                 this.menu.getMenu().setGroupCheckable(R.id.group_filter, true, true);
 
@@ -255,12 +254,16 @@ public class UserMoodsFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
 
                         // Once we click an item, we have to set the appropriate filter. In the case of the none item, we select that, and for every other action we set it to the correct emotional state. Keep in mind that we set the item id for each emotional state menu item to exactly the statecode, so it is easy to reverse match it here.
-                        if (item.getItemId() == R.id.filter_none)
+                        if (item.getItemId() == R.id.filter_none){
                             UserMoodsFragment.this.filter = null;
-                        else
+                            // Show the full list
+                            moodAdapter.getFilter().filter("None");
+                        }
+                        else {
+                            // Filter the list based on the selected item's title
                             UserMoodsFragment.this.filter = EmotionalState.findByStateCode(item.getItemId());
-                            moodAdapter.getFilter().filter(item.getTitle());
-
+                            moodAdapter.getFilter().filter(filter.toString());
+                        }
                         // For any menu item click we set the checked state to true and return true.
                         item.setChecked(true);
                         return true;
