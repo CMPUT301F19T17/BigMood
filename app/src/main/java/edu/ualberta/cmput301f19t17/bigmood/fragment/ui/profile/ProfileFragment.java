@@ -13,14 +13,17 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 
 public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
+    private AppPreferences appPreferences;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         this.profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        this.appPreferences = AppPreferences.getInstance();
 
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
@@ -56,7 +59,7 @@ public class ProfileFragment extends Fragment {
         if (item.getItemId() == R.id.action_sign_out) {
 
             // If the sign out button is pressed, clear the current user and call finish() on the underlying activity.
-//            this.appViewModel.setCurrentUser(null);
+            this.appPreferences.setCurrentUser(null);
             this.getActivity().finish();
             return true;
 

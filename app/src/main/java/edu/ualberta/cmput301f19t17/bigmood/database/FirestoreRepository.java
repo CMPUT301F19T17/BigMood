@@ -13,6 +13,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
@@ -57,6 +59,7 @@ public class FirestoreRepository implements Repository {
     private FirestoreRepository() {
         this.db = FirebaseFirestore.getInstance();
     }
+
 
     // USER RELATED METHODS //
 
@@ -218,57 +221,40 @@ public class FirestoreRepository implements Repository {
 
     }
 
+
     // MOOD RELATED METHODS //
 
     /**
      * This method gets as a List the set of all moods belonging to a particular User.
      * @param user The User whose moods we will retrieve.
-     * @return     Returns a Task of type List<Mood>. If the task succeeds you can iterate over the List in the OnSuccessListener.
+     * @return     Returns a ListenerRegistration. Upon the first call and any other change to the database the callback method will be invoked.
      */
     @Override
-    public Task<List<Mood>> getUserMoods(User user, final MoodsListener listener) {
+    public ListenerRegistration getUserMoods(User user, final MoodsListener listener) {
 
-        CollectionReference userMoodsRef = db
+        return db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
-                .collection(FirestoreMapping.COLLECTION_MOODS);
-
-        userMoodsRef
+                .collection(FirestoreMapping.COLLECTION_MOODS)
+                .orderBy(FirestoreMapping.FIELD_MOOD_DATETIME, Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
+                        // If the passed listener is null this SnapshotListener will be called but it won't do anything.
                         if (listener == null)
                             return;
 
+                        // Create new mood list
                         List<Mood> moodList = new ArrayList<>();
 
+                        // Add every mood to the mood list
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots)
                             moodList.add( FirestoreConversion.MoodFromFirestore(doc) );
 
+                        // Call the callback method in the caller.
                         listener.onUpdate(moodList);
 
-                    }
-                });
-
-        return userMoodsRef
-                .get()
-                .continueWith(new Continuation<QuerySnapshot, List<Mood>>() {
-                    @Override
-                    public List<Mood> then(@NonNull Task<QuerySnapshot> task) throws Exception {
-
-                        // Will propagate error
-                        QuerySnapshot snapshot = task.getResult();
-
-                        if (snapshot == null)
-                            return null;
-
-                        List<Mood> moodList = new ArrayList<>();
-
-                        for (QueryDocumentSnapshot doc : snapshot)
-                            moodList.add( FirestoreConversion.MoodFromFirestore(doc) );
-
-                        return  moodList;
                     }
                 });
 
@@ -278,10 +264,10 @@ public class FirestoreRepository implements Repository {
     /**
      * This method gets the most recent mood (read: limit 1) from ALL the Users the passed in User is following.
      * @param user The current User. We will use their information to get the applicable moods for the users they are following.
-     * @return     Returns a Task of type List<Mood>. If the task succeeds you can iterate over the List in the OnSuccessListener.
+     * @return     Returns a ListenerRegistration. Upon the first call and any other change to the database the callback method will be invoked.
      */
     @Override
-    public Task<List<Mood>> getFollowingMoods(User user, MoodsListener listener) {
+    public ListenerRegistration getFollowingMoods(User user, MoodsListener listener) {
 
         throw new IllegalArgumentException("This method is not implemented yet");
 
@@ -362,34 +348,36 @@ public class FirestoreRepository implements Repository {
 
     }
 
+
     // REQUEST RELATED METHODS //
 
     /**
      * This method gets as a List the set of all Requests belonging to a particular User.
      * @param user The User whose Requests we will retrieve.
-     * @return     Returns a Task of type List<Request>. If the task succeeds you can iterate over the List in the OnSuccessListener.
+     * @return     Returns a ListenerRegistration. Upon the first call and any other change to the database the callback method will be invoked.
      */
     @Override
-    public Task<List<Request>> getUserRequests(User user, RequestsListener listener) {
+    public ListenerRegistration getUserRequests(User user, final RequestsListener listener) {
 
         return db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
                 .whereEqualTo(FirestoreMapping.FIELD_REQUEST_TO, user.getUsername())
-                .get()
-                .continueWith(new Continuation<QuerySnapshot, List<Request>>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public List<Request> then(@NonNull Task<QuerySnapshot> task) throws Exception {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        if (listener == null)
+                            return;
 
                         // Create new List object
                         List<Request> requestList = new ArrayList<>();
 
-                        // Will propagate error
-                        QuerySnapshot query = task.getResult();
-
-                        for (QueryDocumentSnapshot doc : query)
+                        // Add every request to the request list
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots)
                             requestList.add(FirestoreConversion.RequestFromFirestore(doc));
 
-                        return requestList;
+                        // Call the callback method in the caller.
+                        listener.onUpdate(requestList);
 
                     }
                 });

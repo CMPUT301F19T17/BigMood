@@ -1,7 +1,15 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -9,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -26,8 +35,13 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
+import static android.app.Activity.RESULT_OK;
+
 public class DefineMoodDialogFragment extends DialogFragment {
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_PICK_IMAGE = 2;
+    private ImageView imageView;
     private OnButtonPressListener listener;
     private Mood moodToEdit = null;
 
@@ -39,7 +53,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
      */
     public interface OnButtonPressListener {
-        void onSavePressed(Mood mood);
+        void onSavePressed(Mood moodToSave);
     }
 
     /**
@@ -49,7 +63,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
         this.listener = new OnButtonPressListener() {
             @Override
-            public void onSavePressed(Mood mood) {
+            public void onSavePressed(Mood moodToSave) {
 
                 throw new UnsupportedOperationException("DefineMoodDialogFragment.OnButtonPressListener is NOT IMPLEMENTED. use setOnButtonPressListener() to set one.");
 
@@ -150,9 +164,44 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Find and bind spinners
         this.stateSpinner = view.findViewById(R.id.state_spinner);
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
+        // add click listener to the image to pick picture from gallery or camera
+        imageView = view.findViewById(R.id.image);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String title = "Open Photo";
+                CharSequence[] itemlist ={"Take a Photo",
+                        "Pick from Gallery"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(title);
+                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:// Take Photo
+                                // Do Take Photo task here
+                                dispatchTakePictureIntent();
+                                break;
+                            case 1:// Choose Existing Photo
+                                // Do Pick Photo task here
+                                dispatchPickImageIntent();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.setCancelable(true);
+                alert.show();
+            }
+        });
 
         // Return view that has been created
         return view;
+
     }
 
     /**
@@ -192,12 +241,14 @@ public class DefineMoodDialogFragment extends DialogFragment {
         if (this.moodToEdit != null) {
 
             this.toolbar.setTitle(getString(R.string.title_dialog_edit_mood));
+
             //populate values
             this.stateSpinner.setSelection(this.moodToEdit.getState().getStateCode());
             this.situationSpinner.setSelection(this.moodToEdit.getSituation().getSituationCode());
             EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
             reasonEditText.setText(this.moodToEdit.getReason());
             //TODO add location and image
+
         } else {
 
             this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
@@ -219,27 +270,52 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 // TODO 2019-11-03 cameron removed since i dont believe there is a way to set a preset
                 //  for the spinner programmatically, which is necessary for setting it with an ArrayAdapter,
                 //  as above.
-  /*              if (stateSpinner.getSelectedItemPosition() == 0) {
+//                if (stateSpinner.getSelectedItemPosition() == 0) {
+//
+//                    Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
+//                    Log.e("SPINNER ERROR", "The State Spinner was left empty");
+//
+//                } else {
 
-                    Toast.makeText(DefineMoodDialogFragment.this.getContext(), DefineMoodDialogFragment.this.getString(R.string.error_no_emotional_state), Toast.LENGTH_SHORT).show();
-                    Log.e("SPINNER ERROR", "The State Spinner was left empty");
-
-                } else {*/
                 EmotionalState emotionalState = EmotionalState.findByStateCode(stateSpinner.getSelectedItemPosition());
                 SocialSituation socialSituation = SocialSituation.findBySituationCode(situationSpinner.getSelectedItemPosition());
+
                 Calendar calendar;
-                if (moodToEdit != null) {
+
+                if (moodToEdit != null)
                     calendar = moodToEdit.getDatetime();
-                }
-                else {
+                else
                     calendar = Calendar.getInstance();
-                }
+
                 EditText reasonEditText = view.findViewById(R.id.reason_edit_text);
                 String reason = reasonEditText.getText().toString();
-                //}
+//                }
 
                 // TODO add image, location - canned for now
-                Mood mood = new Mood(emotionalState, calendar, socialSituation, reason, new GeoPoint(54.54, 143.49), null);
+
+                Mood mood;
+
+                if (DefineMoodDialogFragment.this.moodToEdit != null)
+                    mood = new Mood(
+                            DefineMoodDialogFragment.this.moodToEdit.getFirestoreId(),
+                            emotionalState,
+                            calendar,
+                            socialSituation,
+                            reason,
+                            new GeoPoint(32.32, 142.22),
+                            null
+                    );
+
+                else
+                    mood = new Mood(
+                            emotionalState,
+                            calendar,
+                            socialSituation,
+                            reason,
+                            new GeoPoint(32.32, 142.22),
+                            null
+                    );
+
                 // add the mood to the list and dismiss the fragment
                 DefineMoodDialogFragment.this.listener.onSavePressed(mood);
                 DefineMoodDialogFragment.this.dismiss();
@@ -277,4 +353,42 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
 
     }
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    private void dispatchPickImageIntent(){
+        Intent i = new Intent(
+                Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (i.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivityForResult(i, REQUEST_PICK_IMAGE);
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageView.setImageBitmap(imageBitmap);
+        } else if(requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK){
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContext().getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
+        }
+    }
+
 }

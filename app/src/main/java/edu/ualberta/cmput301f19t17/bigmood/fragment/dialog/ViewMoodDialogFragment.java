@@ -26,6 +26,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 public class ViewMoodDialogFragment extends DialogFragment {
 
     private Toolbar toolbar;
+    protected Mood moodToView;
 
     /**
      * This is the default constructor for the dialog. newInstance() methods. Technically a user of this class should not use this constructor. If it happens, the class will eventually log a message when spawned.
@@ -55,23 +56,6 @@ public class ViewMoodDialogFragment extends DialogFragment {
     }
 
     /**
-     * This method serves the purpose of building a proper dialog for this fragment. onCreateDialog() must return a dialog and this is where that occurs. The intention is that any subclasses will be able to override this method to implement their own dialogs.
-     * @param view This is the view that the Dialog has to attach to. We presume this has already been created.
-     * @return     Fully built Dialog
-     */
-    protected Dialog buildDialog(View view) {
-
-        // Define new AlertDialog.Builder so we can display a custom dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-
-        // Build and return the dialog. We set the onClick listeners for each button to point to a different method in our interface which take different parameters
-        return builder
-                .setView(view)
-                .create();
-
-    }
-
-    /**
      * This gets called when the dialog is drawn on the screen. We have to populate a bunch of values using the mood we get from the arguments Bundle.
      * @param savedInstanceState A bundle with the saved state.
      * @return                   An instance of a Dialog after we've created it
@@ -88,10 +72,10 @@ public class ViewMoodDialogFragment extends DialogFragment {
             throw new IllegalArgumentException("ViewMoodDialogFragment was not properly provided arguments, did you use the newInstance() method?");
 
         // Get Mood. This can be null if the user did not use the newInstance() methods.
-        Mood mood = args.getParcelable(Mood.TAG_MOOD_OBJECT);
+        this.moodToView = args.getParcelable(Mood.TAG_MOOD_OBJECT);
 
         // If null, raise exception
-        if (mood == null)
+        if (this.moodToView == null)
             throw new IllegalArgumentException("ViewMoodDialogFragment was not provided a Mood object in the arguments bundle, did you use the newInstance() method?");
 
         // At this point we should be in the point in execution where we have a mood to view, so we have to populate all the fields.
@@ -126,38 +110,55 @@ public class ViewMoodDialogFragment extends DialogFragment {
         ImageView locationImageView = view.findViewById(R.id.imageview_placeholder_location);
 
         // Set state to the nice name defined by the enumeration
-        stateTextView.setText(mood.getState().toString());
+        stateTextView.setText(this.moodToView.getState().toString());
 
         // Set image based on enum
         Resources res = this.getContext().getResources();
-        Drawable emoticon = res.getDrawable(mood.getState().getDrawableId());
+        Drawable emoticon = res.getDrawable(this.moodToView.getState().getDrawableId());
         emoteImageView.setImageDrawable(emoticon);
 
         // Set date and time
-        Calendar calendar = mood.getDatetime();
+        Calendar calendar = this.moodToView.getDatetime();
         dateTextView.setText( new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(calendar.getTime()) );
         timeTextView.setText( new SimpleDateFormat("HH:mm", Locale.CANADA).format(calendar.getTime()) );
 
         // If the mood has a social situation, add it. If not, let it take the default value in the resource layout.
-        if (mood.getSituation() != null)
-            situationTextView.setText(mood.getSituation().toString());
+        if (this.moodToView.getSituation() != null)
+            situationTextView.setText(this.moodToView.getSituation().toString());
 
         // If the mood has a state, add it. If not, let it take the default value in the resource layout.
-        if (! mood.getReason().equals(""))
-            reasonTextView.setText(mood.getReason());
-        
-        if (mood.getImage() == null) {
+        if (! this.moodToView.getReason().equals(""))
+            reasonTextView.setText(this.moodToView.getReason());
+
+        if (this.moodToView.getImage() == null) {
             // draw "no picture" image
         } else {
             //photoImageView.setImageBitmap(mood.getImage());
         }
-        if (mood.getLocation() == null) {
+        if (this.moodToView.getLocation() == null) {
             // draw "no location" image
         } else {
             //locationImageView.setImageBitmap("bitmap");
         }
 
         return this.buildDialog(view);
+
+    }
+
+    /**
+     * This method serves the purpose of building a proper dialog for this fragment. onCreateDialog() must return a dialog and this is where that occurs. The intention is that any subclasses will be able to override this method to implement their own dialogs.
+     * @param view This is the view that the Dialog has to attach to. We presume this has already been created.
+     * @return     Fully built Dialog
+     */
+    protected Dialog buildDialog(View view) {
+
+        // Define new AlertDialog.Builder so we can display a custom dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+
+        // Build and return the dialog. We set the onClick listeners for each button to point to a different method in our interface which take different parameters
+        return builder
+                .setView(view)
+                .create();
 
     }
 
