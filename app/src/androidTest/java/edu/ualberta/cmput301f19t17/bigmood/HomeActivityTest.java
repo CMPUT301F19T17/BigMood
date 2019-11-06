@@ -3,7 +3,6 @@ package edu.ualberta.cmput301f19t17.bigmood;
 import android.app.Activity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toolbar;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -42,7 +41,7 @@ public class HomeActivityTest {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, 3); //disgusted
         solo.pressSpinnerItem(1, 2); //two to several
-        solo.enterText((EditText) solo.getView(R.id.reason_edit_text), "I am grossed out");
+        solo.enterText((EditText) solo.getView(R.id.tiedittext_reason), "I am grossed out");
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText("DISGUST");
@@ -59,7 +58,7 @@ public class HomeActivityTest {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, 3); //disgusted
         solo.pressSpinnerItem(1, 2); //two to several
-        solo.enterText((EditText) solo.getView(R.id.reason_edit_text), "I am grossed out");
+        solo.enterText((EditText) solo.getView(R.id.tiedittext_reason), "I am grossed out");
 
         solo.clickOnView(solo.getView(R.id.action_save));
 
