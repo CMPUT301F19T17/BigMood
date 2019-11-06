@@ -1,7 +1,15 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -9,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -26,8 +35,13 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
+import static android.app.Activity.RESULT_OK;
+
 public class DefineMoodDialogFragment extends DialogFragment {
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_PICK_IMAGE = 2;
+    private ImageView imageView;
     private OnButtonPressListener listener;
     private Mood moodToEdit = null;
 
@@ -150,9 +164,44 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Find and bind spinners
         this.stateSpinner = view.findViewById(R.id.state_spinner);
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
+        // add click listener to the image to pick picture from gallery or camera
+        imageView = view.findViewById(R.id.image);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String title = "Open Photo";
+                CharSequence[] itemlist ={"Take a Photo",
+                        "Pick from Gallery"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(title);
+                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:// Take Photo
+                                // Do Take Photo task here
+                                dispatchTakePictureIntent();
+                                break;
+                            case 1:// Choose Existing Photo
+                                // Do Pick Photo task here
+                                dispatchPickImageIntent();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.setCancelable(true);
+                alert.show();
+            }
+        });
 
         // Return view that has been created
         return view;
+
     }
 
     /**
@@ -304,4 +353,42 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
 
     }
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    private void dispatchPickImageIntent(){
+        Intent i = new Intent(
+                Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (i.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivityForResult(i, REQUEST_PICK_IMAGE);
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageView.setImageBitmap(imageBitmap);
+        } else if(requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK){
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContext().getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
+        }
+    }
+
 }
