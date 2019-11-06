@@ -123,7 +123,7 @@ public class UserMoodsFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 // Create dialog and set the button press listener for delete and edit
-                ViewUserMoodDialogFragment viewUserFragment = ViewUserMoodDialogFragment.newInstance(moodList.get(i));
+                ViewUserMoodDialogFragment viewUserFragment = ViewUserMoodDialogFragment.newInstance(moodAdapter.getItem(i));
                 viewUserFragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
                     @Override
                     public void onDeletePressed(Mood moodToDelete) {
