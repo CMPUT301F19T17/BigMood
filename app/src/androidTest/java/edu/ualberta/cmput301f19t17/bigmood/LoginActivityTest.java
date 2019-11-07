@@ -8,7 +8,6 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,11 +36,6 @@ public class LoginActivityTest {
         appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
-    @After
-    public void cleanUp() {
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-    }
-
     @Test
     public void start() throws Exception {
         Activity activity = rule.getActivity();
@@ -54,7 +48,7 @@ public class LoginActivityTest {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "Wrong_password");
         solo.clickOnView(solo.getView(R.id.button_login));
-        solo.clickOnButton("Login");
+        solo.clickOnButton("Log In");
         solo.waitForText("Username/password incorrect");
 
         //successful login
@@ -62,7 +56,7 @@ public class LoginActivityTest {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "Wrong_password");
         solo.clickOnView(solo.getView(R.id.button_login));
-        solo.clickOnButton("Login");
+        solo.clickOnButton("Log In");
 
     }
 

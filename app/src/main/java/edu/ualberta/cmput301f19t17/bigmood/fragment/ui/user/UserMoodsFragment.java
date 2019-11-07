@@ -49,8 +49,8 @@ public class UserMoodsFragment extends Fragment {
 
     private EmotionalState filter = null;
 
-    private View menuItemFilter;
-    private PopupMenu menu;
+    private View menuItemFilter = null;
+    private PopupMenu menu = null;
 
     private ListenerRegistration listenerRegistration;
 
@@ -89,7 +89,7 @@ public class UserMoodsFragment extends Fragment {
                         new MoodsListener() {
                             /**
                              * This method is called whenever the listener hears that there is an update in the moodList
-                             * in FireStore
+                             * in FireStore, and updates the list, and applies a filter, if the user has selected one
                              * @param moodList the new list that has the updated values
                              */
                             @Override
@@ -98,6 +98,8 @@ public class UserMoodsFragment extends Fragment {
                                 UserMoodsFragment.this.moodList.clear();
                                 UserMoodsFragment.this.moodList.addAll(moodList);
                                 UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
+                                // This refresh the filter with the updated data
+                                ((MoodAdapter) UserMoodsFragment.this.moodAdapter).applyFilter(menuItemFilter, menu);
 
                             }
                         });
@@ -138,12 +140,9 @@ public class UserMoodsFragment extends Fragment {
 
                                             }
                                         });
-
                             }
                         });  // End setOnButtonPressListener
-
                 addMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_ADD");
-
             }
         }); // End setOnClickListener
 
@@ -152,6 +151,7 @@ public class UserMoodsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                final int position = i;
                 // Create dialog and set the button press listener for delete and edit
                 ViewUserMoodDialogFragment viewUserFragment = ViewUserMoodDialogFragment.newInstance(moodAdapter.getItem(i));
                 viewUserFragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
@@ -164,7 +164,7 @@ public class UserMoodsFragment extends Fragment {
 
                         // Use the repository to delete the mood.
                         UserMoodsFragment.this.appPreferences.getRepository()
-                                .deleteMood( UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToDelete)
+                                .deleteMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToDelete)
                                 .addOnFailureListener(new OnFailureListener() {
                                     /**
                                      * This method is called when the task to delete a mood fails
@@ -179,11 +179,10 @@ public class UserMoodsFragment extends Fragment {
 
                                     }
                                 });
-
                     }  // End onDeletePressed
 
                     @Override
-                    public void onEditPressed(Mood moodToEdit) {
+                    public void onEditPressed(final Mood moodToEdit) {
 
                         // If the user happens to be null, throw an error
                         if (UserMoodsFragment.this.appPreferences.getCurrentUser() == null)
@@ -218,7 +217,6 @@ public class UserMoodsFragment extends Fragment {
 
                                                     }
                                                 });
-
                                     }
                                 });
 
@@ -268,7 +266,7 @@ public class UserMoodsFragment extends Fragment {
     /**
      * This method gets called when a menu item in the toolbar is clicked. We only have one item here so we only check one
      * @param item The menu item that was selected. This value must never be null.
-     * @return     Return false to allow normal menu processing to proceed, true to consume it here.
+     * @return Return false to allow normal menu processing to proceed, true to consume it here.
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -296,13 +294,13 @@ public class UserMoodsFragment extends Fragment {
                     /**
                      * This method is called when an item in the Filter list is clicked
                      * @param item the item that was clicked
-                     * @return true // TODO: 2019-11-07 Cameron: not sure why it always returns true, investigate 
+                     * @return true // TODO: 2019-11-07 Cameron: not sure why it always returns true, investigate
                      */
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
 
                         // Once we click an item, we have to set the appropriate filter. In the case of the none item, we select that, and for every other action we set it to the correct emotional state. Keep in mind that we set the item id for each emotional state menu item to exactly the statecode, so it is easy to reverse match it here.
-                        if (item.getItemId() == R.id.filter_none){
+                        if (item.getItemId() == R.id.filter_none) {
                             UserMoodsFragment.this.filter = null;
                             // Show the full list
                             moodAdapter.getFilter().filter("None");
@@ -342,9 +340,6 @@ public class UserMoodsFragment extends Fragment {
             Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
 
         }
-        // TODO: 2019-11-07 Cameron: Discovered commented out code. Fix or remove
-//        return super.onOptionsItemSelected(item);
         return true;
-
     }
 }

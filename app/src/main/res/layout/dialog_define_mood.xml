@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="State"
+                android:text="@string/label_emotional_state"
                 app:layout_constraintStart_toStartOf="@+id/spinner_state"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -61,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/date_txt"
+                android:text="@string/label_date"
                 app:layout_constraintStart_toStartOf="@+id/spinner_date"
                 app:layout_constraintTop_toBottomOf="@+id/spinner_state" />
 
@@ -138,6 +138,8 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="@integer/max_length_reason"
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -147,7 +149,9 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/label_reason" />
+                    android:hint="@string/label_reason"
+                    android:inputType="textShortMessage"
+                    android:scrollHorizontally="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -192,7 +196,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:text="@string/add_location_btn"
+                android:text="@string/label_add_location"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"

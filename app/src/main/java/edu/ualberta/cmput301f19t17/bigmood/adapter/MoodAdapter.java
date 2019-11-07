@@ -5,12 +5,14 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -147,6 +149,29 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     }
 
     /**
+     * This function reapply the filter with the mood selected in the menu
+     * If it's the first time running, this won't do anything
+     * @param menuItemFilter the item that we want to filter by
+     * @param menu the reference to the menu
+     */
+    public void applyFilter(View menuItemFilter, PopupMenu menu) {
+        if (menuItemFilter==null || menu == null) return;
+        int stateLen = menu.getMenu().size();
+        // Traverse through the item list, filter the list with the selected mood
+        for (int i = 0; i < stateLen; i++) {
+            MenuItem item = menu.getMenu().getItem(i);
+            if (item == null || (item.getItemId()==R.id.filter_none && item.isChecked())) {
+                this.getFilter().filter("None");
+                break;
+            } else if (item.isChecked()) {
+                this.getFilter().filter(item.getTitle().toString());
+            }
+        }
+
+    }
+
+
+    /**
      * This class implements Filterable to enable filtering mood list by emotional state.
      * This method is the implementation of a Filterable method.
      */
@@ -196,8 +221,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
              * This method will publish the result according to the selected filter
              * This also tell the adapter that the current list has change, hence updating
              * the List View
-             * @param constraint
-             * @param results
+             * @param constraint the filter item that the user selected
+             * @param results the resulting list that comes from the original list being filtered
              */
             @SuppressWarnings("unchecked")
             @Override
