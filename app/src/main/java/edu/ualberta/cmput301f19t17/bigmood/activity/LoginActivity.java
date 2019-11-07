@@ -20,10 +20,12 @@ import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private AppPreferences appPreferences;
+
     private TextInputLayout textInputUsername;
     private TextInputLayout textInputPassword;
 
-    private AppPreferences appPreferences;
+    private Button buttonLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,8 @@ public class LoginActivity extends AppCompatActivity {
         this.textInputPassword = (TextInputLayout) this.findViewById(R.id.text_input_password);
 
         // Get Id of button
-        Button buttonLogin = (Button) this.findViewById(R.id.button_login);
+
+        this.buttonLogin = (Button) this.findViewById(R.id.button_login);
 
         // Get Id of clickable Textview
         TextView buttonSignup = (TextView) this.findViewById(R.id.textview_button_sign_up);
@@ -54,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // Set the onClickListener for the button. We want it to be able to log in the user using the repository's methods in the Preferences file.
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
+        this.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -65,14 +68,14 @@ public class LoginActivity extends AppCompatActivity {
                 String password = LoginActivity.this.textInputPassword.getEditText().getText().toString();
 
                 if (username.isEmpty()) {
-                    LoginActivity.this.textInputUsername.setError("Username cannot be empty.");
+                    LoginActivity.this.textInputUsername.setError(LoginActivity.this.getString(R.string.error_empty_username));
                     failed = true;
                 } else {
                     LoginActivity.this.textInputUsername.setError(null);
                 }
 
                 if (password.isEmpty()) {
-                    LoginActivity.this.textInputPassword.setError("Password cannot be empty.");
+                    LoginActivity.this.textInputPassword.setError(LoginActivity.this.getString(R.string.error_empty_password));
                     failed = true;
                 } else {
                     LoginActivity.this.textInputPassword.setError(null);
@@ -83,14 +86,22 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO: 2019-11-04 Nectarios: ScrollView
 
+                // Since we have to wait for an async task we have to disable the button so further attempts are not submitted. We enable it later on.
+                LoginActivity.this.buttonLogin.setEnabled(false);
+
+                // Validate the user
                 LoginActivity.this.appPreferences.getRepository().validateUser(username, password)
                         .addOnSuccessListener(new OnSuccessListener<User>() {
                             @Override
                             public void onSuccess(User user) {
 
-                                // According to
+                                // When the user is null that means that the read succeeded but either the username or password didn't match. Therefore we have to let the user know.
                                 if (user == null) {
-                                    Toast.makeText(LoginActivity.this, "Username/password incorrect.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this, R.string.error_incorrect_user_pw, Toast.LENGTH_SHORT).show();
+
+                                    // Enable the button again
+                                    LoginActivity.this.buttonLogin.setEnabled(true);
+
                                     return;
                                 }
 
@@ -104,15 +115,23 @@ public class LoginActivity extends AppCompatActivity {
                                 // Clear password field
                                 LoginActivity.this.textInputPassword.getEditText().setText("");
 
+                                // Enable the button again
+                                LoginActivity.this.buttonLogin.setEnabled(true);
+
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
 
-                                Toast.makeText(LoginActivity.this, "Failed to log in. Please try again.", Toast.LENGTH_SHORT).show();
+                                //
+                                Toast.makeText(LoginActivity.this, R.string.error_login_failed, Toast.LENGTH_SHORT).show();
 
+                                // Log the error
                                 Log.d(HomeActivity.LOG_TAG, "User Validation failed: " + e.toString());
+
+                                // Enable the button again
+                                LoginActivity.this.buttonLogin.setEnabled(true);
 
                             }
                         });

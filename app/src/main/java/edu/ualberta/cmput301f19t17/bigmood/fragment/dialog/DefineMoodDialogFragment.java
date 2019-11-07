@@ -279,40 +279,41 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 ));
         timeSpinner.setEnabled(false);
 
-        // add click listener to the image to pick picture from gallery or camera
-        this.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String title = "Open Photo";
-                CharSequence[] itemlist ={"Take a Photo",
-                        "Pick from Gallery"};
+        // TODO: 2019-11-06 Ranajay: Disabled for now since going to take a photo results in a crash
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(title);
-                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:// Take Photo
-                                // Do Take Photo task here
-                                dispatchTakePictureIntent();
-                                break;
-                            case 1:// Choose Existing Photo
-                                // Do Pick Photo task here
-                                dispatchPickImageIntent();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.setCancelable(true);
-                alert.show();
-            }
-        });
-
+//        // add click listener to the image to pick picture from gallery or camera
+//        this.imageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String title = "Open Photo";
+//                CharSequence[] itemlist ={"Take a Photo",
+//                        "Pick from Gallery"};
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                builder.setTitle(title);
+//                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
+//
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        switch (which) {
+//                            case 0:// Take Photo
+//                                // Do Take Photo task here
+//                                dispatchTakePictureIntent();
+//                                break;
+//                            case 1:// Choose Existing Photo
+//                                // Do Pick Photo task here
+//                                dispatchPickImageIntent();
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                    }
+//                });
+//                AlertDialog alert = builder.create();
+//                alert.setCancelable(true);
+//                alert.show();
+//            }
+//        });
 
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
         // This is where the core of the input validation will happen -- that is when the user tries to press Save.
@@ -331,6 +332,30 @@ public class DefineMoodDialogFragment extends DialogFragment {
                             .getText()
                             .toString()
                             .trim();
+
+                    // Get the max length and max word count tha the reason is allowed to be
+                    int maxLength = DefineMoodDialogFragment.this.getContext().getResources().getInteger(R.integer.max_length_reason);
+                    int maxWordCount = DefineMoodDialogFragment.this.getContext().getResources().getInteger(R.integer.max_word_count_reason);
+
+                    // This controls the logic for the max reason length. We display error messages depending on what is violated. For checking word count, we split the string by any space character (\s) one or more times (+). This makes sure that any number sf spaces is counted as one delimiter.
+                    if (reason.length() > maxLength) {
+
+                        // Set error and return, since this is not valid.
+                        DefineMoodDialogFragment.this.reasonInputLayout.setError(DefineMoodDialogFragment.this.getString(R.string.error_reason_too_long));
+                        return false;
+
+                    } else if (reason.split("\\s+").length > maxWordCount) {
+
+                        // Set error and return, since this is not valid.
+                        DefineMoodDialogFragment.this.reasonInputLayout.setError(DefineMoodDialogFragment.this.getString(R.string.error_reason_word_count));
+                        return false;
+
+                    } else {
+
+                        // Technically has no effect because the dialog is immediately dismissed but for completeness we do this.
+                        DefineMoodDialogFragment.this.reasonInputLayout.setError(null);
+
+                    }
 
                     // TODO add image, location - canned for now
 

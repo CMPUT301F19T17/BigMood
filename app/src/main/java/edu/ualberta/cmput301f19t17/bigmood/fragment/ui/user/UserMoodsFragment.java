@@ -281,8 +281,7 @@ public class UserMoodsFragment extends Fragment {
                             UserMoodsFragment.this.filter = null;
                             // Show the full list
                             moodAdapter.getFilter().filter("None");
-                        }
-                        else {
+                        } else {
                             // Filter the list based on the selected item's title
                             UserMoodsFragment.this.filter = EmotionalState.findByStateCode(item.getItemId());
                             moodAdapter.getFilter().filter(filter.toString());
