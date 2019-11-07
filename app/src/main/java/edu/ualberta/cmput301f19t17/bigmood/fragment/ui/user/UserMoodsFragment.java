@@ -81,6 +81,8 @@ public class UserMoodsFragment extends Fragment {
                                 UserMoodsFragment.this.moodList.clear();
                                 UserMoodsFragment.this.moodList.addAll(moodList);
                                 UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
+                                // This refresh the filter with the updated data
+                                ((MoodAdapter) UserMoodsFragment.this.moodAdapter).applyFilter(menuItemFilter, menu);
 
                             }
                         });
@@ -106,12 +108,6 @@ public class UserMoodsFragment extends Fragment {
                                                 Toast.makeText(UserMoodsFragment.this.getContext(), "Failed to add Mood. Please try again.", Toast.LENGTH_SHORT).show();
                                                 Log.e(HomeActivity.LOG_TAG, "Mood failed to save (add) with exception: " + e.toString());
 
-                                            }
-                                        })
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                refreshListView();
                                             }
                                         });
 
@@ -144,7 +140,7 @@ public class UserMoodsFragment extends Fragment {
 
                         // Use the repository to delete the mood.
                         UserMoodsFragment.this.appPreferences.getRepository()
-                                .deleteMood( UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToDelete)
+                                .deleteMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToDelete)
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
@@ -153,12 +149,6 @@ public class UserMoodsFragment extends Fragment {
                                         Toast.makeText(UserMoodsFragment.this.getContext(), "Failed to delete Mood. Please try again.", Toast.LENGTH_SHORT).show();
                                         Log.e(HomeActivity.LOG_TAG, "Mood failed to delete with exception: " + e.toString());
 
-                                    }
-                                })
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                        public void onSuccess(Void aVoid) {
-                                            refreshListView();
                                     }
                                 });
 
@@ -191,13 +181,8 @@ public class UserMoodsFragment extends Fragment {
                                                         Log.e(HomeActivity.LOG_TAG, "Mood failed to save (edit) with exception: " + e.toString());
 
                                                     }
-                                                })
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        refreshListView();
-                                                    }
                                                 });
+
 
                                     }
                                 });
@@ -233,6 +218,7 @@ public class UserMoodsFragment extends Fragment {
 
     /**
      * This method gets called when the fragment needs to assemble menu options.
+     *
      * @param menu     The options menu in which you place your items.
      * @param inflater The menu inflater
      */
@@ -247,8 +233,9 @@ public class UserMoodsFragment extends Fragment {
 
     /**
      * This method gets called when a menu item in the toolbar is clicked. We only have one item here so we only check one
+     *
      * @param item The menu item that was selected. This value must never be null.
-     * @return     Return false to allow normal menu processing to proceed, true to consume it here.
+     * @return Return false to allow normal menu processing to proceed, true to consume it here.
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -277,7 +264,7 @@ public class UserMoodsFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
 
                         // Once we click an item, we have to set the appropriate filter. In the case of the none item, we select that, and for every other action we set it to the correct emotional state. Keep in mind that we set the item id for each emotional state menu item to exactly the statecode, so it is easy to reverse match it here.
-                        if (item.getItemId() == R.id.filter_none){
+                        if (item.getItemId() == R.id.filter_none) {
                             UserMoodsFragment.this.filter = null;
                             // Show the full list
                             moodAdapter.getFilter().filter("None");
@@ -321,34 +308,5 @@ public class UserMoodsFragment extends Fragment {
         return true;
 
     }
-
-    public void refreshListView() {
-
-        UserMoodsFragment.this.appPreferences.getRepository().getUserMoods(
-                UserMoodsFragment.this.appPreferences.getCurrentUser(),
-                new MoodsListener() {
-                    @Override
-                    public void onUpdate(List<Mood> moodList) {
-                        UserMoodsFragment.this.moodList.clear();
-                        UserMoodsFragment.this.moodList.addAll(moodList);
-                        UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
-                    }
-                }
-        );
-        if (UserMoodsFragment.this.menuItemFilter!=null && UserMoodsFragment.this.menu!=null)
-            applyFilter();
-    }
-
-    public void applyFilter() {
-        int stateLen = menu.getMenu().size();
-        for (int i = 0; i < stateLen; i++) {
-            MenuItem item = menu.getMenu().getItem(i);
-            if (item == null || (item.getItemId()==R.id.filter_none && item.isChecked())) {
-                moodAdapter.getFilter().filter("None");
-                break;
-            } else if (item.isChecked()) {
-                moodAdapter.getFilter().filter(item.getTitle().toString());
-            }
-        }
-    }
 }
+

@@ -5,12 +5,14 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -148,6 +150,29 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         TextView state;
         ImageView image;
     }
+
+    /**
+     * This function reapply the filter with the mood selected in the menu
+     * If it's the first time running, this won't do anything
+     * @param menuItemFilter
+     * @param menu
+     */
+    public void applyFilter(View menuItemFilter, PopupMenu menu) {
+        if (menuItemFilter==null || menu == null) return;
+        int stateLen = menu.getMenu().size();
+        // Traverse through the item list, filter the list with the selected mood
+        for (int i = 0; i < stateLen; i++) {
+            MenuItem item = menu.getMenu().getItem(i);
+            if (item == null || (item.getItemId()==R.id.filter_none && item.isChecked())) {
+                this.getFilter().filter("None");
+                break;
+            } else if (item.isChecked()) {
+                this.getFilter().filter(item.getTitle().toString());
+            }
+        }
+
+    }
+
 
     /**
      * This class implements Filterable to enable filtering mood list by emotional state
