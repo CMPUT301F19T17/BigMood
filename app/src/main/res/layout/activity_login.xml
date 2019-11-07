@@ -94,7 +94,7 @@
         android:id="@+id/textview_text_sign_up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
         android:text="@string/text_not_registered"
@@ -113,7 +113,9 @@
         android:layout_marginLeft="4dp"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
+        android:focusable="true"
         android:linksClickable="true"
+        android:padding="8dp"
         android:text="@string/label_sign_up"
         android:textColor="@color/design_default_color_primary"
         android:textSize="18sp"
@@ -122,7 +124,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@+id/textview_text_sign_up"
-        android:focusable="true" />
+        app:layout_constraintStart_toEndOf="@+id/textview_text_sign_up" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
