@@ -48,6 +48,10 @@ public enum EmotionalState {
         return this.drawableId;
     }
 
+    /**
+     * This method converts an EmotionalState into a string
+     * @return the displayName of the EmotionalState
+     */
     @NonNull
     @Override
     public String toString() {

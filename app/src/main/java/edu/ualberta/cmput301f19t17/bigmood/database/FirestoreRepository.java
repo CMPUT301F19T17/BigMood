@@ -308,7 +308,7 @@ public class FirestoreRepository implements Repository {
      * this method attempts to delete a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
-     * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @return returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
      */
     @Override
     public Task<Void> deleteMood(User user, Mood mood) {
@@ -326,6 +326,13 @@ public class FirestoreRepository implements Repository {
 
     }
 
+    /**
+     * This method is used to delete all of the moods that belong to a user.
+     * It is only used for testing, so as to stop clogging up the user with 50+ moods
+     * @param user the user who's moods we want to delete
+     * @return returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     *
+     */
     @Override
     public Task<Void> deleteAllMoods(User user) {
 

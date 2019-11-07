@@ -23,6 +23,9 @@ import java.util.Locale;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
+/**
+ * ViewMoodDialogFragment is used to view a mood
+ */
 public class ViewMoodDialogFragment extends DialogFragment {
 
     private Toolbar toolbar;

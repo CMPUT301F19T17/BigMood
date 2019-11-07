@@ -18,6 +18,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
+/**
+ * LoginActivity is the activity that allows the user to log into the app with their unique username and their password.
+ * It also allows the user to navigate to the SignUpFragment, where they can create an account.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout textInputUsername;
@@ -25,6 +29,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private AppPreferences appPreferences;
 
+    /**
+     * onCreate is called when the Activity is created, and it is used to perform the logic that the Activity
+     * needs, such as setting onClickListeners.
+     * @param savedInstanceState if the instance was saved, this would be sent in when the Activity is created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

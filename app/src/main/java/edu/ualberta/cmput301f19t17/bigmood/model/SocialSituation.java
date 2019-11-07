@@ -19,7 +19,8 @@ public enum SocialSituation {
 
     /**
      * Constructor that allows each state to be associated with a code.
-     * @param situationCode
+     * @param situationCode the "index" of the SocialSituation that it is associated with
+     * @param displayName the "name" of the SocialSituation that it is associated with
      */
     SocialSituation(int situationCode, String displayName) {
         this.situationCode = situationCode;
@@ -28,12 +29,16 @@ public enum SocialSituation {
 
     /**
      * This method retrieves the situation code from the enum category
-     * @return
+     * @return the situation code
      */
     public int getSituationCode() {
         return situationCode;
     }
 
+    /**
+     * This method converts an SocialSituation into a string
+     * @return the displayName of the SocialSituation
+     */
     @NonNull
     @Override
     public String toString() {

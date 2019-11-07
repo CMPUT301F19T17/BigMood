@@ -53,8 +53,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
     /**
      * This method overrides the default one with the filtered array list's item
-     * @param position
-     * @return
+     * @param position the position of the mood we want to get
+     * @return the mood at position
      */
     @Override
     public Mood getItem(int position){
@@ -63,9 +63,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
     /**
      * This method overrides the default one with the filtered array list's count
-     * @return
+     * @return null if the arrayMoodList is null, or the size of the arrayMoodList
      */
-
     @Override
     public int getCount(){
         return arrayMoodList != null? arrayMoodList.size(): 0;
@@ -148,12 +147,18 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     }
 
     /**
-     * This class implements Filterable to enable filtering mood list by emotional state
+     * This class implements Filterable to enable filtering mood list by emotional state.
+     * This method is the implementation of a Filterable method.
      */
     @Override
     public Filter getFilter() {
         // Initialized a filter
         Filter filter = new Filter() {
+            /**
+             * This method creates and returns a sublist of the arrayMoodList based off of the filter that was sent in.
+             * @param constraint the filter that the user has suggested
+             * @return the list of objects that make it through the filtering process
+             */
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
 

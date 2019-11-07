@@ -14,12 +14,22 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
+/**
+ * HomeActivity is the Activity the hosts the fragments:
+ * UserMoodsFragment, FollowingFragment, RequestsFragment, and ProfileFragment.
+ * It also hosts the toolbar that allows the user to navigate through these fragments
+ */
 public class HomeActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = "BigMoodLogger";
 
     private AppPreferences appPreferences;
 
+    /**
+     * onCreate is called when the Activity is created, and it is used to perform the logic that the Activity
+     * needs, such as setting onClickListeners.
+     * @param savedInstanceState if the instance was saved, this would be sent in when the Activity is created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +64,10 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    // Hardware back navigation
+    /**
+     * This method is for hardware back navigation, so if the phone that the user uses has an physical back button
+     * and pressed the button, then this method will be called
+     */
     @Override
     public void onBackPressed() {
 
@@ -62,7 +75,10 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    // Software back navigation
+    /**
+     * This method is for software back navigation, so if the phone that the user uses has a virtual back button
+     * and pressed the button, then this method will be called
+     */
     @Override
     public boolean onSupportNavigateUp() {
 
