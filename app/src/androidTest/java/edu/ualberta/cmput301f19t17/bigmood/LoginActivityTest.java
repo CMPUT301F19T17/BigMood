@@ -8,7 +8,6 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,11 +34,6 @@ public class LoginActivityTest {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
         appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
-    }
-
-    @After
-    public void cleanUp() {
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
     }
 
     @Test
