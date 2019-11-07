@@ -17,7 +17,7 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.LoginActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 
 /**
- * Test class for MainActivity. All the UI tests are written here. Robotium test framework is
+ * Test class for LoginActivity. All the UI tests are written here. Robotium test framework is
  used
  */
 // unit test to ensure that logic returns desired result
@@ -33,7 +33,7 @@ public class LoginActivityTest {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-        appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        //appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Test
