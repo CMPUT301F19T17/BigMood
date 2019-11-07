@@ -110,16 +110,10 @@ public class UserMoodsFragment extends Fragment {
 
                                             }
                                         });
-
                             }
-
-
                         });  // End setOnButtonPressListener
-
                 addMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_ADD");
             }
-
-
         }); // End setOnClickListener
 
 
@@ -151,8 +145,6 @@ public class UserMoodsFragment extends Fragment {
 
                                     }
                                 });
-
-
                     }  // End onDeletePressed
 
                     @Override
@@ -182,8 +174,6 @@ public class UserMoodsFragment extends Fragment {
 
                                                     }
                                                 });
-
-
                                     }
                                 });
 
@@ -303,10 +293,7 @@ public class UserMoodsFragment extends Fragment {
             Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
 
         }
-
-//        return super.onOptionsItemSelected(item);
         return true;
-
     }
 }
 
