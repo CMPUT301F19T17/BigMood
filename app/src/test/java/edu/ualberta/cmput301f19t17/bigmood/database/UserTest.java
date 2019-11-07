@@ -1,20 +1,43 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 
+/**
+ * Unit test for User
+ *
+ * **/
 class UserTest {
+    private static final String UserName = "Username";
+    private static final String firstName = "firstname";
+    private static final String lastName = "lastname";
 
-    @Test
-    void getUsername() {
+    private User mockUser;
+
+    @Before
+    private User mockUser(){
+
+       return new User (UserName,firstName,lastName);
     }
 
     @Test
-    void getFirstName() {
+    void getUsername() throws IllegalAccessException, NoSuchFieldException {
+        User user = new User("username","firstname","lastname");
+        assertEquals(user.getUsername(), "username");
     }
 
     @Test
-    void getLastName() {
+    void getFirstName() throws NoSuchFieldException, IllegalAccessException {
+        User user = new User("username","firstname","lastname");
+        assertEquals(user.getFirstName(), "firstname");
     }
+
+    @Test
+    void getLastName() throws NoSuchFieldException, IllegalAccessException {
+        User user = new User("username","firstname","lastname");
+        assertEquals(user.getLastName(), "lastname");
+    }
+
 }
