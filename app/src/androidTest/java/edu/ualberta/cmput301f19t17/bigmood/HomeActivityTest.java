@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
-import android.app.Activity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -13,40 +11,43 @@ import com.robotium.solo.Solo;
 import androidx.test.rule.ActivityTestRule;
 
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertEquals;
+
+// TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
 
 public class HomeActivityTest {
     private Solo solo;
     private AppPreferences appPreferences;
 
+    @BeforeClass //runs before anything else runs
+    public static void setUpAppPrefs() throws Exception {
+        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+    }
+
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);
 
-    @Before
+    @Before //runs before every test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-        appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
-    }
 
-    @After
-    public void cleanUp() {
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+        // TODO: 2019-11-06 Cameron:
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
     }
 
-    @Test
-    public void start() throws Exception {
-        Activity activity = rule.getActivity();
-    }
 
     @Test
     public void checkAddMood() {
@@ -55,9 +56,9 @@ public class HomeActivityTest {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, 3); //disgusted
-        solo.pressSpinnerItem(1, 2); //two to several
-        solo.enterText((EditText) solo.getView(R.id.text_input_reason), "I am grossed out");
+        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
+        solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
+        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
@@ -65,6 +66,7 @@ public class HomeActivityTest {
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
 
         //make sure we correctly added the mood
+        solo.waitForText(EmotionalState.DISGUST.toString());
         assertEquals(1, moodArrayAdapter.getCount());
     }
 
@@ -75,11 +77,14 @@ public class HomeActivityTest {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, 3); //disgusted
-        solo.pressSpinnerItem(1, 2); //two to several
-        solo.enterText((EditText) solo.getView(R.id.text_input_reason), "I am grossed out");
+        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
+        solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
+        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
 
         solo.clickOnView(solo.getView(R.id.action_save));
+
+        // TODO: 2019-11-06 Cameron:  
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
         int originalNumListItems = moodArrayAdapter.getCount();
 
@@ -87,42 +92,54 @@ public class HomeActivityTest {
         solo.clickInList(0); //select the mood we just created (it will be 0 since the list is sorted newest -> oldest)
 
         solo.clickOnButton("EDIT");
-        solo.waitForText("Edit Mood"); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
+        solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
 
-        solo.pressSpinnerItem(0, 1); //sad
-        solo.pressSpinnerItem(1, 3); //crowd
+        solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode()); //sad
+        solo.pressSpinnerItem(1, SocialSituation.CROWD.getSituationCode()); //crowd
 
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForText("SADNESS"); //make sure the edit worked
+        //make sure the edit worked by checking that the SADNESS shows up
+        solo.waitForText(EmotionalState.SADNESS.toString(), 1, 1000);
+
         //make sure no new items were added, and no items deleted
+        // TODO: 2019-11-06 Cameron:  
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
     }
 
     @Test
     public void checkDeleteMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // TODO: 2019-11-06 Cameron:  
+        //get message from async update before checking number of items in list
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+
         ListView moodList = (ListView) solo.getView(R.id.mood_list);
         ListAdapter moodArrayAdapter = moodList.getAdapter();
+
         int originalNumListItems = moodArrayAdapter.getCount();
 
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, 3); //disgusted
-        solo.pressSpinnerItem(1, 2); //two to several
+        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
+        solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
 
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForText("DISGUST");
+        solo.waitForText(EmotionalState.DISGUST.toString(), 1, 1000);
 
         solo.clickInList(0); //select the mood we just created
 
         solo.clickOnButton("DELETE");
 
+        // TODO: 2019-11-06 Cameron:
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+
 
         //make sure there are no new elements in the list (ie, after we added the mood, it was deleted)
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
     }
-
 
 }
