@@ -26,6 +26,8 @@ public class SignUpActivity extends AppCompatActivity {
     private TextInputLayout textInputPassword;
     private TextInputLayout textInputConfirmPassword;
 
+    private Button button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +57,10 @@ public class SignUpActivity extends AppCompatActivity {
         this.textInputPassword = this.findViewById(R.id.text_input_password);
         this.textInputConfirmPassword = this.findViewById(R.id.text_input_confirm_password);
 
-        Button button = this.findViewById(R.id.button_sign_up);
+        this.button = this.findViewById(R.id.button_sign_up);
 
         // Set onClickListener for the button. This is where the input validation starts. We call all the verification methods with the information from the textInputs and validate each field (and set errors if applicable)
-        button.setOnClickListener(new View.OnClickListener() {
+        this.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -98,6 +100,9 @@ public class SignUpActivity extends AppCompatActivity {
                 // Only if ALL of the validation methods succeed do we proceed. We still have to check if the user exists in the database, which is what we do below.
                 if (SignUpActivity.this.validateAll(firstName, lastName, username, password, confirmPassword)) {
 
+                    // In order to prevent multiple attempts on the async task, we have to disable the button momentarily as it finishes.
+                    SignUpActivity.this.button.setEnabled(false);
+
                     // Get repository and check if the user exists.
                     SignUpActivity.this.appPreferences.getRepository()
                             .userExists(username)
@@ -113,6 +118,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                 R.string.toast_error_user_exists,
                                                 Toast.LENGTH_LONG
                                         ).show();
+
+                                        // Enable the button again
+                                        SignUpActivity.this.button.setEnabled(true);
 
                                         return;
                                     }
@@ -132,11 +140,11 @@ public class SignUpActivity extends AppCompatActivity {
                                                     // If the registration succeeds, print a toast message and finish()
                                                     Toast.makeText(
                                                             SignUpActivity.this,
-                                                            SignUpActivity.this.getString(R.string.toast_success_registration),
+                                                            R.string.toast_success_registration,
                                                             Toast.LENGTH_SHORT
                                                     ).show();
 
-                                                    // Go back to login page
+                                                    // Go back to login page. We don't have to show the button because this activity will be destroyed and upon a second call the button will be recreated again.
                                                     SignUpActivity.this.finish();
 
                                                 }
@@ -152,17 +160,20 @@ public class SignUpActivity extends AppCompatActivity {
                                                             Toast.LENGTH_LONG
                                                     ).show();
 
+                                                    // Enable the button again
+                                                    SignUpActivity.this.button.setEnabled(true);
+
+
                                                 }
                                             });  // End register user
-
 
                                 }
                             });  // End check user
 
-                }
+                }  // End if validateAll()
 
             }
-        });
+        });  // End set onClickListener
 
     }
 

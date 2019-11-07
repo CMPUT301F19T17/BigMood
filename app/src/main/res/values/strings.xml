@@ -63,5 +63,9 @@
     <string name="error_no_pw_match">Passwords do not match</string>
     <string name="error_reason_too_long">Reason too long</string>
     <string name="error_reason_word_count">Reason cannot be longer than 3 words</string>
+    <string name="error_login_failed">Failed to log in. Please try again.</string>
+    <string name="error_incorrect_user_pw">Username/password incorrect.</string>
+    <string name="error_empty_username">Username cannot be empty</string>
+    <string name="error_empty_password">Password cannot be empty</string>
 
 </resources>
