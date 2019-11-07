@@ -48,7 +48,7 @@ public class LoginActivityTest {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "Wrong_password");
         solo.clickOnView(solo.getView(R.id.button_login));
-        solo.clickOnButton("Login");
+        solo.clickOnButton("Log In");
         solo.waitForText("Username/password incorrect");
 
         //successful login
@@ -56,7 +56,7 @@ public class LoginActivityTest {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "Wrong_password");
         solo.clickOnView(solo.getView(R.id.button_login));
-        solo.clickOnButton("Login");
+        solo.clickOnButton("Log In");
 
     }
 
