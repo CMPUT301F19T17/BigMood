@@ -332,6 +332,30 @@ public class DefineMoodDialogFragment extends DialogFragment {
                             .toString()
                             .trim();
 
+                    // Get the max length and max word count tha the reason is allowed to be
+                    int maxLength = DefineMoodDialogFragment.this.getContext().getResources().getInteger(R.integer.max_length_reason);
+                    int maxWordCount = DefineMoodDialogFragment.this.getContext().getResources().getInteger(R.integer.max_word_count_reason);
+
+                    // This controls the logic for the max reason length. We display error messages depending on what is violated. For checking word count, we split the string by any space character (\s) one or more times (+). This makes sure that any number sf spaces is counted as one delimiter.
+                    if (reason.length() > maxLength) {
+
+                        // Set error and return, since this is not valid.
+                        DefineMoodDialogFragment.this.reasonInputLayout.setError(DefineMoodDialogFragment.this.getString(R.string.error_reason_too_long));
+                        return false;
+
+                    } else if (reason.split("\\s+").length > maxWordCount) {
+
+                        // Set error and return, since this is not valid.
+                        DefineMoodDialogFragment.this.reasonInputLayout.setError(DefineMoodDialogFragment.this.getString(R.string.error_reason_word_count));
+                        return false;
+
+                    } else {
+
+                        // Technically has no effect because the dialog is immediately dismissed but for completeness we do this.
+                        DefineMoodDialogFragment.this.reasonInputLayout.setError(null);
+
+                    }
+
                     // TODO add image, location - canned for now
 
                     // Declare mood. Can be initialized as an "old" mood (with firestoreId) or a "new" mood (without firestoreId).
