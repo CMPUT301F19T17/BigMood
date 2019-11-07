@@ -65,7 +65,7 @@ public class UserMoodsFragment extends Fragment {
         this.moodList = new ArrayList<>();
         this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
 
-        ListView moodListView = root.findViewById(R.id.mood_list);
+        final ListView moodListView = root.findViewById(R.id.mood_list);
         FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
 
         moodListView.setAdapter(moodAdapter);
@@ -96,6 +96,7 @@ public class UserMoodsFragment extends Fragment {
                             public void onSavePressed(Mood moodToSave) {
 
                                 // Create the mood using the repository.
+
                                 UserMoodsFragment.this.appPreferences.getRepository()
                                         .createMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToSave)
                                         .addOnFailureListener(new OnFailureListener() {
@@ -108,20 +109,24 @@ public class UserMoodsFragment extends Fragment {
 
                                             }
                                         });
+                                moodList.add(0,moodToSave);
+                                applyFilter();
 
                             }
+
                         });  // End setOnButtonPressListener
 
                 addMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_ADD");
 
             }
+
         }); // End setOnClickListener
 
 
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                final int position = i;
                 // Create dialog and set the button press listener for delete and edit
                 ViewUserMoodDialogFragment viewUserFragment = ViewUserMoodDialogFragment.newInstance(moodAdapter.getItem(i));
                 viewUserFragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
@@ -145,11 +150,13 @@ public class UserMoodsFragment extends Fragment {
 
                                     }
                                 });
+                        moodList.remove(moodToDelete);
+                        applyFilter();
 
                     }  // End onDeletePressed
 
                     @Override
-                    public void onEditPressed(Mood moodToEdit) {
+                    public void onEditPressed(final Mood moodToEdit) {
 
                         // If the user happens to be null, throw an error
                         if (UserMoodsFragment.this.appPreferences.getCurrentUser() == null)
@@ -175,6 +182,8 @@ public class UserMoodsFragment extends Fragment {
 
                                                     }
                                                 });
+                                        moodList.set(position, moodToEdit);
+                                        applyFilter();
 
                                     }
                                 });
@@ -247,7 +256,6 @@ public class UserMoodsFragment extends Fragment {
                     this.menu.getMenu().add(R.id.group_filter, state.getStateCode(), Menu.NONE, state.toString());
                 // Set the checkable state of the group
                 this.menu.getMenu().setGroupCheckable(R.id.group_filter, true, true);
-
                 // Set the onclick listener
                 this.menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -272,7 +280,6 @@ public class UserMoodsFragment extends Fragment {
                 });
 
             }  // end of menu initialization
-
             // We now have a complete menu but in order to render it properly we need to set the item that is selected to checked. We iterate through every state and if it matches with the current filter, set its checked state to true.
             for (EmotionalState state : EmotionalState.values()) {
                 MenuItem menuItem = this.menu.getMenu().findItem(state.getStateCode());
@@ -298,5 +305,18 @@ public class UserMoodsFragment extends Fragment {
 //        return super.onOptionsItemSelected(item);
         return true;
 
+    }
+
+    public void applyFilter() {
+        for (int i = 0; i < this.menu.getMenu().size(); i++) {
+            if (this.menu.getMenu().getItem(i).isChecked()) {
+
+                Toast.makeText(this.getContext(), this.menu.getMenu().getItem(i).getTitle().toString(), Toast.LENGTH_SHORT).show();
+                moodAdapter.getFilter().filter(this.menu.getMenu().getItem(i).getTitle().toString());
+
+                moodAdapter.notifyDataSetChanged();
+                break;
+            }
+        }
     }
 }
