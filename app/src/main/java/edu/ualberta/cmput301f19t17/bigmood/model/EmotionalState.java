@@ -10,6 +10,8 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
  */
 public enum EmotionalState {
 
+    // TODO: 2019-11-06 Nectarios: Refactor to use string resources rather than hardcoded values
+
     HAPPINESS (0, "Happy", R.drawable.ic_emoticon_happy),
     SADNESS (1, "Sad", R.drawable.ic_emoticon_sad),
     FEAR (2, "Afraid", R.drawable.ic_emoticon_fear),
@@ -53,6 +55,7 @@ public enum EmotionalState {
     public String toString() {
         return this.displayName;
     }
+
     /**
      * This method allows the reverse lookup of a state code into a member of the enumeration. This would be used to retrieve the state from an integer taken from a database entry.
      * @param code The code to look up
