@@ -51,6 +51,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         this.originalArrayMood = moodList;
     }
 
+
+
     /**
      * This method overrides the default one with the filtered array list's item
      * @param position

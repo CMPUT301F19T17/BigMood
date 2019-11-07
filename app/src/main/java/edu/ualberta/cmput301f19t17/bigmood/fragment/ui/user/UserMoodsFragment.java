@@ -46,8 +46,8 @@ public class UserMoodsFragment extends Fragment {
 
     private EmotionalState filter = null;
 
-    private View menuItemFilter;
-    private PopupMenu menu;
+    private View menuItemFilter = null;
+    private PopupMenu menu = null;
 
     private ListenerRegistration listenerRegistration;
 
@@ -107,14 +107,23 @@ public class UserMoodsFragment extends Fragment {
                                                 Log.e(HomeActivity.LOG_TAG, "Mood failed to save (add) with exception: " + e.toString());
 
                                             }
+                                        })
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                refreshListView();
+                                            }
                                         });
 
                             }
+
+
                         });  // End setOnButtonPressListener
 
                 addMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_ADD");
-
             }
+
+
         }); // End setOnClickListener
 
 
@@ -122,6 +131,7 @@ public class UserMoodsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                final int position = i;
                 // Create dialog and set the button press listener for delete and edit
                 ViewUserMoodDialogFragment viewUserFragment = ViewUserMoodDialogFragment.newInstance(moodAdapter.getItem(i));
                 viewUserFragment.setOnButtonPressListener(new ViewUserMoodDialogFragment.OnButtonPressListener() {
@@ -144,12 +154,19 @@ public class UserMoodsFragment extends Fragment {
                                         Log.e(HomeActivity.LOG_TAG, "Mood failed to delete with exception: " + e.toString());
 
                                     }
+                                })
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                        public void onSuccess(Void aVoid) {
+                                            refreshListView();
+                                    }
                                 });
+
 
                     }  // End onDeletePressed
 
                     @Override
-                    public void onEditPressed(Mood moodToEdit) {
+                    public void onEditPressed(final Mood moodToEdit) {
 
                         // If the user happens to be null, throw an error
                         if (UserMoodsFragment.this.appPreferences.getCurrentUser() == null)
@@ -173,6 +190,12 @@ public class UserMoodsFragment extends Fragment {
                                                         Toast.makeText(UserMoodsFragment.this.getContext(), "Failed to save Mood. Please try again.", Toast.LENGTH_SHORT).show();
                                                         Log.e(HomeActivity.LOG_TAG, "Mood failed to save (edit) with exception: " + e.toString());
 
+                                                    }
+                                                })
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        refreshListView();
                                                     }
                                                 });
 
@@ -298,5 +321,35 @@ public class UserMoodsFragment extends Fragment {
 //        return super.onOptionsItemSelected(item);
         return true;
 
+    }
+
+    public void refreshListView() {
+
+        UserMoodsFragment.this.appPreferences.getRepository().getUserMoods(
+                UserMoodsFragment.this.appPreferences.getCurrentUser(),
+                new MoodsListener() {
+                    @Override
+                    public void onUpdate(List<Mood> moodList) {
+                        UserMoodsFragment.this.moodList.clear();
+                        UserMoodsFragment.this.moodList.addAll(moodList);
+                        UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
+                    }
+                }
+        );
+        if (UserMoodsFragment.this.menuItemFilter!=null && UserMoodsFragment.this.menu!=null)
+            applyFilter();
+    }
+
+    public void applyFilter() {
+        int stateLen = menu.getMenu().size();
+        for (int i = 0; i < stateLen; i++) {
+            MenuItem item = menu.getMenu().getItem(i);
+            if (item == null || (item.getItemId()==R.id.filter_none && item.isChecked())) {
+                moodAdapter.getFilter().filter("None");
+                break;
+            } else if (item.isChecked()) {
+                moodAdapter.getFilter().filter(item.getTitle().toString());
+            }
+        }
     }
 }
