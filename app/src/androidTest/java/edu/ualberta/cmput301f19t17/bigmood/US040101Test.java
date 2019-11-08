@@ -44,8 +44,9 @@ public class US040101Test {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 1000);
+        // This is actually the sweet spots for sleep time
+        // 1 second would be too low and my trash laptop cant handle that :(
+        solo.sleep(2000);
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
@@ -62,45 +63,37 @@ public class US040101Test {
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
         //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time 0");
 
         solo.clickOnView(solo.getView(R.id.action_save));
 
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
-        String oldTime = timeFormat.format(Calendar.getInstance().getTime());
-
-
-        solo.waitForDialogToClose();
-
-        //wait for one full minute to ensure a new time is chosen
+        //wait for 10 second before adding another mood
         // TODO: 2019-11-07 Cameron: Remove and find a better method to check this, perhaps by creating a specific testUser for this problem, and dont delete the moods after testing
-
-        solo.waitForText("HillyBillyBobTesterino", 0, 60000);
+        int wait_time = 10;
+        solo.sleep(wait_time*1000);
 
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
+        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time +" + wait_time +"s");
 
         solo.clickOnView(solo.getView(R.id.action_save));
 
-        String newTime = timeFormat.format(Calendar.getInstance().getTime());
-
-        solo.waitForDialogToClose();
+        solo.sleep(1000);
 
         //make sure the item at the top is the newly added item
         //gotta use Pattern.quote because it's related somehow to the way Robotium sees string
         //link: https://stackoverflow.com/questions/17741680/robotium-for-android-solo-searchtext-not-working
-        solo.clickInList(0);
-        assertTrue(solo.searchText(Pattern.quote(newTime)));
+        solo.clickOnMenuItem("Happy");
+        assertTrue(solo.searchText(Pattern.quote("at time +" + wait_time +"s")));
 
         //I dont know how to press the X button in ViewMoodDialogFragment, so we will just press edit, and then close the fragment
         solo.clickOnButton("EDIT");
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
 
+        solo.sleep(1000);
         //make sure the second item is the previously added item
-        solo.clickInList(1);
-        assertTrue(solo.searchText(Pattern.quote(oldTime)));
+        solo.clickOnMenuItem("Disgust");
+        assertTrue(solo.searchText(Pattern.quote("at time 0")));
     }
 }
