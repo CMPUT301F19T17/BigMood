@@ -57,35 +57,25 @@ public class US040101Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
-
         solo.clickOnView(solo.getView(R.id.action_save));
-
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
         String oldTime = timeFormat.format(Calendar.getInstance().getTime());
-
-
         solo.waitForDialogToClose();
 
         //wait for one full minute to ensure a new time is chosen
         // TODO: 2019-11-07 Cameron: Remove and find a better method to check this, perhaps by creating a specific testUser for this problem, and dont delete the moods after testing
-
         solo.waitForText("HillyBillyBobTesterino", 0, 60000);
 
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
-
         solo.clickOnView(solo.getView(R.id.action_save));
-
         String newTime = timeFormat.format(Calendar.getInstance().getTime());
-
         solo.waitForDialogToClose();
 
         //make sure the item at the top is the newly added item
