@@ -8,6 +8,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -39,6 +40,11 @@ public class US020101Test {
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+    }
+
     @Test
     public void checkReasonMaxLength(){
 
@@ -49,7 +55,6 @@ public class US020101Test {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check reason length is too long.");
         solo.clickOnView(solo.getView(R.id.action_save));
         assertTrue(solo.waitForText("Reason too long"));
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
 
     }
 
@@ -61,8 +66,7 @@ public class US020101Test {
 
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "chk len too long");
         solo.clickOnView(solo.getView(R.id.action_save));
-        assertTrue(solo.waitForText("Reason too long"));
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+        assertTrue(solo.waitForText("Reason cannot be longer than 3 words"));
     }
 
 

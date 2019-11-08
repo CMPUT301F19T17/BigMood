@@ -50,9 +50,8 @@ public class US010101Test {
         solo.waitForText("HillyBillyBobTesterino", 0, 1000);
     }
     @AfterClass //runs after all tests have run
-    public void cleanUp() {
-        appPreferences = AppPreferences.getInstance();
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test

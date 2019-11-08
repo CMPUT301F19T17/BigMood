@@ -9,6 +9,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -44,6 +45,10 @@ public class US010301Test {
         appPreferences = AppPreferences.getInstance(); // used to call deleteAllMoods method
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         solo.waitForText("poop", 0, 1000);
+    }
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test

@@ -59,6 +59,6 @@ public class US020301Test {
 
         solo.clickInList(0);
         assertTrue(solo.waitForText(SocialSituation.SEVERAL.toString()));
-        
+
     }
 }
