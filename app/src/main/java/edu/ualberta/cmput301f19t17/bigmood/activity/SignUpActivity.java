@@ -17,11 +17,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
 /**
- * SignUpActivity allows the user to create a new account. It is then uploaded to firestore, if it is valid.
+ * SignUpActivity allows the user to create a new account. Basic input validation is preformed and assuming they all pass, a new user is registered.
  */
 public class SignUpActivity extends AppCompatActivity {
 
-    AppPreferences appPreferences;
+    private AppPreferences appPreferences;
 
     private TextInputLayout textInputFirstName;
     private TextInputLayout textInputLastName;
@@ -328,8 +328,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     /**
-     * This method is for hardware back navigation, so if the phone that the user uses has an physical back button
-     * and pressed the button, then this method will be called
+     * This method is called when the software navigation button is pressed. We log the event and make sure the activity is destroyed.
      */
     private void onBackNavigationClicked() {
 
@@ -339,9 +338,9 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     /**
-     * This method is for hardware back navigation, so if the phone that the user uses has an physical back button
-     * and pressed the button, then this method will be called
-     */    @Override
+     * This method is called when the hardware navigation button is pressed. We log the event and make sure the activity is destroyed.
+     */
+    @Override
     public void onBackPressed() {
 
         Log.d(HomeActivity.LOG_TAG, "Back navigation (Hardware) from " + this.getClass().getSimpleName());

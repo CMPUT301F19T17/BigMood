@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;

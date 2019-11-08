@@ -6,11 +6,9 @@ import androidx.annotation.Nullable;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
 /**
- * This Enumeration defines the categories for an emotional state. It also is associated with a stateCode so that we can store an enumeration in a database.
+ * This Enumeration defines the categories for an emotional state. It also is associated with a state code, a display name, and a drawable ID.
  */
 public enum EmotionalState {
-
-    // TODO: 2019-11-06 Nectarios: Refactor to use string resources rather than hardcoded values
 
     HAPPINESS (0, "Happy", R.drawable.ic_emoticon_happy),
     SADNESS (1, "Sad", R.drawable.ic_emoticon_sad),
