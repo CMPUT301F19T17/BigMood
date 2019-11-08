@@ -86,6 +86,9 @@ public class US010401Test {
         // TODO: 2019-11-06 Cameron:
         solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
+
+        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+
     }
 
 }

@@ -84,6 +84,9 @@ public class US010501Test {
 
         //make sure there are no new elements in the list (ie, after we added the mood, it was deleted)
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
+
+        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+
     }
 
 }

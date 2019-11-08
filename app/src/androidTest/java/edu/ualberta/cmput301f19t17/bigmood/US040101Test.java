@@ -186,6 +186,7 @@ public class US040101Test {
         solo.waitForText("Happy", mood_quantity-1, 1000);
         assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
 
+        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
 
     }
 }
