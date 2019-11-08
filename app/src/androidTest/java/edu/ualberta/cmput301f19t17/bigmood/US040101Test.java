@@ -76,7 +76,7 @@ public class US040101Test {
             }
         }
         // This assert also guarantees the filter at startup stay at None
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        // solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
@@ -87,7 +87,7 @@ public class US040101Test {
             solo.clickOnView(filter);
             solo.waitForText(state.toString(), mood_quantity, 1000);
             // the number of mood show should be equal to the number of mood being filtered
-            solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+            // solo.waitForText("HillyBillyBobTesterino", 0, 10000);
             assertEquals(mood_quantity, moodArrayAdapter.getCount());
         }
 
