@@ -9,6 +9,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -43,6 +44,12 @@ public class US040201Test {
         // TODO: 2019-11-06 Cameron:
         solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
+
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+    }
+
 
     @Test
     public void checkFilterMood() {
@@ -122,6 +129,9 @@ public class US040201Test {
         solo.sleep(1000);
         // The number of Sad Mood should increase by 1
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
+
+        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+
     }
 
 } 
