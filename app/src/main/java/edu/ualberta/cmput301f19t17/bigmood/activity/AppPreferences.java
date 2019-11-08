@@ -41,18 +41,38 @@ public class AppPreferences {
         this.repository = FirestoreRepository.getInstance();
     }
 
+    /**
+     * This method sets the current user to a new user.
+     * This is called whenever a user signs in
+     * @param user the user to set
+     */
     public void setCurrentUser(User user) {
         this.currentUser = user;
     }
 
+    /**
+     * This method sets the repository to a new repository
+     * @param repository the repo to set
+     */
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
 
+    /**
+     * This method returns the current user.
+     * This is useful for firestore access
+     * @return the current user
+     */
     public User getCurrentUser() {
         return this.currentUser;
     }
 
+    /**
+     * This method returns the current user.
+     * This is useful for accessing firestore methods in the database package, as
+     * the repository contains all of the methods to access firestore
+     * @return the repository
+     */
     public Repository getRepository() {
         return this.repository;
     }

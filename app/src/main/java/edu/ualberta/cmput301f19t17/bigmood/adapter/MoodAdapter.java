@@ -53,12 +53,10 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         this.originalArrayMood = moodList;
     }
 
-
-
     /**
      * This method overrides the default one with the filtered array list's item
-     * @param position
-     * @return
+     * @param position the position of the mood we want to get
+     * @return the mood at position
      */
     @Override
     public Mood getItem(int position){
@@ -67,9 +65,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
     /**
      * This method overrides the default one with the filtered array list's count
-     * @return
+     * @return null if the arrayMoodList is null, or the size of the arrayMoodList
      */
-
     @Override
     public int getCount(){
         return arrayMoodList != null? arrayMoodList.size(): 0;
@@ -154,8 +151,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     /**
      * This function reapply the filter with the mood selected in the menu
      * If it's the first time running, this won't do anything
-     * @param menuItemFilter
-     * @param menu
+     * @param menuItemFilter the item that we want to filter by
+     * @param menu the reference to the menu
      */
     public void applyFilter(View menuItemFilter, PopupMenu menu) {
         if (menuItemFilter==null || menu == null) return;
@@ -175,12 +172,18 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
 
     /**
-     * This class implements Filterable to enable filtering mood list by emotional state
+     * This class implements Filterable to enable filtering mood list by emotional state.
+     * This method is the implementation of a Filterable method.
      */
     @Override
     public Filter getFilter() {
         // Initialized a filter
         Filter filter = new Filter() {
+            /**
+             * This method creates and returns a sublist of the arrayMoodList based off of the filter that was sent in.
+             * @param constraint the filter that the user has suggested
+             * @return the list of objects that make it through the filtering process
+             */
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
 
@@ -218,8 +221,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
              * This method will publish the result according to the selected filter
              * This also tell the adapter that the current list has change, hence updating
              * the List View
-             * @param constraint
-             * @param results
+             * @param constraint the filter item that the user selected
+             * @param results the resulting list that comes from the original list being filtered
              */
             @SuppressWarnings("unchecked")
             @Override

@@ -56,7 +56,7 @@ public class US010101Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
+        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check add mood");
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
