@@ -45,7 +45,7 @@ public class UserMoodsFragment extends Fragment {
     private AppPreferences appPreferences;
 
     private ArrayList<Mood> moodList;
-    private ArrayAdapter<Mood> moodAdapter;
+    private MoodAdapter moodAdapter;
 
     private EmotionalState filter = null;
 
@@ -99,7 +99,7 @@ public class UserMoodsFragment extends Fragment {
                                 UserMoodsFragment.this.moodList.addAll(moodList);
                                 UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
                                 // This refresh the filter with the updated data
-                                ((MoodAdapter) UserMoodsFragment.this.moodAdapter).applyFilter(menuItemFilter, menu);
+                                UserMoodsFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
 
                             }
                         });
