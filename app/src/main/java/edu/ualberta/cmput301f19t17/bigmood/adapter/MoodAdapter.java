@@ -130,6 +130,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         Resources res = this.getContext().getResources();
         Drawable emoticon = res.getDrawable(currentMood.getState().getDrawableId());
         moodHolder.image.setImageDrawable(emoticon);
+        moodHolder.image.setTag(currentMood.getState().getDrawableId());
 
         // Return the created/reused view as per the method signature
         return convertView;
