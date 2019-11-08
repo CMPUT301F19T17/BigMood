@@ -5,10 +5,7 @@ env:
   global:
     - ANDROID_TARGET=android-22
     - ANDROID_ABI=armeabi-v7a
-    
-notifications:
-  slack: cmput301groupwork:mZMbXZVxRDaXzYpMR0IuvIcM
-  
+
 android:
   components:
     # Uncomment the lines below if you want to
@@ -22,12 +19,12 @@ android:
     # The SDK version used to compile your project
     # TODO: why is this here explicitly in addition to $ANDROID_TARGET below
     - android-23
-    
+
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    
+
     # The SDK version used to compile your project
     - $ANDROID_TARGET
 
@@ -38,7 +35,7 @@ android:
     - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
 
 licenses:
-    - 'android-sdk-license-.+'
+  - 'android-sdk-license-.+'
 
 before_install:
   # Accept sdk licenses
@@ -50,15 +47,19 @@ before_install:
   - unzip -qq gradle-5.3-bin.zip
   - export GRADLE_HOME=$PWD/gradle-5.3
   - export PATH=$GRADLE_HOME/bin:$PATH
-  
+
   # Build the project
   - gradle -v
-  
+
   # Start the emulator
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
-  
+
   # The app will now automatically be installed and tested via
   # the command `gradle connectedCheck`
+
+notifications:
+  slack:
+    secure: dZC5xcYY0RG1NEqyH0lUPkspfrgf8dwFoqeXRFrtE/9129ferkkoMtwF7XvZEljl84Ei9Ljlx7xuyC1uz7b4a/deD5iN0HmwfVMwrQGrrUYYkBuq9xVA8PUlIm3LpnQzIbRpGlWpxDyoPer7kto/80VnMUMHohjjYp6usFpyiZL90KpUE7oiKmnbpsUTDspe35gnriBUriPFbe5gxr8luTqAp3gS2jUgt2cUpZ75CIIfyxNgz7qVL9qeDRCsHCUv1JIywsfedmDy4jjGxZSASbcPpyz9vgez4GxdCrvNPEMjtqq398rA8fs7ymdzAfv3gcPr6W88rUGa9Y0ge+i2j3nub8NPdY7LQ9zb4Jyvi4HjVFZLg8Xr41E3w8D4A1nh5z1SeCrwO4fBwmoSmw+3N4muyGygxxvGgTDXrCwwy1gT+HoQXVclVcxFpFSae195NLH2q5WK/OP2Ku+6RmoSNRTOW4zXNgF5JkBajVR8MJdulLN8j0SSqlpQKmDPN+4qAkFvxVvAa1aS7eHYnPPP9kZkwVINgxCB6L1qBCP0Ty4Lg4bZZFedWnz8PtHsCCJvCRitvCvTzNLEtjBaiOo/Zl7JLbcmwTocwGmyWL1+UciDdimAxxSMdP+jfamDDnFnoBiaCjUdEmGWckDYo7Ajr9+gSptu6JZmHQzsj67+zuE=
