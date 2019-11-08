@@ -8,6 +8,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,32 +34,51 @@ public class LoginActivityTest {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-        //appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
     }
-
+/*
     @Test
     public void start() throws Exception {
         Activity activity = rule.getActivity();
     }
+ */
 
     @Test
-    public void LoginActivity(){
-        //Login fail
-        solo.assertCurrentActivity("Wrong activity",LoginActivity.class);
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "Wrong_password");
+    public void testWrongUsername() {
+        solo.assertCurrentActivity("Wrong activity", LoginActivity.class);
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "HELLO");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "password");
         solo.clickOnView(solo.getView(R.id.button_login));
         solo.clickOnButton("Log In");
-        solo.waitForText("Username/password incorrect");
-
-        //successful login
-        solo.assertCurrentActivity("Wrong activity",LoginActivity.class);
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "Wrong_password");
-        solo.clickOnView(solo.getView(R.id.button_login));
-        solo.clickOnButton("Log In");
-
+        solo.waitForText("Username/password incorrect", 1, 1000);
     }
 
+    @Test
+    public void testWrongPassword() {
+        solo.assertCurrentActivity("Wrong activity", LoginActivity.class);
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "HELLO");
+        solo.clickOnView(solo.getView(R.id.button_login));
+        solo.clickOnButton("Log In");
+        solo.waitForText("Username/password incorrect", 1, 1000);
+    }
 
+    @Test
+    public void testCorrectUsernamePassword() {
+        solo.assertCurrentActivity("Wrong activity", LoginActivity.class);
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "CMPUT301");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "password");
+        solo.clickOnView(solo.getView(R.id.button_login));
+        solo.clickOnButton("Log In");
+        solo.waitForText("Username/password incorrect", 0, 1000);
+    }
+
+    /**
+     * Closes the activity after each test
+     * @throws Exception
+     */
+    @After
+    public void tearDown() throws Exception{
+        solo.finishOpenedActivities();
+    }
 }

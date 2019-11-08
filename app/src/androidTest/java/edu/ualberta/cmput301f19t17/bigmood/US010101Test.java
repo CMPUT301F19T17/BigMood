@@ -24,7 +24,9 @@ import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 import static org.junit.Assert.assertEquals;
 
 // TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
-
+/**
+ * Test class for DefineMoodDialogFragment. All the UI tests are written here. Robotium test framework is used.
+ */
 public class US010101Test {
     private Solo solo;
     private AppPreferences appPreferences;
@@ -44,7 +46,7 @@ public class US010101Test {
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 1000);
     }
 
     @Test
@@ -56,7 +58,8 @@ public class US010101Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
+        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();

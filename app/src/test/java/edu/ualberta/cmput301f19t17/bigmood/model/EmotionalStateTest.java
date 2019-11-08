@@ -3,9 +3,7 @@ package edu.ualberta.cmput301f19t17.bigmood.model;
 import org.junit.jupiter.api.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
-import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 class EmotionalStateTest {
