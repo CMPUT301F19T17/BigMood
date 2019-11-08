@@ -10,7 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -32,3 +32,6 @@ hs_err_pid*
 /captures
 .externalNativeBuild
 .cxx
+
+# Exclusions
+!gradle/wrapper/gradle-wrapper.jar
