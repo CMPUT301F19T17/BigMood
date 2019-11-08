@@ -63,11 +63,11 @@ public class US010301Test {
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
 
-        //ImageView view =  solo.getCurrentActivity().findViewById(R.id.imageview_placeholder_emote);
-        //view.setImageDrawable();
+        ImageView view =  solo.getCurrentActivity().findViewById(R.id.imageview_placeholder_emote);
+        view.setImageDrawable(solo.getCurrentActivity().getRe);
 
-        solo.getCurrentActivity().;
-        assertTrue(R.drawable.ic_emoticon_happy == drawableID);
+        //solo.getCurrentActivity().;
+        //assertTrue(R.drawable.ic_emoticon_happy == drawableID);
 
 
 
