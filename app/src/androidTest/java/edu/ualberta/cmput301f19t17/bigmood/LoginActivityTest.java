@@ -36,12 +36,6 @@ public class LoginActivityTest {
         appPreferences = AppPreferences.getInstance();
         appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
     }
-/*
-    @Test
-    public void start() throws Exception {
-        Activity activity = rule.getActivity();
-    }
- */
 
     @Test
     public void testWrongUsername() {

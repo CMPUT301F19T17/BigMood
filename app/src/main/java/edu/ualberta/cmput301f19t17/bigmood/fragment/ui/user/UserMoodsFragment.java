@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -19,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -36,13 +34,16 @@ import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFra
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
+/**
+ * UserMoodsFragment houses the logic for displaying as a list the current moods that the user has under their profile.
+ */
 public class UserMoodsFragment extends Fragment {
 
     private UserMoodsViewModel userMoodsViewModel;
     private AppPreferences appPreferences;
 
     private ArrayList<Mood> moodList;
-    private ArrayAdapter<Mood> moodAdapter;
+    private MoodAdapter moodAdapter;
 
     private EmotionalState filter = null;
 
@@ -51,6 +52,14 @@ public class UserMoodsFragment extends Fragment {
 
     private ListenerRegistration listenerRegistration;
 
+    /**
+     * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
+     * This is where we inflate all the views and *if applicable* populate all the fields.
+     * @param inflater           View inflater service
+     * @param container          Container that the inflater is housed in
+     * @param savedInstanceState A bundle that holds the state of the fragment
+     * @return                   Returns the inflated view
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
@@ -66,15 +75,21 @@ public class UserMoodsFragment extends Fragment {
         this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
 
         ListView moodListView = root.findViewById(R.id.mood_list);
-        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
-
         moodListView.setAdapter(moodAdapter);
 
+        FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
+
+        // Set up the MoodsListener to listen to updates in FireStore
         this.listenerRegistration = this.appPreferences
                 .getRepository()
                 .getUserMoods(
                         this.appPreferences.getCurrentUser(),
                         new MoodsListener() {
+                            /**
+                             * This method is called whenever the listener hears that there is an update in the moodList
+                             * in FireStore, and updates the list, and applies a filter, if the user has selected one
+                             * @param moodList the new list that has the updated values
+                             */
                             @Override
                             public void onUpdate(List<Mood> moodList) {
 
@@ -82,18 +97,27 @@ public class UserMoodsFragment extends Fragment {
                                 UserMoodsFragment.this.moodList.addAll(moodList);
                                 UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
                                 // This refresh the filter with the updated data
-                                ((MoodAdapter) UserMoodsFragment.this.moodAdapter).applyFilter(menuItemFilter, menu);
+                                UserMoodsFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
 
                             }
                         });
 
         fab.setOnClickListener(new View.OnClickListener() {
+            /**
+             * This method is called when the FAB is clicked on
+             * @param v the FAB itself
+             */
             @Override
             public void onClick(View v) {
 
+                // create an instance of DefineMoodDialogFragment since the user wants to add a new Mood
                 DefineMoodDialogFragment addMoodFragment = DefineMoodDialogFragment.newInstance();
                 addMoodFragment.setOnButtonPressListener(
                         new DefineMoodDialogFragment.OnButtonPressListener() {
+                            /**
+                             * This method is called when the "Save" button is pressed in the DefineMoodDialogFragment
+                             * @param moodToSave the mood that the user wants to save, created from values that they inputted
+                             */
                             @Override
                             public void onSavePressed(Mood moodToSave) {
 
@@ -101,6 +125,10 @@ public class UserMoodsFragment extends Fragment {
                                 UserMoodsFragment.this.appPreferences.getRepository()
                                         .createMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToSave)
                                         .addOnFailureListener(new OnFailureListener() {
+                                            /**
+                                             * This method is called when the task to add a mood fails
+                                             * @param e the exception that caused the task to fail
+                                             */
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
 
@@ -136,6 +164,10 @@ public class UserMoodsFragment extends Fragment {
                         UserMoodsFragment.this.appPreferences.getRepository()
                                 .deleteMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToDelete)
                                 .addOnFailureListener(new OnFailureListener() {
+                                    /**
+                                     * This method is called when the task to delete a mood fails
+                                     * @param e the exception that caused the task to fail
+                                     */
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
 
@@ -158,6 +190,11 @@ public class UserMoodsFragment extends Fragment {
                         DefineMoodDialogFragment editMoodFragment = DefineMoodDialogFragment.newInstance(moodToEdit);
                         editMoodFragment.setOnButtonPressListener(
                                 new DefineMoodDialogFragment.OnButtonPressListener() {
+                                    /**
+                                     * This method is called when the "Save" button is pressed in the DefineMoodDialogFragment
+                                     * @param moodToSave the mood that the user wants to save, created from values that they inputted,
+                                     *                   and the
+                                     */
                                     @Override
                                     public void onSavePressed(Mood moodToSave) {
 
@@ -165,6 +202,10 @@ public class UserMoodsFragment extends Fragment {
                                         UserMoodsFragment.this.appPreferences.getRepository()
                                                 .updateMood(UserMoodsFragment.this.appPreferences.getCurrentUser(), moodToSave)
                                                 .addOnFailureListener(new OnFailureListener() {
+                                                    /**
+                                                     * This method is called when the task to add a mood fails
+                                                     * @param e the exception that caused the task to fail
+                                                     */
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
 
@@ -208,7 +249,6 @@ public class UserMoodsFragment extends Fragment {
 
     /**
      * This method gets called when the fragment needs to assemble menu options.
-     *
      * @param menu     The options menu in which you place your items.
      * @param inflater The menu inflater
      */
@@ -223,7 +263,6 @@ public class UserMoodsFragment extends Fragment {
 
     /**
      * This method gets called when a menu item in the toolbar is clicked. We only have one item here so we only check one
-     *
      * @param item The menu item that was selected. This value must never be null.
      * @return Return false to allow normal menu processing to proceed, true to consume it here.
      */
@@ -250,6 +289,11 @@ public class UserMoodsFragment extends Fragment {
 
                 // Set the onclick listener
                 this.menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    /**
+                     * This method is called when an item in the Filter list is clicked
+                     * @param item the item that was clicked
+                     * @return true // TODO: 2019-11-07 Cameron: not sure why it always returns true, investigate
+                     */
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
 
@@ -258,7 +302,8 @@ public class UserMoodsFragment extends Fragment {
                             UserMoodsFragment.this.filter = null;
                             // Show the full list
                             moodAdapter.getFilter().filter("None");
-                        } else {
+                        }
+                        else {
                             // Filter the list based on the selected item's title
                             UserMoodsFragment.this.filter = EmotionalState.findByStateCode(item.getItemId());
                             moodAdapter.getFilter().filter(filter.toString());
@@ -296,4 +341,3 @@ public class UserMoodsFragment extends Fragment {
         return true;
     }
 }
-

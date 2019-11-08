@@ -16,9 +16,12 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
+/**
+ * SignUpActivity allows the user to create a new account. Basic input validation is preformed and assuming they all pass, a new user is registered.
+ */
 public class SignUpActivity extends AppCompatActivity {
 
-    AppPreferences appPreferences;
+    private AppPreferences appPreferences;
 
     private TextInputLayout textInputFirstName;
     private TextInputLayout textInputLastName;
@@ -28,6 +31,11 @@ public class SignUpActivity extends AppCompatActivity {
 
     private Button button;
 
+    /**
+     * onCreate is called when the Activity is created, and it is used to perform the logic that the Activity
+     * needs, such as setting onClickListeners.
+     * @param savedInstanceState if the instance was saved, this would be sent in when the Activity is created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -319,7 +327,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    // Software back navigation
+    /**
+     * This method is called when the software navigation button is pressed. We log the event and make sure the activity is destroyed.
+     */
     private void onBackNavigationClicked() {
 
         Log.d(HomeActivity.LOG_TAG, "Back navigation (Software) from " + this.getClass().getSimpleName());
@@ -327,7 +337,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    // Hardware back navigation
+    /**
+     * This method is called when the hardware navigation button is pressed. We log the event and make sure the activity is destroyed.
+     */
     @Override
     public void onBackPressed() {
 

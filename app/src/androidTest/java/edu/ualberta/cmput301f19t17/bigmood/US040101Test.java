@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -16,20 +14,20 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.regex.Pattern;
+
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-// TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
-/**
- * Test class for DefineMoodDialogFragment. All the UI tests are written here. Robotium test framework is used.
- */
-public class US010101Test {
+public class US040101Test {
     private Solo solo;
     private AppPreferences appPreferences;
 
@@ -55,7 +53,7 @@ public class US010101Test {
     }
 
     @Test
-    public void checkAddMood() {
+    public void checkSort() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
@@ -63,16 +61,46 @@ public class US010101Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
+        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
 
         solo.clickOnView(solo.getView(R.id.action_save));
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
+        String oldTime = timeFormat.format(Calendar.getInstance().getTime());
+
+
         solo.waitForDialogToClose();
 
-        ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
+        //wait for one full minute to ensure a new time is chosen
+        // TODO: 2019-11-07 Cameron: Remove and find a better method to check this, perhaps by creating a specific testUser for this problem, and dont delete the moods after testing
 
-        //make sure we correctly added the mood
-        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString()));
-        assertEquals(1, moodArrayAdapter.getCount());
+        solo.waitForText("HillyBillyBobTesterino", 0, 60000);
+
+        solo.clickOnView(fab);
+        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
+        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
+
+        solo.clickOnView(solo.getView(R.id.action_save));
+
+        String newTime = timeFormat.format(Calendar.getInstance().getTime());
+
+        solo.waitForDialogToClose();
+
+        //make sure the item at the top is the newly added item
+        //gotta use Pattern.quote because it's related somehow to the way Robotium sees string
+        //link: https://stackoverflow.com/questions/17741680/robotium-for-android-solo-searchtext-not-working
+        solo.clickInList(0);
+        assertTrue(solo.searchText(Pattern.quote(newTime)));
+
+        //I dont know how to press the X button in ViewMoodDialogFragment, so we will just press edit, and then close the fragment
+        solo.clickOnButton("EDIT");
+        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.waitForDialogToClose();
+
+        //make sure the second item is the previously added item
+        solo.clickInList(1);
+        assertTrue(solo.searchText(Pattern.quote(oldTime)));
     }
-
 }

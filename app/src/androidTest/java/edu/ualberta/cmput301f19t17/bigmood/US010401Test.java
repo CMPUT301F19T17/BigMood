@@ -10,6 +10,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -44,7 +45,11 @@ public class US010401Test {
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
+    }
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test
@@ -56,17 +61,18 @@ public class US010401Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
+
+        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check edit mood");
 
         solo.clickOnView(solo.getView(R.id.action_save));
 
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
         int originalNumListItems = moodArrayAdapter.getCount();
 
 
-        solo.clickInList(0); //select the mood we just created (it will be 0 since the list is sorted newest -> oldest)
+        solo.clickOnMenuItem("Disgust"); //select the mood we just created (it will be 0 since the list is sorted newest -> oldest)
 
         solo.clickOnButton("EDIT");
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
@@ -80,8 +86,11 @@ public class US010401Test {
 
         //make sure no new items were added, and no items deleted
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
+
+        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+
     }
 
 }

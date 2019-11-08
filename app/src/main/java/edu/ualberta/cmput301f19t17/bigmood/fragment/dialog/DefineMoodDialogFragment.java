@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -40,6 +38,9 @@ import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static android.app.Activity.RESULT_OK;
 
+/**
+ * DefineMoodDialogFragment is used to create a new mood, or edit a currently existing mood
+ */
 public class DefineMoodDialogFragment extends DialogFragment {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -209,6 +210,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
         // TODO 2019-11-03 Cameron removed since i don't believe there is a way to set a preset for the spinner programmatically, which is necessary for setting it with an ArrayAdapter.
         // TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
+        // set up the spinner with the emotional states
         final ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(
                 this.getContext(),
                 android.R.layout.simple_spinner_item,
@@ -217,6 +219,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
         stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
         this.stateSpinner.setAdapter(stateAdapter);
 
+        // set up the spinner with the social situations
         final ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(
                 this.getContext(),
                 android.R.layout.simple_spinner_item,
@@ -241,7 +244,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
             this.stateSpinner.setSelection(statePosition);
 
             // Populate
-            if (this.moodToEdit.getSituation() == null) {
+            if (this.moodToEdit.getSituation() != null) {
                 int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation());
                 this.situationSpinner.setSelection(situationPosition);
             }

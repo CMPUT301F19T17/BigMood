@@ -10,6 +10,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -47,6 +48,10 @@ public class US010301Test {
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         solo.waitForText("poop", 0, 1000);
     }
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+    }
 
     @Test
     public void testDisplayStateTimeDate() {
@@ -63,13 +68,8 @@ public class US010301Test {
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
 
-        ImageView view =  solo.getCurrentActivity().findViewById(R.id.imageview_placeholder_emote);
-        view.setImageDrawable(solo.getCurrentActivity().getRe);
-
-        //solo.getCurrentActivity().;
-        //assertTrue(R.drawable.ic_emoticon_happy == drawableID);
-
-
+        Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
+        assertTrue(R.drawable.ic_emoticon_happy == drawableID);
 
         assertTrue(solo.waitForText("Happy", 1, 2000));
         assertTrue(solo.waitForText(currentDate, 1, 2000));
@@ -91,6 +91,10 @@ public class US010301Test {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
+
+        Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
+        assertTrue(R.drawable.ic_emoticon_surprise == drawableID);
+
         assertTrue(solo.waitForText("Surprise", 1, 2000));
         assertTrue(solo.waitForText("Crowd", 1, 2000));
         assertTrue(solo.waitForText(currentDate, 1, 2000));
@@ -113,6 +117,14 @@ public class US010301Test {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
+
+        solo.waitForDialogToClose();
+
+        solo.clickInList(1, 0);
+
+        Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
+        assertTrue(R.drawable.ic_emoticon_disgust == drawableID);
+
         assertTrue(solo.waitForText("Disgusted", 1, 2000));
         assertTrue(solo.waitForText(currentDate, 1, 2000));
         assertTrue(solo.waitForText(currentTime, 1, 2000));

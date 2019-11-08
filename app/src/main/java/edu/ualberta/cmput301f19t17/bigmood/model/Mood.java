@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 /**
- * Ignore this class, this is for Firestore Testing purposes
+ * This class models a mood object.
  */
 public class Mood implements Parcelable {
 
