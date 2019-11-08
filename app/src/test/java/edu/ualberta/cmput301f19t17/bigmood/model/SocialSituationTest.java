@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SocialSituationTest {
 
@@ -15,7 +15,7 @@ class SocialSituationTest {
     @Test
     void testGetSituationCode() {
         SocialSituation situation = mockSocialSituation();
-        assertEquals(0, situation.getSituationCode());
+        assertEquals(1, situation.getSituationCode());
     }
 
     @Test
@@ -27,6 +27,6 @@ class SocialSituationTest {
     @Test
     void testFindBySituationCode() {
         SocialSituation situation = mockSocialSituation();
-        assertEquals(situation, situation.findBySituationCode(0));
+        assertEquals(situation, situation.findBySituationCode(1));
     }
 }

@@ -35,7 +35,7 @@ public class US020101Test {
         appPreferences = AppPreferences.getInstance();
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
     @Test
     public void checkReasonMaxLength(){

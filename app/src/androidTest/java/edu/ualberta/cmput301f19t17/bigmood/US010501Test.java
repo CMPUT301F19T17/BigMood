@@ -44,7 +44,7 @@ public class US010501Test {
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class US010501Test {
 
         // TODO: 2019-11-06 Cameron:
         //get message from async update before checking number of items in list
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
         ListView moodList = (ListView) solo.getView(R.id.mood_list);
         ListAdapter moodArrayAdapter = moodList.getAdapter();
@@ -76,7 +76,7 @@ public class US010501Test {
         solo.clickOnButton("DELETE");
 
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
 
         //make sure there are no new elements in the list (ie, after we added the mood, it was deleted)

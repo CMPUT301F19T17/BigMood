@@ -44,7 +44,7 @@ public class US040101Test {
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class US040101Test {
 
 
         //get message from async update before checking number of items in list
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
         ListView moodList = (ListView) solo.getView(R.id.mood_list);
         ListAdapter moodArrayAdapter = moodList.getAdapter();
@@ -76,7 +76,7 @@ public class US040101Test {
             }
         }
         // This assert also guarantees the filter at startup stay at None
-        // solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        // solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
@@ -87,7 +87,7 @@ public class US040101Test {
             solo.clickOnView(filter);
             solo.waitForText(state.toString(), mood_quantity, 1000);
             // the number of mood show should be equal to the number of mood being filtered
-            // solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+            // solo.waitForText("HillyBillyBobTesterino", 0, 2000);
             assertEquals(mood_quantity, moodArrayAdapter.getCount());
         }
 
@@ -96,7 +96,6 @@ public class US040101Test {
         solo.clickOnMenuItem("None");
         solo.clickOnView(filter);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
-        solo.clickOnView(filter);
         // We select a random mood i in the list try to Edit/Delete it
         Random random = new Random();
         int i = random.nextInt(state_quantity);
@@ -118,7 +117,7 @@ public class US040101Test {
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText(EmotionalState.findByStateCode(j).toString(), mood_quantity+1,1000);
         solo.waitForText(EmotionalState.findByStateCode(i).toString(), mood_quantity-1, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
 
@@ -130,7 +129,7 @@ public class US040101Test {
 
 
         //get message from async update before checking number of items in list
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
         ListView moodList = (ListView) solo.getView(R.id.mood_list);
         ListAdapter moodArrayAdapter = moodList.getAdapter();
@@ -165,14 +164,14 @@ public class US040101Test {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am HAPPY2");
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText("Happy", mood_quantity+1, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
         // Delete that mood
         solo.clickOnMenuItem("Happy");
         solo.clickOnButton("DELETE");
         solo.waitForText("Happy", mood_quantity, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
         assertEquals(mood_quantity, moodArrayAdapter.getCount());
 
@@ -187,7 +186,7 @@ public class US040101Test {
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText("Happy", mood_quantity-1, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
         assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
 

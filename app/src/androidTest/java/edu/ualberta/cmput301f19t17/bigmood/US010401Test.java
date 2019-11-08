@@ -44,7 +44,7 @@ public class US010401Test {
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class US010401Test {
         solo.clickOnView(solo.getView(R.id.action_save));
 
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
         int originalNumListItems = moodArrayAdapter.getCount();
 
@@ -81,7 +81,7 @@ public class US010401Test {
 
         //make sure no new items were added, and no items deleted
         // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());

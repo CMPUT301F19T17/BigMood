@@ -53,13 +53,16 @@ public class US010301Test {
 
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
 
-        solo.clickInList(1, 0);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
+
+        solo.waitForDialogToClose();
+
+        solo.clickInList(1, 0);
+
         assertTrue(solo.waitForText("Happy", 1, 2000));
         assertTrue(solo.waitForText(currentDate, 1, 2000));
         assertTrue(solo.waitForText(currentTime, 1, 2000));
@@ -70,18 +73,21 @@ public class US010301Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
-        solo.pressSpinnerItem(0, EmotionalState.SURPRISE.getStateCode());
+        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode());
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
 
-        solo.clickInList(1, 0);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
-        assertTrue(solo.waitForText("Surprise", 1, 2000));
-        assertTrue(solo.waitForText("Crowd", 1, 2000));
+
+        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.waitForDialogToClose();
+
+        solo.clickInList(1, 0);
+
+        assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString(), 1, 2000));
+        assertTrue(solo.waitForText(SocialSituation.CROWD.toString(), 1, 2000));
         assertTrue(solo.waitForText(currentDate, 1, 2000));
         assertTrue(solo.waitForText(currentTime, 1, 2000));
     }
@@ -95,13 +101,16 @@ public class US010301Test {
         solo.pressSpinnerItem(3, SocialSituation.ALONE.getSituationCode());
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "Stepped on poop");
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
 
-        solo.clickInList(1, 0);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.CANADA);
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
+
+        solo.waitForDialogToClose();
+
+        solo.clickInList(1, 0);
+
         assertTrue(solo.waitForText("Disgusted", 1, 2000));
         assertTrue(solo.waitForText(currentDate, 1, 2000));
         assertTrue(solo.waitForText(currentTime, 1, 2000));
