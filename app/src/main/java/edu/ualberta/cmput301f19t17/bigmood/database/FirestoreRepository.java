@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -30,7 +29,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
 /**
- * This class handles all the database requests coming from the application. It implements methods for interacting with the collections and documents that this application should need. All methods return a Task<T>, where T is the applicable return type. Since these are asynchronous you must make sure to add an OnSuccessListener() and an OnFailureListener() to the tasks you get back so that you can give feedback to the user.
+ * This class handles all the database requests coming from the application. It implements methods for interacting with the collections and documents that this application should need. Most methods return a Task<T>, where T is the applicable return type. Since these are asynchronous you must make sure to add an OnSuccessListener() and/or an OnFailureListener() to the tasks you get back so that you can give feedback to the user. For the tasks that return a ListenerRegistration, this defines a live callback routine so you must make sure to detach it whenever the activity is out of view as to not waste network resources.
  */
 public class FirestoreRepository implements Repository {
 
@@ -96,8 +95,8 @@ public class FirestoreRepository implements Repository {
      * This method attempts to register a user using the parameters it was passed.
      * @param username  Username of the user to register. This must be unique or else the query will fail.
      * @param password  Password of the user to register.
-     * @param firstName First name iof the user to register.
-     * @param lastName  Last name iof the user to register.
+     * @param firstName First name of the user to register.
+     * @param lastName  Last name of the user to register.
      * @return          Returns A Task of type Void. The task will succeed if the writes were successful and fail otherwise (if the username is not unique for example).
      */
     @Override
@@ -487,7 +486,7 @@ public class FirestoreRepository implements Repository {
     }
 
     /**
-     * This method handles the operation of "accepting" a request. This means that the recipient (the "to" field) has declined the sender's (the "from" field) request to follow them. Therefore we just need to delete the request and not change anything else.
+     * This method handles the operation of "declining" a request. This means that the recipient (the "to" field) has declined the sender's (the "from" field) request to follow them. Therefore we just need to delete the request and not change anything else.
      * @param request The Request to decline. The Request passed in should be an OLD Request and MUST have a firestoreId.
      * @return        Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
      */

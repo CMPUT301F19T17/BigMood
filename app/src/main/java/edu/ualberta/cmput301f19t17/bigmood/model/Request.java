@@ -3,7 +3,7 @@ package edu.ualberta.cmput301f19t17.bigmood.model;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
 /**
- * This class models a request to follow from one user to another.
+ * This class models a request object. It has fields representing a requester (from) and a requestee (to). This is used for the purposes of viewing the requests in a ListView.
  */
 public class Request {
 

@@ -16,7 +16,7 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 
 /**
- * ProfileFragment is used to view the current user's profile.
+ * ProfileFragment is used to view the current user's profile. It has the logic for logging out and requesting follows
  */
 public class ProfileFragment extends Fragment {
 

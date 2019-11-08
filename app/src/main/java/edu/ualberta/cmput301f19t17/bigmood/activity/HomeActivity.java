@@ -65,8 +65,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * This method is for hardware back navigation, so if the phone that the user uses has an physical back button
-     * and pressed the button, then this method will be called
+     * This method is called when the hardware navigation button is pressed. Since we don't want to accidentally log out by pressing the back button we basically don't do anything here but log the event.
      */
     @Override
     public void onBackPressed() {
@@ -76,8 +75,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * This method is for software back navigation, so if the phone that the user uses has a virtual back button
-     * and pressed the button, then this method will be called
+     * This method is called when the software button is pressed (if applicable). Since we don't want to accidentally log out by pressing the back button we basically don't do anything here but log the event.
      */
     @Override
     public boolean onSupportNavigateUp() {

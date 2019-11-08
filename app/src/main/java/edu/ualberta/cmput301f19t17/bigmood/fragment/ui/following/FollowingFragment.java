@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProviders;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
 /**
- * FollowingFragment is used to view the moods of the people that the user follows
+ * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
  */
 public class FollowingFragment extends Fragment {
 
