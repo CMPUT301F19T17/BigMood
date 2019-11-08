@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -10,12 +8,16 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
@@ -23,7 +25,7 @@ import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class US040101Test {
     private Solo solo;
@@ -41,157 +43,57 @@ public class US040101Test {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        // This is actually the sweet spots for sleep time
+        // 1 second would be too low and my trash laptop cant handle that :(
+        solo.sleep(2000);
+    }
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test
-    public void checkFilterMood() {
+    public void checkSort() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-
-
-        //get message from async update before checking number of items in list
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
-
-        ListView moodList = (ListView) solo.getView(R.id.mood_list);
-        ListAdapter moodArrayAdapter = moodList.getAdapter();
 
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
-        // Create 2 Mood for each state
-
-        int mood_quantity = 2;
-        int state_quantity = EmotionalState.values().length;
-
-        for (EmotionalState state : EmotionalState.values()) {
-            for (int i = 0; i < mood_quantity; i++) {
-                solo.clickOnView(fab);
-                solo.pressSpinnerItem(0, state.getStateCode());
-                solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-                solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am " + state.toString() + i);
-                solo.clickOnView(solo.getView(R.id.action_save));
-                solo.waitForText(state.toString(), i+1, 1000);
-            }
-        }
-        // This assert also guarantees the filter at startup stay at None
-        // solo.waitForText("HillyBillyBobTesterino", 0, 10000);
-        assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
-
-        View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
-        solo.clickOnView(filter);
-        for (EmotionalState state : EmotionalState.values()) {
-            // select a mood and re-click the filter to make it disappear
-            solo.clickOnMenuItem(state.toString());
-            solo.clickOnView(filter);
-            solo.waitForText(state.toString(), mood_quantity, 1000);
-            // the number of mood show should be equal to the number of mood being filtered
-            // solo.waitForText("HillyBillyBobTesterino", 0, 10000);
-            assertEquals(mood_quantity, moodArrayAdapter.getCount());
-        }
-
-        // Go back to None filter, it should show full moods
-
-        solo.clickOnMenuItem("None");
-        solo.clickOnView(filter);
-        assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
-        solo.clickOnView(filter);
-        // We select a random mood i in the list try to Edit/Delete it
-        Random random = new Random();
-        int i = random.nextInt(state_quantity);
-        solo.clickOnMenuItem(EmotionalState.findByStateCode(i).toString());
-            // The mood get edited to a random mood j
-        solo.clickOnButton("EDIT");
-        solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
-
-            //Select a random state j other than the one we created
-        int j = random.nextInt(state_quantity);
-            // i/2 will return the state code
-        while (i == j) {
-            j = random.nextInt(state_quantity);
-        }
-
-        solo.pressSpinnerItem(0, j);
-        solo.pressSpinnerItem(1, SocialSituation.CROWD.getSituationCode()); //crowd
-
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForText(EmotionalState.findByStateCode(j).toString(), mood_quantity+1,1000);
-        solo.waitForText(EmotionalState.findByStateCode(i).toString(), mood_quantity-1, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
-        assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
-
-
-    }
-
-    @Test
-    public void checkFilteredMood() {
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-
-
-        //get message from async update before checking number of items in list
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
-
-        ListView moodList = (ListView) solo.getView(R.id.mood_list);
-        ListAdapter moodArrayAdapter = moodList.getAdapter();
-
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-
-        // Create 2 Mood for each state
-
-        int mood_quantity = 2;
-        int state_quantity = EmotionalState.values().length;
-
-        for (EmotionalState state : EmotionalState.values()) {
-            for (int i = 0; i < mood_quantity; i++) {
-                solo.clickOnView(fab);
-                solo.pressSpinnerItem(0, state.getStateCode());
-                solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-                solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am " + state.toString() + i);
-                solo.clickOnView(solo.getView(R.id.action_save));
-                solo.waitForText(state.toString(), i + 1, 1000);
-            }
-        }
-
-        // Attempt to add/edit/delete mood inside of a filter
-        View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
-        solo.clickOnView(filter);
-        solo.clickOnMenuItem("Happy");
-
-        // Add a mood and see if it's update
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode()); //Happy
-        solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am HAPPY2");
+        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
+        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
+        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time 0");
+
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForText("Happy", mood_quantity+1, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
-        assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
-        // Delete that mood
+        //wait for 10 second before adding another mood
+        // TODO: 2019-11-07 Cameron: Remove and find a better method to check this, perhaps by creating a specific testUser for this problem, and dont delete the moods after testing
+        int wait_time = 10;
+        solo.sleep(wait_time*1000);
+
+        solo.clickOnView(fab);
+        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
+        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time +" + wait_time +"s");
+
+        solo.clickOnView(solo.getView(R.id.action_save));
+
+        solo.sleep(1000);
+
+        //make sure the item at the top is the newly added item
+        //gotta use Pattern.quote because it's related somehow to the way Robotium sees string
+        //link: https://stackoverflow.com/questions/17741680/robotium-for-android-solo-searchtext-not-working
         solo.clickOnMenuItem("Happy");
-        solo.clickOnButton("DELETE");
-        solo.waitForText("Happy", mood_quantity, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+        assertTrue(solo.searchText(Pattern.quote("at time +" + wait_time +"s")));
 
-        assertEquals(mood_quantity, moodArrayAdapter.getCount());
-
-        // Edit another mood
-        solo.clickOnMenuItem("Happy");
+        //I dont know how to press the X button in ViewMoodDialogFragment, so we will just press edit, and then close the fragment
         solo.clickOnButton("EDIT");
-            // Change the mood to sad
-        solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
-
-        solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode()); //sad
-        solo.pressSpinnerItem(1, SocialSituation.CROWD.getSituationCode()); //crowd
-
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForText("Happy", mood_quantity-1, 1000);
-        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
 
-        assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
-
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-
+        solo.sleep(1000);
+        //make sure the second item is the previously added item
+        solo.clickOnMenuItem("Disgust");
+        assertTrue(solo.searchText(Pattern.quote("at time 0")));
     }
 }

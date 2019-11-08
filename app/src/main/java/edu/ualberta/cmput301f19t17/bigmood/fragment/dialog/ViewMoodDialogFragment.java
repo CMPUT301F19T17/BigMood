@@ -119,6 +119,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         Resources res = this.getContext().getResources();
         Drawable emoticon = res.getDrawable(this.moodToView.getState().getDrawableId());
         emoteImageView.setImageDrawable(emoticon);
+        emoteImageView.setTag(this.moodToView.getState().getDrawableId());
 
         // Set date and time
         Calendar calendar = this.moodToView.getDatetime();

@@ -10,6 +10,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -22,6 +23,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 // TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
 /**
@@ -43,10 +45,17 @@ public class US010101Test {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
         solo.waitForText("HillyBillyBobTesterino", 0, 1000);
+
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+        solo.sleep(3000);
+
+    }
+    @AfterClass //runs after all tests have run
+    public static void cleanUp() {
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test
@@ -56,9 +65,9 @@ public class US010101Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
         solo.clickOnView(fab);
+
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
-        solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
+        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
 
         solo.clickOnView(solo.getView(R.id.action_save));
@@ -67,7 +76,7 @@ public class US010101Test {
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
 
         //make sure we correctly added the mood
-        solo.waitForText(EmotionalState.DISGUST.toString());
+        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString()));
         assertEquals(1, moodArrayAdapter.getCount());
     }
 

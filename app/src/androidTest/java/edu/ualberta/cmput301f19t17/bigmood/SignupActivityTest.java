@@ -17,6 +17,8 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.SignUpActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 
+import static org.junit.Assert.assertTrue;
+
 public class SignupActivityTest {
     private Solo solo;
     private AppPreferences appPreferences;
@@ -31,10 +33,6 @@ public class SignupActivityTest {
         appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
-    @Test
-    public void start() throws Exception {
-        Activity activity=rule.getActivity();
-    }
 
     @Test
     public void SignUpActivity() {
@@ -47,7 +45,7 @@ public class SignupActivityTest {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_confirm_password)).getEditText(), "cmput301");
         solo.clickOnView(solo.getView(R.id.button_sign_up));
         solo.clickOnButton("Sign Up");
-        solo.waitForText("Username already exists");
+        assertTrue(solo.waitForText("Sorry, a user already exists with that username."));
 
         //Successful SignUp
         solo.assertCurrentActivity("Wrong activity",SignUpActivity.class);

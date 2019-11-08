@@ -244,7 +244,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
             this.stateSpinner.setSelection(statePosition);
 
             // Populate
-            if (this.moodToEdit.getSituation() == null) {
+            if (this.moodToEdit.getSituation() != null) {
                 int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation());
                 this.situationSpinner.setSelection(situationPosition);
             }
