@@ -66,10 +66,7 @@ public class US010501Test {
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
 
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am disgust");
-
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check delete");
-
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText(EmotionalState.DISGUST.toString(), 1, 1000);
