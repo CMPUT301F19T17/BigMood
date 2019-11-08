@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -67,15 +68,13 @@ public class US040201Test {
 
         // Create 2 Mood for each state
 
-        int mood_quantity = 2;
+        int mood_quantity = 1;
         int state_quantity = EmotionalState.values().length;
 
         for (EmotionalState state : EmotionalState.values()) {
             for (int i = 0; i < mood_quantity; i++) {
                 solo.clickOnView(fab);
                 solo.pressSpinnerItem(0, state.getStateCode());
-                solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-                solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am " + state.toString() + i);
                 solo.clickOnView(solo.getView(R.id.action_save));
                 solo.waitForText(state.toString(), i+1, 1000);
             }
@@ -87,6 +86,7 @@ public class US040201Test {
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
         solo.clickOnView(filter);
         for (EmotionalState state : EmotionalState.values()) {
+            Log.e("US040201Test", "Emotional state: " + state.toString());
             // select a mood and re-click the filter to make it disappear
             solo.clickOnMenuItem(state.toString());
             solo.clickOnView(filter);
