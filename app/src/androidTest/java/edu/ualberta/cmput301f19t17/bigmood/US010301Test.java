@@ -49,7 +49,7 @@ public class US010301Test {
     }
 
     @Test
-    public void testDisplayOnlyStateTimeDate() {
+    public void testDisplayStateTimeDate() {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
@@ -63,9 +63,12 @@ public class US010301Test {
         String currentDate = dateFormat.format(Calendar.getInstance().getTime());
         String currentTime = timeFormat.format(Calendar.getInstance().getTime());
 
+        //ImageView view =  solo.getCurrentActivity().findViewById(R.id.imageview_placeholder_emote);
+        //view.setImageDrawable();
 
+        solo.getCurrentActivity().;
+        assertTrue(R.drawable.ic_emoticon_happy == drawableID);
 
-        assertEquals(R.drawable.ic_emoticon_happy, solo.getCurrentActivity().findViewById(R.id.imageview_placeholder_emote).getTag());
 
 
         assertTrue(solo.waitForText("Happy", 1, 2000));
@@ -74,7 +77,7 @@ public class US010301Test {
     }
 
     @Test
-    public void  testDisplayOnlyStateTimeDateSituation() {
+    public void  testDisplayStateTimeDateSituation() {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
@@ -95,7 +98,7 @@ public class US010301Test {
     }
 
     @Test
-    public void  testDisplayOnlyStateTimeDateSituationReason() {
+    public void  testDisplayStateTimeDateSituationReason() {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
