@@ -76,6 +76,7 @@ public class US040101Test {
             }
         }
         // This assert also guarantees the filter at startup stay at None
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
@@ -86,6 +87,7 @@ public class US040101Test {
             solo.clickOnView(filter);
             solo.waitForText(state.toString(), mood_quantity, 1000);
             // the number of mood show should be equal to the number of mood being filtered
+            solo.waitForText("HillyBillyBobTesterino", 0, 10000);
             assertEquals(mood_quantity, moodArrayAdapter.getCount());
         }
 
@@ -116,9 +118,9 @@ public class US040101Test {
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText(EmotionalState.findByStateCode(j).toString(), mood_quantity+1,1000);
         solo.waitForText(EmotionalState.findByStateCode(i).toString(), mood_quantity-1, 1000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
 
     }
 
@@ -150,8 +152,6 @@ public class US040101Test {
                 solo.waitForText(state.toString(), i + 1, 1000);
             }
         }
-        // This assert also guarantees the filter at startup stay at None
-        assertEquals(mood_quantity * state_quantity, moodArrayAdapter.getCount());
 
         // Attempt to add/edit/delete mood inside of a filter
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
@@ -165,12 +165,15 @@ public class US040101Test {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am HAPPY2");
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText("Happy", mood_quantity+1, 1000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
         // Delete that mood
         solo.clickOnMenuItem("Happy");
         solo.clickOnButton("DELETE");
         solo.waitForText("Happy", mood_quantity, 1000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+
         assertEquals(mood_quantity, moodArrayAdapter.getCount());
 
         // Edit another mood
@@ -184,6 +187,8 @@ public class US040101Test {
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText("Happy", mood_quantity-1, 1000);
+        solo.waitForText("HillyBillyBobTesterino", 0, 10000);
+
         assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
 
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());

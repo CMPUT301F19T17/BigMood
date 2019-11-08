@@ -47,7 +47,7 @@ public class US020101Test {
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check reason length is too long.");
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText("Reason too long");
-
+        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
 
     }
 
