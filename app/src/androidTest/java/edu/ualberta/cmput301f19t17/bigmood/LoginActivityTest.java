@@ -1,7 +1,5 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
-import android.app.Activity;
-
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
@@ -34,11 +32,6 @@ public class LoginActivityTest {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
         appPreferences.setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
-    }
-
-    @Test
-    public void start() throws Exception {
-        Activity activity = rule.getActivity();
     }
 
     @Test
