@@ -48,6 +48,10 @@ public class US010101Test {
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
         solo.waitForText("HillyBillyBobTesterino", 0, 1000);
+
+        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+        solo.sleep(3000);
+
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
@@ -61,6 +65,7 @@ public class US010101Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
         solo.clickOnView(fab);
+
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
