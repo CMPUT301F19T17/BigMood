@@ -17,6 +17,7 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
@@ -79,7 +80,6 @@ public class US040101Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "got puked on");
 
         solo.clickOnView(solo.getView(R.id.action_save));
@@ -89,8 +89,10 @@ public class US040101Test {
         solo.waitForDialogToClose();
 
         //make sure the item at the top is the newly added item
+        //gotta use Pattern.quote because it's related somehow to the way Robotium sees string
+        //link: https://stackoverflow.com/questions/17741680/robotium-for-android-solo-searchtext-not-working
         solo.clickInList(0);
-        assertTrue(solo.waitForText(newTime, 1, 2000));
+        assertTrue(solo.searchText(Pattern.quote(newTime)));
 
         //I dont know how to press the X button in ViewMoodDialogFragment, so we will just press edit, and then close the fragment
         solo.clickOnButton("EDIT");
@@ -99,6 +101,6 @@ public class US040101Test {
 
         //make sure the second item is the previously added item
         solo.clickInList(1);
-        assertTrue(solo.waitForText(oldTime, 1, 2000));
+        assertTrue(solo.searchText(Pattern.quote(oldTime)));
     }
 }
