@@ -74,7 +74,7 @@ public class US010501Test {
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForText(EmotionalState.DISGUST.toString(), 1, 1000);
 
-        solo.clickInList(0); //select the mood we just created
+        solo.clickOnMenuItem("Disgust"); //select the mood we just created
 
         solo.clickOnButton("DELETE");
 

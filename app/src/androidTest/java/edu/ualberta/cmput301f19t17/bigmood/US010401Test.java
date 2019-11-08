@@ -70,7 +70,7 @@ public class US010401Test {
         int originalNumListItems = moodArrayAdapter.getCount();
 
 
-        solo.clickInList(0); //select the mood we just created (it will be 0 since the list is sorted newest -> oldest)
+        solo.clickOnMenuItem("Disgust"); //select the mood we just created (it will be 0 since the list is sorted newest -> oldest)
 
         solo.clickOnButton("EDIT");
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
