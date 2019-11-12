@@ -7,13 +7,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
+import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 
 /**
  * ProfileFragment is used to view the current user's profile. It has the logic for logging out and requesting follows
@@ -22,6 +29,10 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
     private AppPreferences appPreferences;
+
+    private TextInputLayout textInputRequest;
+    private EditText edit_text_request;
+    private Button buttonRequest;
 
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
@@ -35,14 +46,28 @@ public class ProfileFragment extends Fragment {
 
         this.profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
         this.appPreferences = AppPreferences.getInstance();
+        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        View root = inflater.inflate(R.layout.fragment_profile, container, false);
+        this.textInputRequest = rootView.findViewById(R.id.textInputLayoutRequest);
+        this.edit_text_request = textInputRequest.getEditText();
+        this.buttonRequest = rootView.findViewById(R.id.button_request);
+        this.edit_text_request.setText("Scooby Doo");
+
+        this.buttonRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "This is my Toast message!", Toast.LENGTH_LONG).show();
+            }
+        });
 
         this.setHasOptionsMenu(true);
 
-
-        return root;
+        return rootView;
     }
+
+
+
+
 
     /**
      * This method gets called when the fragment needs to assemble menu options.

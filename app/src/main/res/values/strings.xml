@@ -67,5 +67,11 @@
     <string name="error_incorrect_user_pw">Username/password incorrect.</string>
     <string name="error_empty_username">Username cannot be empty</string>
     <string name="error_empty_password">Password cannot be empty</string>
+    <string name="request_button_label">REQUEST</string>
+    <string name="username_display_placeholder">Username</string>
+    <string name="username_display_symbol">\@</string>
+    <string name="request_label">Request to Follow</string>
+    <string name="first_name_placeholder">First Name</string>
+    <string name="last_name_placeholder">Last Name</string>
 
 </resources>

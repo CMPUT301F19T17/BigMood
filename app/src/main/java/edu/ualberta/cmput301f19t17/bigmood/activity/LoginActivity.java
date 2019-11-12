@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         this.textInputPassword = (TextInputLayout) this.findViewById(R.id.text_input_password);
 
         // Get Id of button
-
         this.buttonLogin = (Button) this.findViewById(R.id.button_login);
 
         // Get Id of clickable Textview
