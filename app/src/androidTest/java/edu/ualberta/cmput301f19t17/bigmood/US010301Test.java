@@ -1,7 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -83,7 +82,7 @@ public class US010301Test {
         solo.clickInList(1, 0);
 
         Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_surprise == drawableID);
+        assertEquals(R.drawable.ic_emoticon_surprise, (int) drawableID);
 
         assertTrue(solo.waitForText("Surprise", 1, 2000));
         assertTrue(solo.waitForText("Crowd", 1, 2000));
