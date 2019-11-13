@@ -7,13 +7,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.ListenerRegistration;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewMoodDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
+import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 /**
  * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
@@ -22,6 +40,15 @@ public class FollowingFragment extends Fragment {
 
     private FollowingViewModel followingViewModel;
 
+    private AppPreferences appPreferences;
+
+    private ArrayList<Mood> moodList;
+    private MoodAdapter moodAdapter;
+
+    private ListenerRegistration listenerRegistration;
+
+    private View menuItemFilter = null;
+    private PopupMenu menu = null;
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
      * This is where we inflate all the views and *if applicable* populate all the fields.
@@ -31,16 +58,59 @@ public class FollowingFragment extends Fragment {
      * @return                   Returns the inflated view
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        this.followingViewModel = ViewModelProviders.of(this).get(FollowingViewModel.class);
-
         View root = inflater.inflate(R.layout.fragment_following, container, false);
-
         // Enable options menu
         this.setHasOptionsMenu(true);
 
-        return root;
+        this.followingViewModel = ViewModelProviders.of(this).get(FollowingViewModel.class);
+        this.appPreferences = AppPreferences.getInstance();
 
+        // Initialize a new ArrayList
+        this.moodList = new ArrayList<>();
+        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
+
+        // TODO: 2019-11-13 Cameron: canned data
+        moodList.add(new Mood(EmotionalState.ANGER, Calendar.getInstance(), SocialSituation.OPTIONAL, "", new GeoPoint(54.23, 23.10), null));
+        moodAdapter.notifyDataSetChanged();
+
+        ListView moodListView = root.findViewById(R.id.following_mood_list);
+        moodListView.setAdapter(moodAdapter);
+
+        // TODO: 2019-11-13 Cameron: Implement FireStore listener 
+        // Set up the MoodsListener to listen to updates in FireStore
+       /* this.listenerRegistration = this.appPreferences
+                .getRepository()
+                .getUserMoods(
+                        this.appPreferences.getCurrentUser(),
+                        new MoodsListener() {
+                            /**
+                             * This method is called whenever the listener hears that there is an update in the moodList
+                             * in FireStore, and updates the list, and applies a filter, if the user has selected one
+                             * @param moodList the new list that has the updated values
+                             */
+                            /*@Override
+                            public void onUpdate(List<Mood> moodList) {
+
+                                FollowingFragment.this.moodList.clear();
+                                FollowingFragment.this.moodList.addAll(moodList);
+                                FollowingFragment.this.moodAdapter.notifyDataSetChanged();
+                                // This refresh the filter with the updated data
+                                FollowingFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
+
+                            }
+                        });*/
+
+        moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                // Create dialog and set the button press listener for delete and edit
+                ViewMoodDialogFragment viewUserFragment = ViewMoodDialogFragment.newInstance(moodAdapter.getItem(i));
+                // Show the view Dialog
+                viewUserFragment.show(getFragmentManager(), "FRAGMENT_VIEW_MOOD");
+            }
+        });
+
+        return root;
     }
 
     /**
