@@ -14,9 +14,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
@@ -27,7 +24,14 @@ import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertTrue;
 
-public class US040101Test {
+/**
+ * This class is to test the User Story US 05.03.01
+ * The test will be very similar to US 04.01.01, since the only difference between these two is the
+ * location that the Moods are brought from.
+ * In this class we are making sure that the moods belonging to the users that the main user is
+ * following show up in reverse chronological order.
+ */
+public class US050301Test {
     private Solo solo;
     private AppPreferences appPreferences;
 
@@ -57,43 +61,21 @@ public class US040101Test {
     public void checkSort() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-
-        solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
-        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time 0");
-
-        solo.clickOnView(solo.getView(R.id.action_save));
-
-        //wait for 10 second before adding another mood
-        // TODO: 2019-11-07 Cameron: Remove and find a better method to check this, perhaps by creating a specific testUser for this problem, and dont delete the moods after testing
-        int wait_time = 10;
-        solo.sleep(wait_time*1000);
-
-        solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
-        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()); //two to several
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time +" + wait_time +"s");
-
-        solo.clickOnView(solo.getView(R.id.action_save));
-
-        solo.sleep(1000);
+        // switch to the Following tab
+        solo.clickOnText("Following");
 
         //make sure the item at the top is the newly added item
         //gotta use Pattern.quote because it's related somehow to the way Robotium sees string
         //link: https://stackoverflow.com/questions/17741680/robotium-for-android-solo-searchtext-not-working
+        // TODO: 2019-11-12 Cameron: change the following to make sure we check times properly, we will likely have to change this, since we will likely be adding moods to a second user and following them, without altering the moods in between
         solo.clickOnMenuItem("Happy");
-        assertTrue(solo.searchText(Pattern.quote("at time +" + wait_time +"s")));
+        assertTrue(solo.searchText(Pattern.quote("at time +" + 1000 +"s")));
 
-        //I dont know how to press the X button in ViewMoodDialogFragment, so we will just press edit, and then close the fragment
-        solo.clickOnButton("EDIT");
-        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.clickOnImage(R.drawable.ic_close_black_24dp);
 
-        solo.sleep(1000);
         //make sure the second item is the previously added item
         solo.clickOnMenuItem("Disgust");
         assertTrue(solo.searchText(Pattern.quote("at time 0")));
+
     }
 }
