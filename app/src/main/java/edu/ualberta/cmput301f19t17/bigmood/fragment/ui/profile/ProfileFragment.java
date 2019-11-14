@@ -9,18 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
-import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.database.User;
+import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
 /**
  * ProfileFragment is used to view the current user's profile. It has the logic for logging out and requesting follows
@@ -34,6 +36,10 @@ public class ProfileFragment extends Fragment {
     private EditText edit_text_request;
     private Button buttonRequest;
 
+    private TextView textViewUsername;
+    private TextView textViewFirstName;
+    private TextView textViewLastName;
+
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
      * This is where we inflate all the views and *if applicable* populate all the fields.
@@ -44,10 +50,22 @@ public class ProfileFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        // Setup the fragment
         this.profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
         this.appPreferences = AppPreferences.getInstance();
-        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // Display the user's info
+        this.textViewUsername = rootView.findViewById(R.id.textView_username);
+        this.textViewFirstName = rootView.findViewById(R.id.textView_first_name);
+        this.textViewLastName = rootView.findViewById(R.id.textView_last_name);
+        User currentUser = appPreferences.getCurrentUser();
+        this.textViewUsername.setText(currentUser.getUsername());
+        this.textViewFirstName.setText(currentUser.getFirstName());
+        this.textViewLastName.setText(currentUser.getLastName());
+
+
+        // Get the EditText and Button
         this.textInputRequest = rootView.findViewById(R.id.textInputLayoutRequest);
         this.edit_text_request = textInputRequest.getEditText();
         this.buttonRequest = rootView.findViewById(R.id.button_request);
@@ -55,7 +73,25 @@ public class ProfileFragment extends Fragment {
         this.buttonRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "This is my Toast message!", Toast.LENGTH_LONG).show();
+                final String requested_username = edit_text_request.getText().toString();
+                if (requested_username.isEmpty()) {
+                    textInputRequest.setError("Username required");
+                }else{
+                    appPreferences.getRepository().userExists(requested_username).addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean aBoolean) {
+                            if (aBoolean) {
+                                Request request = new Request(appPreferences.getCurrentUser(),requested_username);
+                                appPreferences.getRepository().createRequest(request);
+                                Toast.makeText(getActivity(), "Request sent.", Toast.LENGTH_SHORT).show();
+                                edit_text_request.setText("");
+                            }else{
+                                textInputRequest.setError("User does not exist");
+                            }
+                        }
+                    });
+
+                }
             }
         });
 

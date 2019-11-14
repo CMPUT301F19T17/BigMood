@@ -73,5 +73,8 @@
     <string name="request_label">Request to Follow</string>
     <string name="first_name_placeholder">First Name</string>
     <string name="last_name_placeholder">Last Name</string>
+    <string name="request_message">wants to follow you!</string>
+    <string name="button_dismiss_label">DISMISS</string>
+    <string name="button_accept_label">ACCEPT</string>
 
 </resources>
