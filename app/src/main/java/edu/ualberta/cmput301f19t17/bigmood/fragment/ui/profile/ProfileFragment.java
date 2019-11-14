@@ -51,7 +51,6 @@ public class ProfileFragment extends Fragment {
         this.textInputRequest = rootView.findViewById(R.id.textInputLayoutRequest);
         this.edit_text_request = textInputRequest.getEditText();
         this.buttonRequest = rootView.findViewById(R.id.button_request);
-        this.edit_text_request.setText("Scooby Doo");
 
         this.buttonRequest.setOnClickListener(new View.OnClickListener() {
             @Override
