@@ -13,6 +13,10 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
+/**
+ * ViewUserMoodDialogFragment is used to view a mood of the current user. It subclasses ViewMoodDialogFragment
+ * and it adds the Edit and Delete buttons.
+ */
 public class ViewUserMoodDialogFragment extends ViewMoodDialogFragment {
 
     // Define new listener

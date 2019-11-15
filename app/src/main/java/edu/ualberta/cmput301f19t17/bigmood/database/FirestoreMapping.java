@@ -41,7 +41,6 @@ class FirestoreMapping {
     /**
      * We keep this private to stop anyone from instantiating this class
      */
-    private FirestoreMapping() {
-    }
+    private FirestoreMapping() {}
     
 }

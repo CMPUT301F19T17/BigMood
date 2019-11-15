@@ -23,6 +23,9 @@ import java.util.Locale;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
+/**
+ * ViewMoodDialogFragment is used to view a mood in general. It defines the logic of viewing a mood.
+ */
 public class ViewMoodDialogFragment extends DialogFragment {
 
     private Toolbar toolbar;
@@ -116,6 +119,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         Resources res = this.getContext().getResources();
         Drawable emoticon = res.getDrawable(this.moodToView.getState().getDrawableId());
         emoteImageView.setImageDrawable(emoticon);
+        emoteImageView.setTag(this.moodToView.getState().getDrawableId());
 
         // Set date and time
         Calendar calendar = this.moodToView.getDatetime();

@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
 /**
- * This Enumeration defines the categories for an emotional state. It also is associated with a stateCode so that we can store an enumeration in a database.
+ * This Enumeration defines the categories for an emotional state. It also is associated with a state code, a display name, and a drawable ID.
  */
 public enum EmotionalState {
 
@@ -48,11 +48,16 @@ public enum EmotionalState {
         return this.drawableId;
     }
 
+    /**
+     * This method converts an EmotionalState into a string
+     * @return the displayName of the EmotionalState
+     */
     @NonNull
     @Override
     public String toString() {
         return this.displayName;
     }
+
     /**
      * This method allows the reverse lookup of a state code into a member of the enumeration. This would be used to retrieve the state from an integer taken from a database entry.
      * @param code The code to look up

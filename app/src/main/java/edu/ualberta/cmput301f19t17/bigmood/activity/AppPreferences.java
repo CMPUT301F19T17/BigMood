@@ -6,14 +6,13 @@ import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
 /**
  * This Preferences class is a singleton class that holds the currently activated User,
- * as well as the reference to the FireStore Repository, so that all the classes can use them
- * for storing data to FireStore
+ * as well as the reference to a repository interface. This is in most cases Firestore
+ * but could point to an in-memory database for testing purposes for example.
  */
 public class AppPreferences {
+
     private static AppPreferences preferences = null;
 
-    //Leaving this to do in, not sure what nick had in mind, but to be on the safe side, leaving
-    // TODO: 2019-11-02 Nectarios: Implement
     private User currentUser;
     private Repository repository;
 
@@ -41,18 +40,40 @@ public class AppPreferences {
         this.repository = FirestoreRepository.getInstance();
     }
 
+    /**
+     * This method sets the current user to a new user.
+     * This is called whenever a user signs in
+     * @param user the user to set
+     */
     public void setCurrentUser(User user) {
         this.currentUser = user;
     }
 
+    /**
+     * This method sets the repository to a new repository.
+     * This can be used for replacing the repository class
+     * with a testable in-memory database.
+     * @param repository the repo to set
+     */
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
 
+    /**
+     * This method returns the current user.
+     * This is useful for firestore access
+     * @return the current user
+     */
     public User getCurrentUser() {
         return this.currentUser;
     }
 
+    /**
+     * This method returns the current user.
+     * This is useful for accessing firestore methods in the database package, as
+     * the repository contains all of the methods to access firestore
+     * @return the repository
+     */
     public Repository getRepository() {
         return this.repository;
     }

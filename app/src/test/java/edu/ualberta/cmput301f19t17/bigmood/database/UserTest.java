@@ -1,9 +1,8 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for User
@@ -16,10 +15,10 @@ class UserTest {
 
     private User mockUser;
 
-    @Before
     private User mockUser(){
 
        return new User (UserName,firstName,lastName);
+
     }
 
     @Test

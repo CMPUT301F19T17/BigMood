@@ -8,10 +8,12 @@ import androidx.annotation.Nullable;
  */
 public enum SocialSituation {
 
-    ALONE (0, "Alone"),
-    ONE (1, "One person"),
-    SEVERAL (2, "Two to several people"),
-    CROWD (3, "Crowd"),
+    OPTIONAL (0, "No situation provided"),
+    ALONE (1, "Alone"),
+    ONE (2, "One person"),
+    SEVERAL (3, "Two to several people"),
+    CROWD (4, "Crowd"),
+
     ;
 
     private int situationCode;
@@ -19,7 +21,8 @@ public enum SocialSituation {
 
     /**
      * Constructor that allows each state to be associated with a code.
-     * @param situationCode
+     * @param situationCode the "index" of the SocialSituation that it is associated with
+     * @param displayName the "name" of the SocialSituation that it is associated with
      */
     SocialSituation(int situationCode, String displayName) {
         this.situationCode = situationCode;
@@ -28,12 +31,16 @@ public enum SocialSituation {
 
     /**
      * This method retrieves the situation code from the enum category
-     * @return
+     * @return the situation code
      */
     public int getSituationCode() {
         return situationCode;
     }
 
+    /**
+     * This method converts an SocialSituation into a string
+     * @return the displayName of the SocialSituation
+     */
     @NonNull
     @Override
     public String toString() {
