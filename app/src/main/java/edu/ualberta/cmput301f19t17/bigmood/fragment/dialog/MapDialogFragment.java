@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -30,6 +31,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme_FullScreenDialog);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -37,7 +39,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         }
 
         LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.dialog_view_user_map, null);
+        View view = inflater.inflate(R.layout.dialog_view_user_map, null, false);
 
         mapView = view.findViewById(R.id.map_view);
         mapView.onCreate(mapViewBundle);
@@ -46,6 +48,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
         return this.buildDialog(view);
     }
+
+
 
     /**
      * This method serves the purpose of building a proper dialog for this fragment. onCreateDialog() must return a dialog and this is where that occurs. The intention is that any subclasses will be able to override this method to implement their own dialogs.
@@ -63,6 +67,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
                 .create();
 
     }
+
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -83,11 +89,6 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         mapView.onResume();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
 
     @Override
     public void onStop() {
@@ -115,5 +116,22 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         googleMap.setMinZoomPreference(12);
         LatLng ny = new LatLng(40.7143528, -74.0059731);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Dialog dialog = this.getDialog();
+
+        if (dialog != null) {
+
+            int width = ViewGroup.LayoutParams.MATCH_PARENT;
+            int height = ViewGroup.LayoutParams.MATCH_PARENT;
+
+            dialog.getWindow().setLayout(width, height);
+            dialog.getWindow().setWindowAnimations(R.style.AppTheme_Slide);
+
+        }
     }
 }
