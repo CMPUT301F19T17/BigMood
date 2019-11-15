@@ -17,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -30,6 +32,7 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.DefineMoodDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewUserMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -344,9 +347,13 @@ public class UserMoodsFragment extends Fragment {
         } else if (item.getItemId() == R.id.action_maps_user) {
 
             Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
+            MapDialogFragment mapDialogFragment = new MapDialogFragment();
+            mapDialogFragment.show(getFragmentManager(), "FRAGMENT_VIEW_USER_MAP");
 
         }
         return true;
     }
+
+
 }
 
