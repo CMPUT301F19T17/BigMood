@@ -45,6 +45,9 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     private Toolbar toolbar;
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
+    public MapDialogFragment(MoodAdapter moodAdapter) {
+        this.moodAdapter = moodAdapter;
+    }
 
     /**
      * of the on*()methods, this is the first. When we first want to create the dialog we set the theme to the fullscreen theme so that the edges match the parent. Here we also check for the existence of a mood in the arguments bundle and set it to our instance variable.
