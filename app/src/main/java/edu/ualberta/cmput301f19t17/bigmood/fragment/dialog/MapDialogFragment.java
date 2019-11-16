@@ -20,7 +20,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.GeoPoint;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
@@ -148,10 +155,62 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMapView) {
         googleMap = googleMapView;
-        googleMap.setMinZoomPreference(12);
+        googleMap.setMinZoomPreference(15);
         LatLng ny = new LatLng(40.7143528, -74.0059731);
+        googleMap.addMarker(new MarkerOptions().position(ny)
+                .title("Marker in NY")
+                .snippet("Test marker!"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
     }
 
+    public void makeMoodMaker(GoogleMap googleMap, Mood mood) {
+        GeoPoint geoPoint = mood.getLocation();
+        LatLng moodLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
+        Calendar calendar = mood.getDatetime();
+        String moodDate = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(calendar.getTime());
+        String moodTime = new SimpleDateFormat("HH:mm", Locale.CANADA).format(calendar.getTime());
+        String moodReason = mood.getReason();
+
+        int moodState = mood.getState().getStateCode();
+        switch (moodState) {
+            case 0:
+                googleMap.addMarker(new MarkerOptions().position(moodLocation)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                        .title(moodDate)
+                        .snippet(moodTime + " " + moodReason));
+                break;
+            case 1:
+                googleMap.addMarker(new MarkerOptions().position(moodLocation)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                        .title(moodDate)
+                        .snippet(moodTime + " " + moodReason));
+                break;
+            case 2:
+                googleMap.addMarker(new MarkerOptions().position(moodLocation)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
+                        .title(moodDate)
+                        .snippet(moodTime + " " + moodReason));
+                break;
+            case 3:
+                googleMap.addMarker(new MarkerOptions().position(moodLocation)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                        .title(moodDate)
+                        .snippet(moodTime + " " + moodReason));
+                break;
+            case 4:
+                googleMap.addMarker(new MarkerOptions().position(moodLocation)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                        .title(moodDate)
+                        .snippet(moodTime + " " + moodReason));
+                break;
+            case 5:
+                googleMap.addMarker(new MarkerOptions().position(moodLocation)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                        .title(moodDate)
+                        .snippet(moodTime + " " + moodReason));
+                break;
+        }
+
+    }
 
 }
