@@ -347,7 +347,7 @@ public class UserMoodsFragment extends Fragment {
         } else if (item.getItemId() == R.id.action_maps_user) {
 
             Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
-            MapDialogFragment mapDialogFragment = new MapDialogFragment();
+            MapDialogFragment mapDialogFragment = new MapDialogFragment(moodAdapter);
             mapDialogFragment.show(getFragmentManager(), "FRAGMENT_VIEW_USER_MAP");
 
         }
