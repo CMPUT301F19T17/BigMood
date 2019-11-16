@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +10,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -190,6 +186,23 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
                 .title("Marker in NY")
                 .snippet("Test marker!"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
+
+        /**
+         * DO NOT DELETE CODE BELOW
+         * WILL IMPLEMENT THIS CODE AFTER WE FIGURE HOW TO GET THE LOCATION OF A MOOD
+         * THE CODE ABOVE IS A TEST OF THE MAP
+         */
+
+//        for (int i = 0; i < moodAdapter.getCount(); i++ ) {
+//            Mood moodToMark = moodAdapter.getItem(i);
+//            makeMoodMarker(googleMap, moodToMark);
+//        }
+//
+//        // Center the camera at the most recent mood (?)
+//        Mood recentMood = moodAdapter.getItem(0);
+//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(recentMood.getLocation().getLatitude(), recentMood.getLocation().getLongitude())));
+
+
     }
 
     /**
@@ -197,7 +210,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
      * @param googleMap
      * @param mood
      */
-    public void makeMoodMaker(GoogleMap googleMap, Mood mood) {
+    public void makeMoodMarker(GoogleMap googleMap, Mood mood) {
         GeoPoint geoPoint = mood.getLocation();
         LatLng moodLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
         Calendar calendar = mood.getDatetime();
