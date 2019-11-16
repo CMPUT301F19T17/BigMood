@@ -45,6 +45,11 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     private Toolbar toolbar;
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
+    /**
+     * This is the constructor. We pass in a moodAdapter then show the map with the marker being the mood in the adapter
+     * @param moodAdapter
+     */
+
     public MapDialogFragment(MoodAdapter moodAdapter) {
         this.moodAdapter = moodAdapter;
     }
@@ -62,6 +67,14 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         // TODO: 11/15 Tri, the idea is to pass in the moodAdapter, get the location of every mood in it => put the marker on the map
     }
 
+    /**
+     * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
+     * This is where we inflate all the views and *if applicable* populate all the fields.
+     * @param inflater           View inflater service
+     * @param container          Container that the inflater is housed in
+     * @param savedInstanceState A bundle that holds the state of the fragment
+     * @return                   Returns the inflated view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -84,6 +97,11 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     }
 
+    /**
+     * of the on*()methods, this is the third. This is executed when the view is created. Here we set onClickListeners, etc. This is where we will actually error check all the views and
+     * @param view               The view that was created and inflated
+     * @param savedInstanceState A bundle that holds the state of the fragment
+     */
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -96,10 +114,12 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         });
     }
 
+    /**
+     * of the on*()methods, this is the fourth. We set the width and height of the view and also set its animation.
+     */
     @Override
     public void onStart() {
         super.onStart();
-
         Dialog dialog = this.getDialog();
 
         if (dialog != null) {
@@ -155,6 +175,12 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         super.onLowMemory();
         mapView.onLowMemory();
     }
+
+    /**
+     * This method draw the marker on the map
+     * @param googleMapView
+     */
+    // TODO 11/15 Tri: draw from moodAdapter
     @Override
     public void onMapReady(GoogleMap googleMapView) {
         googleMap = googleMapView;
@@ -166,6 +192,11 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
     }
 
+    /**
+     * This method takes in a mood and create a custom marker for it
+     * @param googleMap
+     * @param mood
+     */
     public void makeMoodMaker(GoogleMap googleMap, Mood mood) {
         GeoPoint geoPoint = mood.getLocation();
         LatLng moodLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
