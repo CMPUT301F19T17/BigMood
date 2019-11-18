@@ -21,6 +21,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
+import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
@@ -83,14 +84,13 @@ public class ProfileFragment extends Fragment {
                             if (aBoolean) {
                                 Request request = new Request(appPreferences.getCurrentUser(),requested_username);
                                 appPreferences.getRepository().createRequest(request);
-                                Toast.makeText(getActivity(), "Request sent.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Request sent", Toast.LENGTH_SHORT).show();
                                 edit_text_request.setText("");
                             }else{
                                 textInputRequest.setError("User does not exist");
                             }
                         }
                     });
-
                 }
             }
         });
