@@ -7,7 +7,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -63,7 +62,7 @@ public class US050101Test {
         solo.clickOnText("Profile");
         solo.sleep(2000);
         solo.clickOnText("Requests");
-        solo.sleep(5000);
+        solo.sleep(2000);
         assertTrue(solo.waitForText(requester_username, 1, 2000));
     }
 
