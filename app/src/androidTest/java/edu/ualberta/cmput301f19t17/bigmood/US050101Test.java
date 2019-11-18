@@ -56,9 +56,9 @@ public class US050101Test {
         solo.clickOnButton("REQUEST");
         assertTrue(solo.waitForText("Request sent", 1, 2000));
 
-        appPreferences.getInstance().setCurrentUser(new MockUser(requested_username, "Bob", "Smith"));
         solo.clickOnText("My Moods");
         solo.sleep(2000);
+        appPreferences.getInstance().setCurrentUser(new MockUser(requested_username, "Bob", "Smith"));
         solo.clickOnText("Profile");
         solo.sleep(2000);
         solo.clickOnText("Requests");
