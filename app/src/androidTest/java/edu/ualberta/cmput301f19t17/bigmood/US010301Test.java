@@ -41,7 +41,7 @@ public class US010301Test {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance(); // used to call deleteAllMoods method
         appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        solo.waitForText("poop", 0, 1000);
+        solo.waitForText("text", 0, 1000);
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
