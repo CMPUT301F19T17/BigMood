@@ -191,7 +191,9 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
                 // If the user opt for "NONE" filter option, will return the original list
                 // In case something unexpected happened, it will also return the original list
+
                 if (constraint == null || constraint.toString().equals("None") || constraint.toString().length() == 0) {
+
                     results.count = originalArrayMood.size();
                     results.values = originalArrayMood;
                 } else {

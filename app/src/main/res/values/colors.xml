@@ -9,10 +9,10 @@
     <!--    <color name="colorAccent">#D81B60</color>-->
 
     <color name="colorHappy">#FFE300</color>
-    <color name="colorSad">#2264D5</color>
-    <color name="colorAnger">#FF4C4C</color>
-    <color name="colorDisgust">#00FF09</color>
-    <color name="colorFear">#A574FF</color>
-    <color name="colorSurprise">#FF527A</color>
+    <color name="colorSad">#4D8EFF</color>
+    <color name="colorAnger">#FF3647</color>
+    <color name="colorDisgust">#5AFF60</color>
+    <color name="colorFear">#7630FF</color>
+    <color name="colorSurprise">#FF7493</color>
 
 </resources>

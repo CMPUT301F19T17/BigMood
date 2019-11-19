@@ -16,7 +16,7 @@
       android:strokeAlpha="1"
       android:strokeLineJoin="round"
       android:strokeWidth="2"
-      android:fillColor="#FF4C4C"
+      android:fillColor="#FF3647"
       android:strokeColor="#000000"
       android:fillAlpha="1"/>
   <path
