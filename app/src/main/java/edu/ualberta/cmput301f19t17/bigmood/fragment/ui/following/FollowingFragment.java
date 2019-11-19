@@ -71,12 +71,15 @@ public class FollowingFragment extends Fragment {
 
         // TODO: 2019-11-13 Cameron: canned data
         moodList.add(new Mood(EmotionalState.ANGER, Calendar.getInstance(), SocialSituation.OPTIONAL, "", new GeoPoint(54.23, 23.10), null));
+        moodList.add(new Mood(EmotionalState.ANGER, Calendar.getInstance(), SocialSituation.OPTIONAL, "", new GeoPoint(54.23, 23.10), null));
+
         moodAdapter.notifyDataSetChanged();
 
+        //set up a reference to the listview we will be populating
         ListView moodListView = root.findViewById(R.id.following_mood_list);
         moodListView.setAdapter(moodAdapter);
 
-        // TODO: 2019-11-13 Cameron: Implement FireStore listener 
+        // TODO: 2019-11-13 Cameron: Implement FireStore listener
         // Set up the MoodsListener to listen to updates in FireStore
        /* this.listenerRegistration = this.appPreferences
                 .getRepository()
@@ -99,7 +102,7 @@ public class FollowingFragment extends Fragment {
 
                             }
                         });*/
-
+        // set the onItemClickListener for the mood list items. This will be called anytime a mood is clicked on in the lis
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
