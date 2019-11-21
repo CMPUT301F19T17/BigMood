@@ -34,7 +34,7 @@ public class ProfileFragment extends Fragment {
     private AppPreferences appPreferences;
 
     private TextInputLayout textInputRequest;
-    private EditText edit_text_request;
+    private EditText editTextRequest;
     private Button buttonRequest;
 
     private TextView textViewUsername;
@@ -68,13 +68,13 @@ public class ProfileFragment extends Fragment {
 
         // Get the EditText and Button
         this.textInputRequest = rootView.findViewById(R.id.textInputLayoutRequest);
-        this.edit_text_request = textInputRequest.getEditText();
+        this.editTextRequest = textInputRequest.getEditText();
         this.buttonRequest = rootView.findViewById(R.id.button_request);
 
         this.buttonRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String requested_username = edit_text_request.getText().toString();
+                final String requested_username = editTextRequest.getText().toString();
                 if (requested_username.isEmpty()) {
                     textInputRequest.setError("Username required");
                 }else{
@@ -85,7 +85,7 @@ public class ProfileFragment extends Fragment {
                                 Request request = new Request(appPreferences.getCurrentUser(),requested_username);
                                 appPreferences.getRepository().createRequest(request);
                                 Toast.makeText(getActivity(), "Request sent", Toast.LENGTH_SHORT).show();
-                                edit_text_request.setText("");
+                                editTextRequest.setText("");
                             }else{
                                 textInputRequest.setError("User does not exist");
                             }

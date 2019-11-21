@@ -26,12 +26,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
@@ -58,6 +60,9 @@ public class DefineMoodDialogFragment extends DialogFragment {
     private TextInputLayout reasonInputLayout;
 
     private ImageView imageView;
+
+    private MoodSpinnerAdapter moodSpinnerAdapter;
+    ArrayList<EmotionalState> moodSpinnerArrayList;
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -172,7 +177,11 @@ public class DefineMoodDialogFragment extends DialogFragment {
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
         // Find and bind elements
+        initList();
         this.stateSpinner = view.findViewById(R.id.spinner_state);
+        this.moodSpinnerAdapter = new MoodSpinnerAdapter(this.getContext(), 0, moodSpinnerArrayList);
+        this.stateSpinner.setAdapter(this.moodSpinnerAdapter);
+
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
         this.reasonInputLayout = view.findViewById(R.id.text_input_reason);
 
@@ -463,6 +472,16 @@ public class DefineMoodDialogFragment extends DialogFragment {
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
         }
+    }
+
+    public void initList() {
+        moodSpinnerArrayList = new ArrayList<>();
+        moodSpinnerArrayList.add(EmotionalState.HAPPINESS);
+        moodSpinnerArrayList.add(EmotionalState.SADNESS);
+        moodSpinnerArrayList.add(EmotionalState.ANGER);
+        moodSpinnerArrayList.add(EmotionalState.DISGUST);
+        moodSpinnerArrayList.add(EmotionalState.FEAR);
+        moodSpinnerArrayList.add(EmotionalState.SURPRISE);
     }
 
 }
