@@ -21,7 +21,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
-import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
@@ -57,17 +56,18 @@ public class ProfileFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         // Display the user's info
-        this.textViewUsername = rootView.findViewById(R.id.textView_username);
-        this.textViewFirstName = rootView.findViewById(R.id.textView_first_name);
-        this.textViewLastName = rootView.findViewById(R.id.textView_last_name);
-        User currentUser = appPreferences.getCurrentUser();
-        this.textViewUsername.setText(currentUser.getUsername());
+        this.textViewUsername = rootView.findViewById(R.id.textview_username);
+        this.textViewFirstName = rootView.findViewById(R.id.textview_firstname);
+        this.textViewLastName = rootView.findViewById(R.id.textview_lastname);
+
+        User currentUser = this.appPreferences.getCurrentUser();
+
+        this.textViewUsername.setText(String.format("@%s", currentUser.getUsername()));
         this.textViewFirstName.setText(currentUser.getFirstName());
         this.textViewLastName.setText(currentUser.getLastName());
 
-
         // Get the EditText and Button
-        this.textInputRequest = rootView.findViewById(R.id.textInputLayoutRequest);
+        this.textInputRequest = rootView.findViewById(R.id.test_input_username);
         this.edit_text_request = textInputRequest.getEditText();
         this.buttonRequest = rootView.findViewById(R.id.button_request);
 
@@ -76,17 +76,19 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 final String requested_username = edit_text_request.getText().toString();
                 if (requested_username.isEmpty()) {
-                    textInputRequest.setError("Username required");
-                }else{
-                    appPreferences.getRepository().userExists(requested_username).addOnSuccessListener(new OnSuccessListener<Boolean>() {
+                    textInputRequest.setError(ProfileFragment.this.getString(R.string.error_empty_username));
+                } else {
+                    appPreferences.getRepository()
+                            .userExists(requested_username)
+                            .addOnSuccessListener(new OnSuccessListener<Boolean>() {
                         @Override
                         public void onSuccess(Boolean aBoolean) {
                             if (aBoolean) {
-                                Request request = new Request(appPreferences.getCurrentUser(),requested_username);
+                                Request request = new Request(appPreferences.getCurrentUser(), requested_username);
                                 appPreferences.getRepository().createRequest(request);
                                 Toast.makeText(getActivity(), "Request sent", Toast.LENGTH_SHORT).show();
                                 edit_text_request.setText("");
-                            }else{
+                            } else {
                                 textInputRequest.setError("User does not exist");
                             }
                         }
@@ -99,10 +101,6 @@ public class ProfileFragment extends Fragment {
 
         return rootView;
     }
-
-
-
-
 
     /**
      * This method gets called when the fragment needs to assemble menu options.

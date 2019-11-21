@@ -40,6 +40,14 @@
     <string name="label_password">Password</string>
     <string name="label_confirm_password">Confirm Password</string>
 
+    <string name="label_request_to_follow">Request to Follow</string>
+    <string name="label_request">Request</string>
+
+    <string name="label_request_accept">ACCEPT</string>
+    <string name="label_request_reject">REJECT</string>
+
+    <string name="message_request">wants to follow you!</string>
+
     <string name="label_add_location">Tap to Add Location</string>
 
     <string name="toast_success_registration">Registration Successful</string>
@@ -67,14 +75,5 @@
     <string name="error_incorrect_user_pw">Username/password incorrect.</string>
     <string name="error_empty_username">Username cannot be empty</string>
     <string name="error_empty_password">Password cannot be empty</string>
-    <string name="request_button_label">REQUEST</string>
-    <string name="username_display_placeholder">Username</string>
-    <string name="username_display_symbol">\@</string>
-    <string name="request_label">Request to Follow</string>
-    <string name="first_name_placeholder">First Name</string>
-    <string name="last_name_placeholder">Last Name</string>
-    <string name="request_message">wants to follow you!</string>
-    <string name="button_dismiss_label">DISMISS</string>
-    <string name="button_accept_label">ACCEPT</string>
 
 </resources>

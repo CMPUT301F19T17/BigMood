@@ -56,7 +56,7 @@ public class RequestAdapter extends ArrayAdapter<Request> {
             requestHolder = new RequestHolder();
 
             // Set all fields of the holder class
-            requestHolder.requester = convertView.findViewById(R.id.textView_requester_username_display);
+            requestHolder.requester = convertView.findViewById(R.id.textview_from);
 
             // Cache views for that row using setTag on the full row view
             convertView.setTag(requestHolder);
@@ -73,11 +73,11 @@ public class RequestAdapter extends ArrayAdapter<Request> {
         final Request currentRequest = this.getItem(position);
 
         // Set the requester's name in the row.
-        requestHolder.requester.setText(currentRequest.getFrom());
+        requestHolder.requester.setText(String.format("@%s", currentRequest.getFrom()));
 
         // Set listener for dismiss and accept TextView buttons
-        TextView buttonDismiss = convertView.findViewById(R.id.textView_button_dismiss);
-        TextView buttonAccept = convertView.findViewById(R.id.textView_button_accept);
+        TextView buttonDismiss = convertView.findViewById(R.id.textview_button_reject);
+        TextView buttonAccept = convertView.findViewById(R.id.textview_button_accept);
 
         buttonDismiss.setOnClickListener(new View.OnClickListener() {
             @Override
