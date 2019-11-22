@@ -57,9 +57,9 @@ public class ProfileFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         // Display the user's info
-        this.textViewUsername = rootView.findViewById(R.id.textView_username);
-        this.textViewFirstName = rootView.findViewById(R.id.textView_first_name);
-        this.textViewLastName = rootView.findViewById(R.id.textView_last_name);
+        this.textViewUsername = rootView.findViewById(R.id.textview_username);
+        this.textViewFirstName = rootView.findViewById(R.id.textview_firstname);
+        this.textViewLastName = rootView.findViewById(R.id.textview_lastname);
         User currentUser = appPreferences.getCurrentUser();
         this.textViewUsername.setText(currentUser.getUsername());
         this.textViewFirstName.setText(currentUser.getFirstName());
@@ -67,7 +67,7 @@ public class ProfileFragment extends Fragment {
 
 
         // Get the EditText and Button
-        this.textInputRequest = rootView.findViewById(R.id.textInputLayoutRequest);
+        this.textInputRequest = rootView.findViewById(R.id.text_input_username);
         this.editTextRequest = textInputRequest.getEditText();
         this.buttonRequest = rootView.findViewById(R.id.button_request);
 
