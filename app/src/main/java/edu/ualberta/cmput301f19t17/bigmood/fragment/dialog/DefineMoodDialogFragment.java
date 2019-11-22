@@ -1,6 +1,8 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -282,41 +284,41 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 ));
         timeSpinner.setEnabled(false);
 
-        // TODO: 2019-11-06 Ranajay: Disabled for now since going to take a photo results in a crash
 
-//        // add click listener to the image to pick picture from gallery or camera
-//        this.imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String title = "Open Photo";
-//                CharSequence[] itemlist ={"Take a Photo",
-//                        "Pick from Gallery"};
-//
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                builder.setTitle(title);
-//                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
-//
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        switch (which) {
-//                            case 0:// Take Photo
-//                                // Do Take Photo task here
-//                                dispatchTakePictureIntent();
-//                                break;
-//                            case 1:// Choose Existing Photo
-//                                // Do Pick Photo task here
-//                                dispatchPickImageIntent();
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//                    }
-//                });
-//                AlertDialog alert = builder.create();
-//                alert.setCancelable(true);
-//                alert.show();
-//            }
-//        });
+
+        // add click listener to the image to pick picture from gallery or camera
+        this.imageView.setOnClickListener(new View.OnClickListener() {
+           @Override
+            public void onClick(View v) {
+                String title = "Open Photo";
+                CharSequence[] itemlist ={"Take a Photo",
+                        "Pick from Gallery"};
+
+               AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(title);
+                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:// Take Photo
+                                // Do Take Photo task here
+                                dispatchTakePictureIntent();
+                                break;
+                            case 1:// Choose Existing Photo
+                                // Do Pick Photo task here
+                                dispatchPickImageIntent();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.setCancelable(true);
+                alert.show();
+            }
+        });
 
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
         // This is where the core of the input validation will happen -- that is when the user tries to press Save.
@@ -440,6 +442,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
             startActivityForResult(i, REQUEST_PICK_IMAGE);
         }
     }
+    
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
