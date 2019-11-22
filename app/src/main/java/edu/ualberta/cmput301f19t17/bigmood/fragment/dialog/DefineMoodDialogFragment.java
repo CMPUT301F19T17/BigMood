@@ -63,6 +63,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
     private MoodSpinnerAdapter moodSpinnerAdapter;
     ArrayList<EmotionalState> moodSpinnerArrayList;
+    ArrayList<String> situationSpinnerArrayList;
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -216,29 +217,17 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 DefineMoodDialogFragment.this.dismiss();
             }
         });
-/*
-        // TODO 2019-11-03 Cameron removed since i don't believe there is a way to set a preset for the spinner programmatically, which is necessary for setting it with an ArrayAdapter.
-        // TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
-        // set up the spinner with the emotional states
-        final ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(
-                this.getContext(),
-                android.R.layout.simple_spinner_item,
-                EmotionalState.values()
-        );
-        stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        this.stateSpinner.setAdapter(stateAdapter);
-
- */
-
 
 
         // set up the spinner with the social situations
-        final ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(
+        initSituationSpinnerList();
+        final ArrayAdapter<String> situationAdapter = new ArrayAdapter<>(
                 this.getContext(),
                 android.R.layout.simple_spinner_item,
-                SocialSituation.values()
+                situationSpinnerArrayList
         );
-        situationAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+
+        situationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.situationSpinner.setAdapter(situationAdapter);
 
 
@@ -255,12 +244,13 @@ public class DefineMoodDialogFragment extends DialogFragment {
             calendar = this.moodToEdit.getDatetime();
 
             // Populate state
-//            int statePosition = stateAdapter.getPosition(this.moodToEdit.getState());
-//            this.stateSpinner.setSelection(statePosition);
+            int statePosition = moodSpinnerAdapter.getPosition(this.moodToEdit.getState());
+            this.stateSpinner.setSelection(statePosition);
+
 
             // Populate
             if (this.moodToEdit.getSituation() != null) {
-                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation());
+                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation().toString());
                 this.situationSpinner.setSelection(situationPosition);
             }
 
@@ -340,10 +330,28 @@ public class DefineMoodDialogFragment extends DialogFragment {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_save) {
 
-                    // Get emotional state and social situation
-                    //EmotionalState emotionalState = stateAdapter.getItem(stateSpinner.getSelectedItemPosition());
+                    // Get emotional state from state spinner
                     EmotionalState emotionalState = moodSpinnerAdapter.getItem(stateSpinner.getSelectedItemPosition());
-                    SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+
+                    // Get social situation from situation spinner
+                    //SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+                    String socialSituationString = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+                    // Set the social situation to a default value of null until the user chooses one.
+                    SocialSituation socialSituation = null;
+                    switch (socialSituationString.toLowerCase()) {
+                        case "alone":
+                            socialSituation = SocialSituation.ALONE;
+                            break;
+                        case "one person":
+                            socialSituation = SocialSituation.ONE;
+                            break;
+                        case "two to several people":
+                            socialSituation = SocialSituation.SEVERAL;
+                            break;
+                        case "crowd":
+                            socialSituation = SocialSituation.CROWD;
+                            break;
+                    }
 
                     // Get reason
                     String reason = DefineMoodDialogFragment.this.reasonInputLayout
@@ -416,9 +424,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
             }
         });
-
-
-
     }
 
     /**
@@ -481,7 +486,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
     }
 
-    // Creates an ArrayList for the StateSpinner
+    // Creates an ArrayList for stateSpinner
     private void initStateSpinnerList() {
         moodSpinnerArrayList = new ArrayList<>();
         moodSpinnerArrayList.add(EmotionalState.HAPPINESS);
@@ -490,6 +495,16 @@ public class DefineMoodDialogFragment extends DialogFragment {
         moodSpinnerArrayList.add(EmotionalState.DISGUST);
         moodSpinnerArrayList.add(EmotionalState.FEAR);
         moodSpinnerArrayList.add(EmotionalState.SURPRISE);
+    }
+
+    // Creates an ArrayList for situationSpinner
+    private void initSituationSpinnerList() {
+        situationSpinnerArrayList = new ArrayList<>();
+        situationSpinnerArrayList.add(0, "No situation selected");
+        situationSpinnerArrayList.add(SocialSituation.ALONE.toString());
+        situationSpinnerArrayList.add(SocialSituation.ONE.toString());
+        situationSpinnerArrayList.add(SocialSituation.SEVERAL.toString());
+        situationSpinnerArrayList.add(SocialSituation.CROWD.toString());
     }
 
 }
