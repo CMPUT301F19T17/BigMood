@@ -28,12 +28,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
@@ -60,6 +62,10 @@ public class DefineMoodDialogFragment extends DialogFragment {
     private TextInputLayout reasonInputLayout;
 
     private ImageView imageView;
+
+    private MoodSpinnerAdapter moodSpinnerAdapter;
+    ArrayList<EmotionalState> moodSpinnerArrayList;
+    ArrayList<String> situationSpinnerArrayList;
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -174,7 +180,11 @@ public class DefineMoodDialogFragment extends DialogFragment {
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
         // Find and bind elements
+        initStateSpinnerList();
         this.stateSpinner = view.findViewById(R.id.spinner_state);
+        this.moodSpinnerAdapter = new MoodSpinnerAdapter(this.getContext(), 0, moodSpinnerArrayList);
+        this.stateSpinner.setAdapter(this.moodSpinnerAdapter);
+
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
         this.reasonInputLayout = view.findViewById(R.id.text_input_reason);
 
@@ -210,25 +220,19 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
-        // TODO 2019-11-03 Cameron removed since i don't believe there is a way to set a preset for the spinner programmatically, which is necessary for setting it with an ArrayAdapter.
-        // TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
-        // set up the spinner with the emotional states
-        final ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(
-                this.getContext(),
-                android.R.layout.simple_spinner_item,
-                EmotionalState.values()
-        );
-        stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        this.stateSpinner.setAdapter(stateAdapter);
 
         // set up the spinner with the social situations
-        final ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(
+        initSituationSpinnerList();
+        final ArrayAdapter<String> situationAdapter = new ArrayAdapter<>(
                 this.getContext(),
                 android.R.layout.simple_spinner_item,
-                SocialSituation.values()
+                situationSpinnerArrayList
         );
-        situationAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+
+        situationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.situationSpinner.setAdapter(situationAdapter);
+
+
 
         final Calendar calendar;
 
@@ -242,12 +246,13 @@ public class DefineMoodDialogFragment extends DialogFragment {
             calendar = this.moodToEdit.getDatetime();
 
             // Populate state
-            int statePosition = stateAdapter.getPosition(this.moodToEdit.getState());
+            int statePosition = moodSpinnerAdapter.getPosition(this.moodToEdit.getState());
             this.stateSpinner.setSelection(statePosition);
+
 
             // Populate
             if (this.moodToEdit.getSituation() != null) {
-                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation());
+                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation().toString());
                 this.situationSpinner.setSelection(situationPosition);
             }
 
@@ -327,9 +332,28 @@ public class DefineMoodDialogFragment extends DialogFragment {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_save) {
 
-                    // Get emotional state and social situation
-                    EmotionalState emotionalState = stateAdapter.getItem(stateSpinner.getSelectedItemPosition());
-                    SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+                    // Get emotional state from state spinner
+                    EmotionalState emotionalState = moodSpinnerAdapter.getItem(stateSpinner.getSelectedItemPosition());
+
+                    // Get social situation from situation spinner
+                    //SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+                    String socialSituationString = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+                    // Set the social situation to a default value of null until the user chooses one.
+                    SocialSituation socialSituation = null;
+                    switch (socialSituationString.toLowerCase()) {
+                        case "alone":
+                            socialSituation = SocialSituation.ALONE;
+                            break;
+                        case "one person":
+                            socialSituation = SocialSituation.ONE;
+                            break;
+                        case "two to several people":
+                            socialSituation = SocialSituation.SEVERAL;
+                            break;
+                        case "crowd":
+                            socialSituation = SocialSituation.CROWD;
+                            break;
+                    }
 
                     // Get reason
                     String reason = DefineMoodDialogFragment.this.reasonInputLayout
@@ -402,9 +426,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
             }
         });
-
-
-
     }
 
     /**
@@ -466,6 +487,27 @@ public class DefineMoodDialogFragment extends DialogFragment {
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
         }
+    }
+
+    // Creates an ArrayList for stateSpinner
+    private void initStateSpinnerList() {
+        moodSpinnerArrayList = new ArrayList<>();
+        moodSpinnerArrayList.add(EmotionalState.HAPPINESS);
+        moodSpinnerArrayList.add(EmotionalState.SADNESS);
+        moodSpinnerArrayList.add(EmotionalState.ANGER);
+        moodSpinnerArrayList.add(EmotionalState.DISGUST);
+        moodSpinnerArrayList.add(EmotionalState.FEAR);
+        moodSpinnerArrayList.add(EmotionalState.SURPRISE);
+    }
+
+    // Creates an ArrayList for situationSpinner
+    private void initSituationSpinnerList() {
+        situationSpinnerArrayList = new ArrayList<>();
+        situationSpinnerArrayList.add(0, "No situation selected");
+        situationSpinnerArrayList.add(SocialSituation.ALONE.toString());
+        situationSpinnerArrayList.add(SocialSituation.ONE.toString());
+        situationSpinnerArrayList.add(SocialSituation.SEVERAL.toString());
+        situationSpinnerArrayList.add(SocialSituation.CROWD.toString());
     }
 
 }
