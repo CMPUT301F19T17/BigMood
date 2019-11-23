@@ -71,7 +71,7 @@ public class UserMoodsFragment extends Fragment {
 
         // Initialize a new ArrayList
         this.moodList = new ArrayList<>();
-        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
+        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.list_item_mood, moodList);
 
         ListView moodListView = root.findViewById(R.id.mood_list);
 

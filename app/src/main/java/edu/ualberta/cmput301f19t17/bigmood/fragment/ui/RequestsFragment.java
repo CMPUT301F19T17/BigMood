@@ -47,7 +47,7 @@ public class RequestsFragment extends Fragment {
 
         // Initialize a new ArrayList
         this.requestList = new ArrayList<>();
-        this.requestAdapter = new RequestAdapter(root.getContext(), R.layout.request_item, requestList);
+        this.requestAdapter = new RequestAdapter(root.getContext(), R.layout.list_item_request, requestList);
 
         ListView requestListView = root.findViewById(R.id.request_list);
         requestListView.setAdapter(requestAdapter);
