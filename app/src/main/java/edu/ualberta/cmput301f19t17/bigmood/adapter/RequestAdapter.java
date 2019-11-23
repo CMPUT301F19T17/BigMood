@@ -21,7 +21,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
 public class RequestAdapter extends ArrayAdapter<Request> {
     private AppPreferences appPreferences;
-    private Context context;
     private int resource;
 
     /**
@@ -34,7 +33,6 @@ public class RequestAdapter extends ArrayAdapter<Request> {
      */
     public RequestAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Request> requestList) {  //Request[] objects) {
         super(context, resource, requestList);
-        this.context = context;
         this.resource = resource;
         this.appPreferences = AppPreferences.getInstance();
     }
