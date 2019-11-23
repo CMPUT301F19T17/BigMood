@@ -1,4 +1,4 @@
-package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.following;
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
@@ -19,8 +18,6 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
  * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
  */
 public class FollowingFragment extends Fragment {
-
-    private FollowingViewModel followingViewModel;
 
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
@@ -31,8 +28,6 @@ public class FollowingFragment extends Fragment {
      * @return                   Returns the inflated view
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        this.followingViewModel = ViewModelProviders.of(this).get(FollowingViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_following, container, false);
 

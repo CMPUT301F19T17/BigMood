@@ -1,4 +1,4 @@
-package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.requests;
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

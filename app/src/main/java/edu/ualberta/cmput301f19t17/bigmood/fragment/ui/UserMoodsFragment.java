@@ -1,4 +1,4 @@
-package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.user;
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -40,7 +39,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
  */
 public class UserMoodsFragment extends Fragment {
 
-    private UserMoodsViewModel userMoodsViewModel;
     private AppPreferences appPreferences;
 
     private ArrayList<Mood> moodList;
@@ -68,8 +66,7 @@ public class UserMoodsFragment extends Fragment {
         // Enable options menu
         this.setHasOptionsMenu(true);
 
-        // Set ViewModel and App Preferences
-        this.userMoodsViewModel = ViewModelProviders.of(this).get(UserMoodsViewModel.class);
+        // Set App Preferences
         this.appPreferences = AppPreferences.getInstance();
 
         // Initialize a new ArrayList
