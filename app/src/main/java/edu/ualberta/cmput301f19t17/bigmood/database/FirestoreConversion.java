@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
-import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 /**
  * This class is solely responsible for converting Firestore data to model objects and vice versa.
@@ -172,12 +172,16 @@ class FirestoreConversion {
     /**
      * Converts a valid Mood object into a Map to send to Firestore.
      * @param mood Mood object to convert into a Firestore compatible Map.
+     * @param user The currently logged in user. This function needs this field to set the owner field of the mood document.
      * @return     Returns a Map object converted from the Mood.
      */
-    static Map<String, Object> MoodToFirestore(Mood mood) {
+    static Map<String, Object> MoodToFirestore(Mood mood, User user) {
 
         // Create new Hash Map to store all the values
         Map<String, Object> data = new HashMap<>();
+
+        // We need to put this owner field here since it is required to be set in the database for the getFollowingMoods() function in the FirestoreRepository. However, it is not required by our model because we always know the user of a mood that we are saving/editing. In other words, we set the owner here but we never retrieve it.
+        data.put( FirestoreMapping.FIELD_MOOD_OWNER, user.getUsername() );
 
         // These fields always exist, so we don't have to check if they are null.
         data.put( FirestoreMapping.FIELD_MOOD_STATE, mood.getState().getStateCode() );

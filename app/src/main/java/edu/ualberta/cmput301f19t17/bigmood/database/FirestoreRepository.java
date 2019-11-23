@@ -275,7 +275,6 @@ public class FirestoreRepository implements Repository {
 
     }
 
-    // TODO: 2019-11-01 Nectarios: IMPLEMENT QUERY
     /**
      * This method gets the most recent mood (read: limit 1) from ALL the Users the passed in User is following.
      * @param user The current User. We will use their information to get the applicable moods for the users they are following.
@@ -307,7 +306,7 @@ public class FirestoreRepository implements Repository {
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
-                .add(FirestoreConversion.MoodToFirestore(mood))
+                .add(FirestoreConversion.MoodToFirestore(mood, user))
                 .continueWith(new Continuation<DocumentReference, Void>() {
                     @Override
                     public Void then(@NonNull Task<DocumentReference> task) throws Exception {
@@ -369,7 +368,7 @@ public class FirestoreRepository implements Repository {
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
                 .document(mood.getFirestoreId())
-                .update(FirestoreConversion.MoodToFirestore(mood))
+                .update(FirestoreConversion.MoodToFirestore(mood, user))
                 .addOnSuccessListener(successListener)
                 .addOnFailureListener(failureListener);
 
