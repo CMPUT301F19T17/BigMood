@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -169,7 +171,7 @@ public class FirestoreRepository implements Repository {
      * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public void validateUser(final String username, final String password, OnSuccessListener<User> successListener, OnFailureListener failureListener) {
+    public void validateUser(String username, final String password, OnSuccessListener<User> successListener, OnFailureListener failureListener) {
 
         // Queue up a task to get the user document
         Task<DocumentSnapshot> userTask = this.db
@@ -221,11 +223,7 @@ public class FirestoreRepository implements Repository {
                         // We validate the user's password here, and if it succeeds we return a user object.
                         // Okay, stop yelling at me. I know this is an eternal sin to do this but here me out. Firstly, we have no custom authentication server to dish out JWTs, and secondly, for the purposes of our app (basically school demonstration) using Firebase's Authentication would be way too overkill and cumbersome to demo. This app is not supposed to be public, which is why I am committing this unpardonable sin. I'm so sorry. It hurts me as well.
                         if (dbPassword.equals(password))
-                            return new User(
-                                    username,
-                                    userDoc.getString(FirestoreMapping.FIELD_USER_FIRSTNAME),
-                                    userDoc.getString(FirestoreMapping.FIELD_USER_LASTNAME)
-                            );
+                            return FirestoreConversion.UserFromFirestore(userDoc);
                         else
                             return null;
 
@@ -264,11 +262,78 @@ public class FirestoreRepository implements Repository {
                         List<Mood> moodList = new ArrayList<>();
 
                         // Add every mood to the mood list
-                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots)
+                        for (DocumentSnapshot doc : queryDocumentSnapshots)
                             moodList.add( FirestoreConversion.MoodFromFirestore(doc) );
 
                         // Call the callback method in the caller.
                         listener.onUpdate(moodList);
+
+                    }
+                });
+
+    }
+
+    /**
+     * This method sets up a ListenerRegistration that polls for changes in the following document, which holds the following list for each user.
+     * @param user     The User who the following list belongs to
+     * @param listener An implemented callback interface that will be called whenever there is an update in the follower list.
+     * @return         Returns a ListenerRegistration. Make sure to remove() it when you don't need it anymore.
+     */
+    @Override
+    public ListenerRegistration getFollowingList(User user, final FollowingListener listener) {
+
+        // We target the follower document in a query like fashion so we can listen for changes.
+        return this.db
+                .collection(FirestoreMapping.COLLECTION_USERS)
+                .document(user.getUsername())
+                .collection(FirestoreMapping.COLLECTION_PRIVATE)
+                .whereEqualTo(FieldPath.documentId(), FirestoreMapping.DOCUMENT_FOLLOWER)
+                .limit(1)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        // If the passed listener is null this SnapshotListener will be called but it won't do anything.
+                        if (listener == null)
+                            return;
+
+                        // Create new follower list (usernames as strings)
+                        List<String> followerList = new ArrayList<>();
+
+                        // Define a new runtime exception in case we need to raise this exception
+                        RuntimeException documentDNEException = new IllegalStateException("The follower document does not exist in the database. This is against the security rules. Please recreate it in the Firebase console.");
+
+                        // Define a document variable
+                        DocumentSnapshot doc;
+
+                        // We wrap this operation in a try/except block because we need to check if there exists a document in the DB. We also have to check if the document exists (it should, if it passes the first test. In either case we have to raise an exception because we cannot proceed.
+                        try {
+
+                            // Get the follower document. Since we limited this query to 1 there should always be a document in the first position.
+                            doc = queryDocumentSnapshots.getDocuments().get(0);
+
+                            if (! doc.exists())
+                                throw documentDNEException;
+
+                        } catch (IndexOutOfBoundsException e1) {
+
+                            throw documentDNEException;
+
+                        }
+
+                        // Define an ArrayList<Object> that will hold the array data from Firestore.
+                        ArrayList firestoreList = (ArrayList) doc.get(FirestoreMapping.FIELD_FOLLOWER_FOLLOWERLIST);
+
+                        // If the firestore array is null this means that document is illegal and we cannot proceed.
+                        if (firestoreList == null)
+                            throw new IllegalStateException("The follower list does not exist in the follower document. This is against the security rules. Please recreate it in the Firebase console.");
+
+                        // Cast every object in the array to a string (representing a username) and add it to our follower list.
+                        for (Object username : firestoreList)
+                            followerList.add((String) username);
+
+                        // We're done assembling the follower list, so we call the listener.
+                        listener.onUpdate(followerList);
 
                     }
                 });
@@ -323,7 +388,7 @@ public class FirestoreRepository implements Repository {
     }
 
     /**
-     * this method attempts to delete a Mood in the database given the parameters.
+     * This method attempts to delete a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
      * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)

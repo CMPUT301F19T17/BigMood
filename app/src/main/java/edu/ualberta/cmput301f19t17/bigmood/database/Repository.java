@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -48,6 +49,14 @@ public interface Repository {
      * @return     Returns a ListenerRegistration. Upon the first call and any other change to the database the callback method will be invoked.
      */
     ListenerRegistration getUserMoods(User user, MoodsListener listener);
+
+    /**
+     * This method sets up a ListenerRegistration that polls for changes in the following document, which holds the following list for each user.
+     * @param user     The User who the following list belongs to
+     * @param listener An implemented callback interface that will be called whenever there is an update in the follower list.
+     * @return         Returns a ListenerRegistration. Make sure to remove() it when you don't need it anymore.
+     */
+    ListenerRegistration getFollowingList(User user, final FollowingListener listener);
 
     /**
      * This method gets the most recent mood (read: limit 1) from ALL the Users the passed in User is following.
