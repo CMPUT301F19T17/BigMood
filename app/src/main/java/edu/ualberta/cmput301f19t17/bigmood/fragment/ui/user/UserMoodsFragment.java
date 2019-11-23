@@ -76,7 +76,6 @@ public class UserMoodsFragment extends Fragment {
         this.moodList = new ArrayList<>();
         this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
 
-
         ListView moodListView = root.findViewById(R.id.mood_list);
 
         moodListView.setAdapter(moodAdapter);
@@ -87,7 +86,9 @@ public class UserMoodsFragment extends Fragment {
         this.listenerRegistration = this.appPreferences
                 .getRepository()
                 .getUserMoods(
+
                         this.appPreferences.getCurrentUser(),
+
                         new MoodsListener() {
                             /**
                              * This method is called whenever the listener hears that there is an update in the moodList
@@ -101,7 +102,8 @@ public class UserMoodsFragment extends Fragment {
                                 UserMoodsFragment.this.moodList.clear();
                                 UserMoodsFragment.this.moodList.addAll(moodList);
                                 UserMoodsFragment.this.moodAdapter.notifyDataSetChanged();
-                                // This refresh the filter with the updated data
+
+                                // This refreshes the filter with the updated data
                                 UserMoodsFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
 
                             }

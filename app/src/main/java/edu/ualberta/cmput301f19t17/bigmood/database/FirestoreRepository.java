@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
@@ -346,9 +347,55 @@ public class FirestoreRepository implements Repository {
      * @return     Returns a ListenerRegistration. Upon the first call and any other change to the database the callback method will be invoked.
      */
     @Override
-    public ListenerRegistration getFollowingMoods(User user, MoodsListener listener) {
+    public ListenerRegistration getFollowingMoods(User user, final MoodsListener listener) {
 
-        throw new IllegalArgumentException("This method is not implemented yet");
+        return this.db
+                .collectionGroup(FirestoreMapping.COLLECTION_MOODS)
+                .orderBy(FirestoreMapping.FIELD_MOOD_DATETIME, Query.Direction.DESCENDING)
+                .orderBy(FirestoreMapping.FIELD_MOOD_OWNER)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        if (queryDocumentSnapshots == null)
+                            return;
+
+                        // Get preferences
+                        AppPreferences preferences = AppPreferences.getInstance();
+
+                        // Define a new mood list and get the current cached follower list from the preferences.
+                        List<Mood> followingMoodList = new ArrayList<>();
+                        List<String> usernameList = preferences.getFollowingList();
+
+                        // The idea is to do one sweep of the document list, checking if any mood document is owned by someone on our follower list. If we find one, we know it's the most recent one (since the query is ordered by datetime). Once we remove that follower from the temporary follower list we will never add another one of their moods.
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
+
+                            // "Base" case, it makes no sense to continue down the list of documents if there are no more users to match.
+                            if (usernameList.size() == 0)
+                                break;
+
+                            // For safety, check if the document exists. If for some reason it does not, go to the next document.
+                            if (! doc.exists())
+                                continue;
+
+                            // Store username of the document in a variable
+                            String username = doc.get(FirestoreMapping.FIELD_MOOD_OWNER, String.class);
+
+                            // If the owner of the current document we're looking at matches ANY of the owners in our list, add that specific mood and remove the username from the list. This gives the effect of finding only the most recent mood document from the document list given by the query.
+                            if (usernameList.contains(username)) {
+
+                                followingMoodList.add(FirestoreConversion.MoodFromFirestore(doc));
+                                usernameList.remove(username);
+
+                            }
+
+                        }
+
+                        // At this point we have exhausted the entire username list and added the first occurrence of a mood matching that username. We now call the callback function to submit the final list.
+                        listener.onUpdate(followingMoodList);
+
+                    }
+                });  // End addSnapshotListener
 
     }
 
