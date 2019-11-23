@@ -28,14 +28,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
-import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodSpinnerAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.SituationSpinnerAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
@@ -53,19 +53,20 @@ public class DefineMoodDialogFragment extends DialogFragment {
     private Toolbar toolbar;
 
     private OnButtonPressListener listener;
+
     private Mood moodToEdit = null;
+
+    private StateSpinnerAdapter stateSpinnerAdapter;
+    private SituationSpinnerAdapter situationSpinnerAdapter;
 
     private Spinner stateSpinner;
     private Spinner situationSpinner;
     private Spinner dateSpinner;
     private Spinner timeSpinner;
+
     private TextInputLayout reasonInputLayout;
 
     private ImageView imageView;
-
-    private MoodSpinnerAdapter moodSpinnerAdapter;
-    ArrayList<EmotionalState> moodSpinnerArrayList;
-    ArrayList<String> situationSpinnerArrayList;
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -179,19 +180,27 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Bind toolbar XML to view
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
-        // Find and bind elements
-        initStateSpinnerList();
+        // Find and set state and situation spinner
         this.stateSpinner = view.findViewById(R.id.spinner_state);
-        this.moodSpinnerAdapter = new MoodSpinnerAdapter(this.getContext(), 0, moodSpinnerArrayList);
-        this.stateSpinner.setAdapter(this.moodSpinnerAdapter);
-
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
+
+        // Find and set the reason InputLayout
         this.reasonInputLayout = view.findViewById(R.id.text_input_reason);
 
+        // Find and set the emotional state ImageView
         this.imageView = view.findViewById(R.id.image);
 
+        // Find and set the date/time spinners
         this.dateSpinner = view.findViewById(R.id.spinner_date);
         this.timeSpinner = view.findViewById(R.id.spinner_time);
+
+        // If the context is null, we cannot proceed.
+        if (this.getContext() == null)
+            throw new IllegalStateException("Context is null, cannot create the array adapters");
+
+        // Create the state and spinner adapters
+        this.stateSpinnerAdapter = new StateSpinnerAdapter(this.getContext());
+        this.situationSpinnerAdapter = new SituationSpinnerAdapter(this.getContext());
 
         // Return view that has been created
         return view;
@@ -220,21 +229,11 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
-
-        // set up the spinner with the social situations
-        initSituationSpinnerList();
-        final ArrayAdapter<String> situationAdapter = new ArrayAdapter<>(
-                this.getContext(),
-                android.R.layout.simple_spinner_item,
-                situationSpinnerArrayList
-        );
-
-        situationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.situationSpinner.setAdapter(situationAdapter);
-
-
-
         final Calendar calendar;
+
+        // Bind adapters to spinners. This should populate the values in each spinner.
+        this.stateSpinner.setAdapter(this.stateSpinnerAdapter);
+        this.situationSpinner.setAdapter(this.situationSpinnerAdapter);
 
         // Here we populate values in the fragment if we have a mood and set the appropriate title.
         if (this.moodToEdit != null) {
@@ -246,32 +245,34 @@ public class DefineMoodDialogFragment extends DialogFragment {
             calendar = this.moodToEdit.getDatetime();
 
             // Populate state
-            int statePosition = moodSpinnerAdapter.getPosition(this.moodToEdit.getState());
+            int statePosition = stateSpinnerAdapter.getPosition(this.moodToEdit.getState());
             this.stateSpinner.setSelection(statePosition);
 
+            // Populate situation. The situation value can be null, but a null value in guaranteed to exist in the adapter's array
+            int situationPosition = situationSpinnerAdapter.getPosition(this.moodToEdit.getSituation());
+            this.situationSpinner.setSelection(situationPosition);
 
-            // Populate
-            if (this.moodToEdit.getSituation() != null) {
-                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation().toString());
-                this.situationSpinner.setSelection(situationPosition);
-            }
-
+            // If the string is non empty, set the text to that. If the string is empty, we leave it to the default value.
             if (! this.moodToEdit.getReason().equals(""))
                 this.reasonInputLayout.getEditText().setText(this.moodToEdit.getReason());
 
-            //TODO add location and image
+            // TODO populate location and image
 
         } else {
 
             // Set Title
             this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
 
-            // Set calendar to a new calendar since it's a new mood
+            // Set calendar to a new calendar since we're in the add mood case.
             calendar = Calendar.getInstance();
 
         }
 
-        // Set text of date spinner
+        // If the context is null, we cannot proceed.
+        if (this.getContext() == null)
+            throw new IllegalStateException("Context is null, cannot create the array adapters");
+
+        // Set text of date spinner. We are using a disabled spinner so we can be more consistent with the UI. We disable it so that the user cannot interact with it.
         dateSpinner.setAdapter(
                 new ArrayAdapter<String>(
                         this.getContext(),
@@ -280,7 +281,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 ));
         dateSpinner.setEnabled(false);
 
-        // Set text of time spinner
+        // Set text of time spinner. We are using a disabled spinner so we can be more consistent with the UI. We disable it so that the user cannot interact with it.
         timeSpinner.setAdapter(
                 new ArrayAdapter<String>(
                         this.getContext(),
@@ -288,7 +289,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
                         Collections.singletonList(new SimpleDateFormat("HH:mm", Locale.CANADA).format(calendar.getTime()))
                 ));
         timeSpinner.setEnabled(false);
-
 
 
         // add click listener to the image to pick picture from gallery or camera
@@ -333,29 +333,14 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 if (item.getItemId() == R.id.action_save) {
 
                     // Get emotional state from state spinner
-                    EmotionalState emotionalState = moodSpinnerAdapter.getItem(stateSpinner.getSelectedItemPosition());
+                    EmotionalState emotionalState = DefineMoodDialogFragment.this.stateSpinnerAdapter
+                            .getItem(stateSpinner.getSelectedItemPosition());
 
-                    // Get social situation from situation spinner
-                    //SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
-                    String socialSituationString = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
-                    // Set the social situation to a default value of null until the user chooses one.
-                    SocialSituation socialSituation = null;
-                    switch (socialSituationString.toLowerCase()) {
-                        case "alone":
-                            socialSituation = SocialSituation.ALONE;
-                            break;
-                        case "one person":
-                            socialSituation = SocialSituation.ONE;
-                            break;
-                        case "two to several people":
-                            socialSituation = SocialSituation.SEVERAL;
-                            break;
-                        case "crowd":
-                            socialSituation = SocialSituation.CROWD;
-                            break;
-                    }
+                    // Get social situation from situation spinner. Keep in mind this can be null, but that's fine because a null value is allowed (to represent no option).
+                    SocialSituation socialSituation = DefineMoodDialogFragment.this.situationSpinnerAdapter
+                            .getItem(situationSpinner.getSelectedItemPosition());
 
-                    // Get reason
+                    // Get reason string
                     String reason = DefineMoodDialogFragment.this.reasonInputLayout
                             .getEditText()
                             .getText()
@@ -414,6 +399,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
                                 null
                         );
 
+                    Log.d(HomeActivity.LOG_TAG, String.format("MOOD INFO:\n\tState: {%s}\n\tSituation: {%s}", mood.getState().toString(), (mood.getSituation() == null ? "null" : mood.getSituation().toString()) ));
+
                     // Invoke the callback method with the mood and dismiss the fragment
                     DefineMoodDialogFragment.this.listener.onSavePressed(mood);
                     DefineMoodDialogFragment.this.dismiss();
@@ -449,6 +436,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
     }
 
+    // TODO: 2019-11-23 Ranajay: Add comments, javadoc, and finish photograph implementation
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
@@ -463,7 +452,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
             startActivityForResult(i, REQUEST_PICK_IMAGE);
         }
     }
-    
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -487,27 +475,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
         }
-    }
-
-    // Creates an ArrayList for stateSpinner
-    private void initStateSpinnerList() {
-        moodSpinnerArrayList = new ArrayList<>();
-        moodSpinnerArrayList.add(EmotionalState.HAPPINESS);
-        moodSpinnerArrayList.add(EmotionalState.SADNESS);
-        moodSpinnerArrayList.add(EmotionalState.ANGER);
-        moodSpinnerArrayList.add(EmotionalState.DISGUST);
-        moodSpinnerArrayList.add(EmotionalState.FEAR);
-        moodSpinnerArrayList.add(EmotionalState.SURPRISE);
-    }
-
-    // Creates an ArrayList for situationSpinner
-    private void initSituationSpinnerList() {
-        situationSpinnerArrayList = new ArrayList<>();
-        situationSpinnerArrayList.add(0, "No situation selected");
-        situationSpinnerArrayList.add(SocialSituation.ALONE.toString());
-        situationSpinnerArrayList.add(SocialSituation.ONE.toString());
-        situationSpinnerArrayList.add(SocialSituation.SEVERAL.toString());
-        situationSpinnerArrayList.add(SocialSituation.CROWD.toString());
     }
 
 }
