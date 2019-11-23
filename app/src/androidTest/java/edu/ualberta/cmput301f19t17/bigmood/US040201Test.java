@@ -15,7 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
@@ -29,7 +28,7 @@ public class US040201Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule

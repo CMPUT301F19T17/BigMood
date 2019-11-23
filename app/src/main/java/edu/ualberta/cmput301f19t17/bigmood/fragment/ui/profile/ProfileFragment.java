@@ -238,7 +238,7 @@ public class ProfileFragment extends Fragment {
         if (item.getItemId() == R.id.action_sign_out) {
 
             // If the sign out button is pressed, clear the current user and call finish() on the underlying activity.
-            this.appPreferences.setCurrentUser(null);
+            this.appPreferences.logout();
             this.getActivity().finish();
             return true;
 

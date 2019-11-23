@@ -14,9 +14,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
@@ -33,7 +30,7 @@ public class US040101Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule

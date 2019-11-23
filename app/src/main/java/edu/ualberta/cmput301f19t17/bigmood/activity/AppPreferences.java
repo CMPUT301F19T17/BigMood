@@ -1,5 +1,10 @@
 package edu.ualberta.cmput301f19t17.bigmood.activity;
 
+import androidx.annotation.VisibleForTesting;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.cmput301f19t17.bigmood.database.FirestoreRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.Repository;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
@@ -13,8 +18,10 @@ public class AppPreferences {
 
     private static AppPreferences preferences = null;
 
-    private User currentUser;
     private Repository repository;
+
+    private User currentUser;
+    private List<String> followingList;
 
     /**
      * Since this is a singleton, we force the user of the class to call getInstance()
@@ -37,15 +44,33 @@ public class AppPreferences {
      */
     private AppPreferences() {
         this.currentUser = null;
+        this.followingList = new ArrayList<>();
         this.repository = FirestoreRepository.getInstance();
     }
 
     /**
-     * This method sets the current user to a new user.
-     * This is called whenever a user signs in
-     * @param user the user to set
+     * This method logs out the current user and clears all related variables.
      */
-    public void setCurrentUser(User user) {
+    public void logout() {
+
+        // In order to log out the current user we have to clear the currentUser variable and clear the followingList so that it does not bleed over into the next login.
+        this.currentUser = null;
+        this.followingList.clear();
+
+    }
+
+    /**
+     * This method sets the current user to a validated user. This "logs" the user into the system.
+     * @param user the <code>User</code>> to log in
+     */
+    public void login(User user) {
+
+        if (user == null)
+            throw new IllegalArgumentException("You cannot log in with a null user. If you were looking to log out. use the logout() method.");
+
+        // Just for safety, we log out first before "logging in" again.
+        this.logout();
+
         this.currentUser = user;
     }
 
@@ -55,6 +80,7 @@ public class AppPreferences {
      * with a testable in-memory database.
      * @param repository the repo to set
      */
+    @VisibleForTesting
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
@@ -77,4 +103,13 @@ public class AppPreferences {
     public Repository getRepository() {
         return this.repository;
     }
+
+    /**
+     * This method returns the cached follower list from the
+     * @return
+     */
+    public List<String> getFollowingList() {
+        return followingList;
+    }
+
 }

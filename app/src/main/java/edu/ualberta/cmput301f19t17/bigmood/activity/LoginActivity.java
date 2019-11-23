@@ -120,7 +120,7 @@ public class LoginActivity extends AppCompatActivity {
                                         }
 
                                         // Set user in the ViewModel
-                                        LoginActivity.this.appPreferences.setCurrentUser(user);
+                                        LoginActivity.this.appPreferences.login(user);
 
                                         // Go to the home screen
                                         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);

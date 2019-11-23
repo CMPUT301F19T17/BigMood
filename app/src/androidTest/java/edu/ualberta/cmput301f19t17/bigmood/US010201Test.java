@@ -1,13 +1,10 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -21,9 +18,7 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
-import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class US010201Test {
@@ -32,7 +27,7 @@ public class US010201Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule

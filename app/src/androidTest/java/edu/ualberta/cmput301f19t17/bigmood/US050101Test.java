@@ -24,7 +24,7 @@ public class US050101Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule
@@ -58,7 +58,7 @@ public class US050101Test {
 
         solo.clickOnText("My Moods");
         solo.sleep(2000);
-        appPreferences.getInstance().setCurrentUser(new MockUser(requested_username, "Bob", "Smith"));
+        appPreferences.getInstance().login(new MockUser(requested_username, "Bob", "Smith"));
         solo.clickOnText("Profile");
         solo.sleep(2000);
         solo.clickOnText("Requests");

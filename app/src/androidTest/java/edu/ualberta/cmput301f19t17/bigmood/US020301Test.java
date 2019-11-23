@@ -5,7 +5,6 @@ import android.view.View;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
 import org.junit.AfterClass;
@@ -27,7 +26,7 @@ public class US020301Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule
