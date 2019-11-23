@@ -34,8 +34,8 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
  */
 public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     private final int resource;
-    private ArrayList<Mood> arrayMoodList;
-    private ArrayList<Mood> originalArrayMood;
+    private ArrayList<Mood> currentMoodList;
+    private ArrayList<Mood> originalMoodList;
 
     /**
      * This constructor is used to create a new MoodAdapter
@@ -47,8 +47,8 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
     public MoodAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Mood> moodList) {
         super(context, resource, moodList);
         this.resource = resource;
-        this.arrayMoodList = moodList;
-        this.originalArrayMood = moodList;
+        this.currentMoodList = moodList;
+        this.originalMoodList = moodList;
     }
 
     /**
@@ -59,17 +59,17 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
      */
     @Override
     public Mood getItem(int position) {
-        return arrayMoodList.get(position);
+        return currentMoodList.get(position);
     }
 
     /**
      * This method overrides the default one with the filtered array list's count
      *
-     * @return null if the arrayMoodList is null, or the size of the arrayMoodList
+     * @return null if the currentMoodList is null, or the size of the currentMoodList
      */
     @Override
     public int getCount() {
-        return arrayMoodList != null ? arrayMoodList.size() : 0;
+        return currentMoodList != null ? currentMoodList.size() : 0;
     }
 
     /**
@@ -177,7 +177,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
         // Initialized a filter
         Filter filter = new Filter() {
             /**
-             * This method creates and returns a sublist of the arrayMoodList based off of the filter that was sent in.
+             * This method creates and returns a sublist of the currentMoodList based off of the filter that was sent in.
              * @param constraint the filter that the user has suggested
              * @return the list of objects that make it through the filtering process
              */
@@ -194,13 +194,13 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
 
                 if (constraint == null || constraint.toString().equals("None") || constraint.toString().length() == 0) {
 
-                    results.count = originalArrayMood.size();
-                    results.values = originalArrayMood;
+                    results.count = originalMoodList.size();
+                    results.values = originalMoodList;
                 } else {
 
                     // Select the mood with the matching criteria and add them into the filteredMoodList
-                    for (int i = 0; i < originalArrayMood.size(); i++) {
-                        Mood currentMood = originalArrayMood.get(i);
+                    for (int i = 0; i < originalMoodList.size(); i++) {
+                        Mood currentMood = originalMoodList.get(i);
                         EmotionalState emotionalState = currentMood.getState();
                         String state = emotionalState.toString();
                         if (state.startsWith(constraint.toString())) {
@@ -229,11 +229,11 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 // If the result is not null (filter applied), assign the new filteredMoodList
                 if (results != null && results.values != null) {
-                    arrayMoodList = (ArrayList<Mood>) results.values;
+                    currentMoodList = (ArrayList<Mood>) results.values;
                     notifyDataSetChanged();
                 } else {
                     // If no filter, or null, set the array to the original one
-                    arrayMoodList = originalArrayMood;
+                    currentMoodList = originalMoodList;
                 }
             }
 
