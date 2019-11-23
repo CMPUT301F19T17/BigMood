@@ -90,14 +90,14 @@ class FirestoreConversion {
         // Get Emotional State code from the document. Should not be null.
         EmotionalState state = EmotionalState.findByStateCode(stateCode);
 
-        // Get Date from data. // TODO: This is a Firestore type so we can convert it directly.
+        // Get Date from data. This is a Firestore type so we can convert it directly.
         Date dateField = document.getDate(FirestoreMapping.FIELD_MOOD_DATETIME);
 
         // This should not happen, but we can cover ourselves if it does
         if (dateField == null)
             throw new IllegalArgumentException(String.format("Mood with ID {%s} has a date field for which it's null. This document is not allowed with the security rules, please delete and recreate it on the Firebase Console.", document.getId()));
 
-        // TODO: Instantiate new Calendar object and set the date to what the timestamp's Date() is. This should include all the information.
+        // Instantiate new Calendar object and set the date to what the timestamp's Date() is. This should include all the information.
         Calendar datetime = GregorianCalendar.getInstance();
         datetime.setTime( dateField );
 
