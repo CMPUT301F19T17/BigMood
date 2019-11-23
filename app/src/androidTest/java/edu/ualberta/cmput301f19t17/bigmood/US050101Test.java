@@ -40,7 +40,7 @@ public class US050101Test {
     public void checkUserDoesNotExist() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
         solo.clickOnText("Profile");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.test_input_username)).getEditText(), "SuperMario");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "SuperMario");
         solo.clickOnButton("REQUEST");
         assertTrue(solo.waitForText("User does not exist", 1, 2000));
         solo.sleep(2000);
@@ -52,7 +52,7 @@ public class US050101Test {
         solo.clickOnText("Profile");
         String requester_username = "CMPUT301";
         String requested_username = "apple";
-        solo.typeText(((TextInputLayout) solo.getView(R.id.test_input_username)).getEditText(), requested_username);
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), requested_username);
         solo.clickOnButton("REQUEST");
         assertTrue(solo.waitForText("Request sent", 1, 2000));
 

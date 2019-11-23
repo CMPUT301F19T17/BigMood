@@ -1,8 +1,7 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
-import androidx.annotation.VisibleForTesting;
-
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
@@ -18,9 +17,10 @@ public interface Repository {
     /**
     * This method checks if a user exists in the database by a username lookup.
     * @param username Username string of the user to look up
-    * @return         Returns an asynchronous Task of type Boolean. The Boolean is true if the user exists and false otherwise.
+    * @param successListener A SuccessListener of type <code>Boolean</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+    * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
     */
-    Task<Boolean> userExists(String username);
+    void userExists(String username, OnSuccessListener<Boolean> successListener, OnFailureListener failureListener);
 
     /**
      * This method attempts to register a user using the parameters it was passed.
@@ -28,17 +28,19 @@ public interface Repository {
      * @param password  Password of the user to register.
      * @param firstName First name of the user to register.
      * @param lastName  Last name of the user to register.
-     * @return          Returns A Task of type Void. The task will succeed if the writes were successful and fail otherwise (if the username is not unique for example).
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> registerUser(String username, String password, String firstName, String lastName);
+    void registerUser(String username, String password, String firstName, String lastName, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
     /**
      * This method handles our """authentication""". It basically validates a username and password against the database and if it is successful it returns a constructed User object that is used as the token for """authentication""".
      * @param username Username of the user to validate
      * @param password Password of the use to validate
-     * @return         Returns a task of type User. The task will succeed if there is a valid username and password combination in the database. In the OnSuccessListener you can then extract the user object to use and store as an authentication "token".
+     * @param successListener A SuccessListener of type <code>User</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<User> validateUser(String username, String password);
+    void validateUser(String username, String password, OnSuccessListener<User> successListener, OnFailureListener failureListener);
 
     /**
      * This method gets as a List the set of all moods belonging to a particular User.
@@ -58,35 +60,38 @@ public interface Repository {
      * This method attempts to create a Mood in the database given the parameters.
      * @param user The User for which the new Mood should fall under.
      * @param mood The Mood we are trying to post to the database. The mood passed in should be a NEW mood and NOT have a firestoreId/databaseId.
-     * @return     Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> createMood(User user, Mood mood);
+    void createMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
     /**
      * this method attempts to delete a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId/databaseId.
-     * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> deleteMood(User user, Mood mood);
+    void deleteMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
-    /**
-     * This method is used to delete all of the moods that belong to a user.
-     * It is only used for testing, so as to stop clogging up the user with 50+ moods
-     * @param user The user who's moods we want to delete
-     * @return     Returns a Task of type Void. The task will succeed if it was able to retrieve all the documents from the database, and may not necessarily fail when documents fail to be deleted.
-     *
-     */
-    @VisibleForTesting
-    Task<Void> deleteAllMoods(User user);
+//    /**
+//     * This method is used to delete all of the moods that belong to a user.
+//     * It is only used for testing, so as to stop clogging up the user with 50+ moods
+//     * @param user The user who's moods we want to delete
+//     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+//     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+//     */
+//    @VisibleForTesting
+//    void deleteAllMoods(User user, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
     /**
      * this method attempts to modify a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId/databaseId.
-     * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> updateMood(User user, Mood mood);
+    void updateMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
     /**
      * This method gets as a List the set of all Requests belonging to a particular User.
@@ -98,22 +103,25 @@ public interface Repository {
     /**
      * This method attempts to create a Request in the database given the parameters.
      * @param request The Request we are trying to post to the database. The Request passed in should be a NEW request and the destination user exists.
-     * @return        Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> createRequest(Request request);
+    void createRequest(Request request, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
     /**
      * This method handles the operation of "accepting" a request. This means that the recipient (the "to" field) has accepted the sender's (the "from" field) request to follow them. Therefore we need to add the recipient to the sender's follower list.
      * @param request The Request to accept. The Request passed in should be an OLD Request and MUST have a firestoreId.
-     * @return        Returns a Task of type Void. The task will succeed if it was able to complete the transaction of deleting the request and adding to the correct follower list.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> acceptRequest(Request request);
+    void acceptRequest(Request request, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
     /**
      * This method handles the operation of "declining" a request. This means that the recipient (the "to" field) has declined the sender's (the "from" field) request to follow them. Therefore we just need to delete the request and not change anything else.
      * @param request The Request to decline. The Request passed in should be an OLD Request and MUST have a firestoreId.
-     * @return        Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
-    Task<Void> declineRequest(Request request);
+    void declineRequest(Request request, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
 }

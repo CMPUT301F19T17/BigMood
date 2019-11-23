@@ -50,9 +50,19 @@
 
     <string name="label_add_location">Tap to Add Location</string>
 
-    <string name="toast_success_registration">Registration Successful</string>
+    <string name="toast_error_db">Failed to complete operation. Please try again.</string>
     <string name="toast_error_registration">Failed to register. Please try again.</string>
+    <string name="toast_error_add_mood">Failed to add mood. Please try again.</string>
+    <string name="toast_error_delete_mood">Failed to delete mood. Please try again.</string>
+    <string name="toast_error_save_mood">Failed to save mood. Please try again.</string>
     <string name="toast_error_user_exists">Sorry, a user already exists with that username.</string>
+    <string name="toast_error_incorrect_user_pw">Username/password incorrect. Please try again.</string>
+    <string name="toast_error_login">Failed to log in. Please try again.</string>
+    <string name="toast_error_user_dne">Sorry, that user does not exist.</string>
+
+    <string name="toast_success_registration">Registration successful.</string>
+    <string name="toast_success_request_accept">Request successfully accepted.</string>
+    <string name="toast_success_request_reject">Request successfully rejected.</string>
 
     <string name="placeholder_state">State</string>
     <string name="placeholder_date">yyyy-MM-dd</string>
@@ -71,9 +81,8 @@
     <string name="error_no_pw_match">Passwords do not match</string>
     <string name="error_reason_too_long">Reason too long</string>
     <string name="error_reason_word_count">Reason cannot be longer than 3 words</string>
-    <string name="error_login_failed">Failed to log in. Please try again.</string>
-    <string name="error_incorrect_user_pw">Username/password incorrect.</string>
     <string name="error_empty_username">Username cannot be empty</string>
     <string name="error_empty_password">Password cannot be empty</string>
+    <string name="toast_success_request_sent">Request successfully sent.</string>
 
 </resources>
