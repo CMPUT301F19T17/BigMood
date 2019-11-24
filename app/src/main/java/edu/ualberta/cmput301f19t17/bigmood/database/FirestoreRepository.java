@@ -535,8 +535,6 @@ public class FirestoreRepository implements Repository {
         if (request.getFirestoreId() != null)
             throw new IllegalArgumentException("This request cannot be from the database -- it must be created as new.");
 
-        // TODO: 2019-10-31 https://github.com/CMPUT301F19T17/BigMood/issues/4
-
         // We target the requests collection and add a request. In order to avoid duplicates at a server-side level, we create a unique document ID by assembling a (from + to) string. We attach a success and failure listener.
         this.db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
