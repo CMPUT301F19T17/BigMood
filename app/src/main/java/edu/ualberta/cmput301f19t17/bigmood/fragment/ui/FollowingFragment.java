@@ -1,6 +1,7 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +34,8 @@ public class FollowingFragment extends Fragment {
 
         // Enable options menu
         this.setHasOptionsMenu(true);
+
+
 
         return root;
 

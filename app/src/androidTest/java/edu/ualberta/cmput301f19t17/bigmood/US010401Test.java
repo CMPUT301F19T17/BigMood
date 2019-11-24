@@ -49,7 +49,7 @@ public class US010401Test {
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
-        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+        AppPreferences.getInstance().getRepository().deleteAllMood(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test
