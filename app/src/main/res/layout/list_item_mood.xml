@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:text="HH:mm"
+        android:text="@string/placeholder_time"
         app:layout_constraintBaseline_toBaselineOf="@+id/mood_item_date"
         app:layout_constraintStart_toEndOf="@+id/mood_item_date" />
 
@@ -22,7 +21,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:text="yyyy-MM-dd"
+        android:text="@string/placeholder_date"
         app:layout_constraintBottom_toTopOf="@+id/mood_item_state"
         app:layout_constraintStart_toEndOf="@+id/mood_item_emoticon"
         app:layout_constraintTop_toTopOf="parent"
@@ -34,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:text="STATE"
+        android:text="@string/placeholder_state"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/mood_item_date"
         app:layout_constraintTop_toBottomOf="@+id/mood_item_date"
@@ -42,6 +41,7 @@
 
     <ImageView
         android:id="@+id/mood_item_emoticon"
+        android:contentDescription="@string/placeholder_state"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"

@@ -30,7 +30,7 @@ public class US010301Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule
@@ -40,12 +40,12 @@ public class US010301Test {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance(); // used to call deleteAllMoods method
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        solo.waitForText("poop", 0, 1000);
+//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+        solo.waitForText("text", 0, 1000);
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
-        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test

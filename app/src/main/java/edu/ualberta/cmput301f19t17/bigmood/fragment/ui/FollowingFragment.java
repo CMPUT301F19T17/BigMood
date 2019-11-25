@@ -1,4 +1,4 @@
-package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.profile;
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,21 +7,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
-import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 
 /**
- * ProfileFragment is used to view the current user's profile. It has the logic for logging out and requesting follows
+ * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
  */
-public class ProfileFragment extends Fragment {
-
-    private ProfileViewModel profileViewModel;
-    private AppPreferences appPreferences;
+public class FollowingFragment extends Fragment {
 
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
@@ -33,15 +29,13 @@ public class ProfileFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        this.profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
-        this.appPreferences = AppPreferences.getInstance();
+        View root = inflater.inflate(R.layout.fragment_following, container, false);
 
-        View root = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        // Enable options menu
         this.setHasOptionsMenu(true);
 
-
         return root;
+
     }
 
     /**
@@ -52,8 +46,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
 
-        // Inflate the menu
-        inflater.inflate(R.menu.fragment_profile, menu);
+        inflater.inflate(R.menu.fragment_following, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -67,18 +60,12 @@ public class ProfileFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.action_sign_out) {
+        if (item.getItemId() == R.id.action_maps_following)
+            Toast.makeText(this.getContext(), "Display Maps", Toast.LENGTH_SHORT).show();
 
-            // If the sign out button is pressed, clear the current user and call finish() on the underlying activity.
-            this.appPreferences.setCurrentUser(null);
-            this.getActivity().finish();
-            return true;
-
-        } else {
-
-            return super.onOptionsItemSelected(item);
-
-        }
+        return super.onOptionsItemSelected(item);
 
     }
+
+
 }

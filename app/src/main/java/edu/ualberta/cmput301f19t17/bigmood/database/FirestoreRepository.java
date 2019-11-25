@@ -4,11 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -23,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -65,12 +70,14 @@ public class FirestoreRepository implements Repository {
     /**
      * This method checks if a user exists in the database by a username lookup.
      * @param username Username string of the user to look up
-     * @return         Returns an asynchronous Task of type Boolean. The Boolean is true if the user exists and false otherwise.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Boolean> userExists(final String username) {
+    public void userExists(final String username, OnSuccessListener<Boolean> successListener, OnFailureListener failureListener) {
 
-        return db
+        // Try to retrieve a document in the users collection whose name is exactly the username. We attach the success and failure listener
+        this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(username)
                 .get()
@@ -87,7 +94,9 @@ public class FirestoreRepository implements Repository {
                     }
 
 
-                });
+                })
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
@@ -97,17 +106,18 @@ public class FirestoreRepository implements Repository {
      * @param password  Password of the user to register.
      * @param firstName First name of the user to register.
      * @param lastName  Last name of the user to register.
-     * @return          Returns A Task of type Void. The task will succeed if the writes were successful and fail otherwise (if the username is not unique for example).
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> registerUser(String username, String password, String firstName, String lastName) {
+    public void registerUser(String username, String password, String firstName, String lastName, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         // Check if the username, password, firstName, and lastName are at least one character.
         if (username.length() <= 0 || password.length() <= 0 || firstName.length() <= 0 || lastName.length() <= 0)
             throw new IllegalArgumentException("Any of username, password, firstName, and lastName have to be at least one character.");
 
         // Create batch object
-        WriteBatch batch = db.batch();
+        WriteBatch batch = this.db.batch();
 
 
         // Prepare user data
@@ -123,19 +133,19 @@ public class FirestoreRepository implements Repository {
 
 
         // Create user document
-        DocumentReference userDocument = db
+        DocumentReference userDocument = this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(username);
 
         // Create password document
-        DocumentReference passwordDocument = db
+        DocumentReference passwordDocument = this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(newUser.getUsername())
                 .collection(FirestoreMapping.COLLECTION_PRIVATE)
                 .document(FirestoreMapping.DOCUMENT_CREDENTIAL);
 
         // Create follower document
-        DocumentReference followerDocument = db
+        DocumentReference followerDocument = this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(newUser.getUsername())
                 .collection(FirestoreMapping.COLLECTION_PRIVATE)
@@ -147,8 +157,10 @@ public class FirestoreRepository implements Repository {
         batch.set(passwordDocument, passwordData);
         batch.set(followerDocument, followerData);
 
-        // Since there is no object or document to return we are returning a task of type void
-        return batch.commit();
+        // Since there is no object or document to return it creates a task of type Void. We attach a success and failure listener.
+        batch.commit()
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
@@ -156,67 +168,70 @@ public class FirestoreRepository implements Repository {
      * This method handles our """authentication""". It basically validates a username and password against the database and if it is successful it returns a constructed User object that is used as the token for """authentication""".
      * @param username Username of the user to validate
      * @param password Password of the use to validate
-     * @return         Returns a task of type User. The task will succeed if there is a valid username and password combination in the database. In the OnSuccessListener you can then extract the user object to use and store as an authentication "token".
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<User> validateUser(final String username, final String password) {
+    public void validateUser(String username, final String password, OnSuccessListener<User> successListener, OnFailureListener failureListener) {
 
         // Queue up a task to get the user document
-        Task<DocumentSnapshot> userTask = db
+        Task<DocumentSnapshot> userTask = this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(username)
                 .get();
 
         // Queue up a task to get the credential document of the user.
-        Task<DocumentSnapshot> credentialTask = db
+        Task<DocumentSnapshot> credentialTask = this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(username)
                 .collection(FirestoreMapping.COLLECTION_PRIVATE)
                 .document(FirestoreMapping.DOCUMENT_CREDENTIAL)
                 .get();
 
-        // Define a task list containing
+        // Define a master task that will only be run when both tasks succeed.
         Task<List<DocumentSnapshot>> allTasks = Tasks.whenAllSuccess(userTask, credentialTask);
 
-        // Define a continuation to actually verify the data
-        return allTasks.continueWith(new Continuation<List<DocumentSnapshot>, User>() {
-            @Override
-            public User then(@NonNull Task<List<DocumentSnapshot>> task) throws Exception {
+        // Define a continuation to actually verify the data. This returns a Task of type User.
+        allTasks
+                .continueWith(new Continuation<List<DocumentSnapshot>, User>() {
+                    @Override
+                    public User then(@NonNull Task<List<DocumentSnapshot>> task) throws Exception {
 
-                // If any of the two tasks failed, .getResult() will propagate an error.
-                List<DocumentSnapshot> taskList = task.getResult();
+                        // If any of the two tasks failed, .getResult() will propagate an error.
+                        List<DocumentSnapshot> taskList = task.getResult();
 
-                // Check all the documents in the list exist. I am not sure if this is entirely necessary but just to be sure I included it.
-                for (DocumentSnapshot doc : taskList)
-                    if (doc == null)
-                        throw new IllegalArgumentException("One or more documents are null in the task list. This should not happen.");
+                        // Check all the documents in the list exist. I am not sure if this is entirely necessary but just to be sure I included it.
+                        for (DocumentSnapshot doc : taskList)
+                            if (doc == null)
+                                throw new IllegalArgumentException("One or more documents are null in the task list. This should not happen.");
 
-                // Since the task list is evaluated in the order we listed them in the first element is the user document. If the user document does not exist then the username/password combo does not match anything. In that case we return null.
-                DocumentSnapshot userDoc = taskList.get(0);
-                if (! userDoc.exists())
-                    return null;
+                        // Since the task list is evaluated in the order we listed them in the first element is the user document. If the user document does not exist then the username/password combo does not match anything. In that case we return null.
+                        DocumentSnapshot userDoc = taskList.get(0);
+                        if (!userDoc.exists())
+                            return null;
 
-                // Just to be safe (and to avoid an error), if the password document does not exist we have to throw an error. We assume that the username exists but since they have no password this user is in an illegal state and should not exist in the DB.
-                DocumentSnapshot passwordDoc = taskList.get(1);
-                if (! passwordDoc.exists())
-                    throw new IllegalStateException(String.format("User '%s' does not have a password document in the database. This user is in an invalid state and must be recreated. Please delete this user in the Firebase console.", taskList.get(0).getId()));
+                        // Just to be safe (and to avoid an error), if the password document does not exist we have to throw an error. We assume that the username exists but since they have no password this user is in an illegal state and should not exist in the DB.
+                        DocumentSnapshot passwordDoc = taskList.get(1);
+                        if (!passwordDoc.exists())
+                            throw new IllegalStateException(String.format("User '%s' does not have a password document in the database. This user is in an invalid state and must be recreated. Please delete this user in the Firebase console.", taskList.get(0).getId()));
 
-                // Get the password stored in the database. Don't freak out. It's fine.
-                String dbPassword = passwordDoc.getString(FirestoreMapping.FIELD_CREDENTIAL_PASSWORD);
+                        // Get the password stored in the database. Don't freak out. It's fine.
+                        String dbPassword = passwordDoc.getString(FirestoreMapping.FIELD_CREDENTIAL_PASSWORD);
 
-                // We validate the user's password here, and if it succeeds we return a user object.
-                // Okay, stop yelling at me. I know this is an eternal sin to do this but here me out. Firstly, we have no custom authentication server to dish out JWTs, and secondly, for the purposes of our app (basically school demonstration) using Firebase's Authentication would be way too overkill and cumbersome to demo. This app is not supposed to be public, which is why I am committing this unpardonable sin. I'm so sorry. It hurts me as well.
-                if (dbPassword.equals(password))
-                    return new User(
-                            username,
-                            userDoc.getString(FirestoreMapping.FIELD_USER_FIRSTNAME),
-                            userDoc.getString(FirestoreMapping.FIELD_USER_LASTNAME)
-                    );
-                else
-                    return null;
+                        if (dbPassword == null)
+                            throw new IllegalStateException("The password document retrieved does not have a password field in it. This document is invalid, please recreate it in Firestore.");
 
-            }
-        });
+                        // We validate the user's password here, and if it succeeds we return a user object.
+                        // Okay, stop yelling at me. I know this is an eternal sin to do this but here me out. Firstly, we have no custom authentication server to dish out JWTs, and secondly, for the purposes of our app (basically school demonstration) using Firebase's Authentication would be way too overkill and cumbersome to demo. This app is not supposed to be public, which is why I am committing this unpardonable sin. I'm so sorry. It hurts me as well.
+                        if (dbPassword.equals(password))
+                            return FirestoreConversion.UserFromFirestore(userDoc);
+                        else
+                            return null;
+
+                    }
+                })
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
@@ -231,7 +246,7 @@ public class FirestoreRepository implements Repository {
     @Override
     public ListenerRegistration getUserMoods(User user, final MoodsListener listener) {
 
-        return db
+        return this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
@@ -248,7 +263,7 @@ public class FirestoreRepository implements Repository {
                         List<Mood> moodList = new ArrayList<>();
 
                         // Add every mood to the mood list
-                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots)
+                        for (DocumentSnapshot doc : queryDocumentSnapshots)
                             moodList.add( FirestoreConversion.MoodFromFirestore(doc) );
 
                         // Call the callback method in the caller.
@@ -259,16 +274,128 @@ public class FirestoreRepository implements Repository {
 
     }
 
-    // TODO: 2019-11-01 Nectarios: IMPLEMENT QUERY
+    /**
+     * This method sets up a ListenerRegistration that polls for changes in the following document, which holds the following list for each user.
+     * @param user     The User who the following list belongs to
+     * @param listener An implemented callback interface that will be called whenever there is an update in the follower list.
+     * @return         Returns a ListenerRegistration. Make sure to remove() it when you don't need it anymore.
+     */
+    @Override
+    public ListenerRegistration getFollowingList(User user, final FollowingListener listener) {
+
+        // We target the follower document in a query like fashion so we can listen for changes.
+        return this.db
+                .collection(FirestoreMapping.COLLECTION_USERS)
+                .document(user.getUsername())
+                .collection(FirestoreMapping.COLLECTION_PRIVATE)
+                .whereEqualTo(FieldPath.documentId(), FirestoreMapping.DOCUMENT_FOLLOWER)
+                .limit(1)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        // If the passed listener is null this SnapshotListener will be called but it won't do anything.
+                        if (listener == null)
+                            return;
+
+                        // Create new follower list (usernames as strings)
+                        List<String> followerList = new ArrayList<>();
+
+                        // Define a new runtime exception in case we need to raise this exception
+                        RuntimeException documentDNEException = new IllegalStateException("The follower document does not exist in the database. This is against the security rules. Please recreate it in the Firebase console.");
+
+                        // Define a document variable
+                        DocumentSnapshot doc;
+
+                        // We wrap this operation in a try/except block because we need to check if there exists a document in the DB. We also have to check if the document exists (it should, if it passes the first test. In either case we have to raise an exception because we cannot proceed.
+                        try {
+
+                            // Get the follower document. Since we limited this query to 1 there should always be a document in the first position.
+                            doc = queryDocumentSnapshots.getDocuments().get(0);
+
+                            if (! doc.exists())
+                                throw documentDNEException;
+
+                        } catch (IndexOutOfBoundsException e1) {
+
+                            throw documentDNEException;
+
+                        }
+
+                        // Define an ArrayList<Object> that will hold the array data from Firestore.
+                        ArrayList firestoreList = (ArrayList) doc.get(FirestoreMapping.FIELD_FOLLOWER_FOLLOWERLIST);
+
+                        // If the firestore array is null this means that document is illegal and we cannot proceed.
+                        if (firestoreList == null)
+                            throw new IllegalStateException("The follower list does not exist in the follower document. This is against the security rules. Please recreate it in the Firebase console.");
+
+                        // Cast every object in the array to a string (representing a username) and add it to our follower list.
+                        for (Object username : firestoreList)
+                            followerList.add((String) username);
+
+                        // We're done assembling the follower list, so we call the listener.
+                        listener.onUpdate(followerList);
+
+                    }
+                });
+
+    }
+
     /**
      * This method gets the most recent mood (read: limit 1) from ALL the Users the passed in User is following.
      * @param user The current User. We will use their information to get the applicable moods for the users they are following.
      * @return     Returns a ListenerRegistration. Upon the first call and any other change to the database the callback method will be invoked.
      */
     @Override
-    public ListenerRegistration getFollowingMoods(User user, MoodsListener listener) {
+    public ListenerRegistration getFollowingMoods(User user, final MoodsListener listener) {
 
-        throw new IllegalArgumentException("This method is not implemented yet");
+        return this.db
+                .collectionGroup(FirestoreMapping.COLLECTION_MOODS)
+                .orderBy(FirestoreMapping.FIELD_MOOD_DATETIME, Query.Direction.DESCENDING)
+                .orderBy(FirestoreMapping.FIELD_MOOD_OWNER)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+                        if (queryDocumentSnapshots == null)
+                            return;
+
+                        // Get preferences
+                        AppPreferences preferences = AppPreferences.getInstance();
+
+                        // Define a new mood list and get the current cached follower list from the preferences.
+                        List<Mood> followingMoodList = new ArrayList<>();
+                        List<String> usernameList = preferences.getFollowingList();
+
+                        // The idea is to do one sweep of the document list, checking if any mood document is owned by someone on our follower list. If we find one, we know it's the most recent one (since the query is ordered by datetime). Once we remove that follower from the temporary follower list we will never add another one of their moods.
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
+
+                            // "Base" case, it makes no sense to continue down the list of documents if there are no more users to match.
+                            if (usernameList.size() == 0)
+                                break;
+
+                            // For safety, check if the document exists. If for some reason it does not, go to the next document.
+                            if (! doc.exists())
+                                continue;
+
+                            // Store username of the document in a variable
+                            String username = doc.get(FirestoreMapping.FIELD_MOOD_OWNER, String.class);
+
+                            // If the owner of the current document we're looking at matches ANY of the owners in our list, add that specific mood and remove the username from the list. This gives the effect of finding only the most recent mood document from the document list given by the query.
+                            if (usernameList.contains(username)) {
+
+                                followingMoodList.add(FirestoreConversion.MoodFromFirestore(doc));
+                                usernameList.remove(username);
+
+                            }
+
+                        }
+
+                        // At this point we have exhausted the entire username list and added the first occurrence of a mood matching that username. We now call the callback function to submit the final list.
+                        listener.onUpdate(followingMoodList);
+
+                    }
+                });  // End addSnapshotListener
 
     }
 
@@ -276,20 +403,22 @@ public class FirestoreRepository implements Repository {
      * This method attempts to create a Mood in the database given the parameters.
      * @param user The User for which the new Mood should fall under.
      * @param mood The Mood we are trying to post to the database. The mood passed in should be a NEW mood and NOT have a firestoreId.
-     * @return     Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> createMood(User user, Mood mood) {
+    public void createMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         // Since the Firestore ID is final in the class, we can assume that if it has one, it came from the database. We don't want to add another duplicate mood to the database if it already exists. In other words we play it safe
         if (mood.getFirestoreId() != null)
             throw new IllegalArgumentException("This mood cannot be from the database -- it must be created as new.");
 
-        return db
+        // Go to the moods collection and add a mood, leaving the task of generating an ID to Firestore.
+        this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
-                .add(FirestoreConversion.MoodToFirestore(mood))
+                .add(FirestoreConversion.MoodToFirestore(mood, user))
                 .continueWith(new Continuation<DocumentReference, Void>() {
                     @Override
                     public Void then(@NonNull Task<DocumentReference> task) throws Exception {
@@ -299,62 +428,35 @@ public class FirestoreRepository implements Repository {
 
                         return null;
                     }
-                });
+                })
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
     /**
-     * this method attempts to delete a Mood in the database given the parameters.
+     * This method attempts to delete a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
-     * @return returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> deleteMood(User user, Mood mood) {
+    public void deleteMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         // Any mood that is passed into this task has to have a FirestoreId. If it doesn't, then this mood was not created as valid.
         if (mood.getFirestoreId() == null)
             throw new IllegalArgumentException("This mood cannot be new -- it must be created from the database");
 
-        return db
+        // Delete the document that has a Firestore ID that matches the mood we have. We attach a success and failure listener.
+        this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
                 .document(mood.getFirestoreId())
-                .delete();
-
-    }
-
-    /**
-     * This method is used to delete all of the moods that belong to a user.
-     * It is only used for testing, so as to stop clogging up the user with 50+ moods
-     * @param user the user who's moods we want to delete
-     * @return returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
-     *
-     */
-    @Override
-    public Task<Void> deleteAllMoods(User user) {
-
-        return db
-                .collection(FirestoreMapping.COLLECTION_USERS)
-                .document(user.getUsername())
-                .collection(FirestoreMapping.COLLECTION_MOODS)
-                .get()
-                .continueWith(new Continuation<QuerySnapshot, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<QuerySnapshot> task) throws Exception {
-
-                        // Will propagate error
-                        QuerySnapshot query = task.getResult();
-
-                        for (QueryDocumentSnapshot document : query)
-                            document.getReference().delete();
-
-                        return null;
-
-                    }
-                });
-
+                .delete()
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
@@ -362,21 +464,25 @@ public class FirestoreRepository implements Repository {
      * this method attempts to modify a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.
      * @param mood The Mood we are trying to delete from the database. The mood passed in should be an OLD mood and HAVE a firestoreId.
-     * @return     Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> updateMood(User user, Mood mood) {
+    public void updateMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         // Any mood that is passed into this task has to have a FirestoreId. If it doesn't, then this mood was not created as valid.
         if (mood.getFirestoreId() == null)
             throw new IllegalArgumentException("This mood cannot be new -- it must be created from the database");
 
-        return db
+        // We want to target the specific mood passed in as a parameter. That means we need to get the firestore ID and update the document with all the new values.
+        this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(user.getUsername())
                 .collection(FirestoreMapping.COLLECTION_MOODS)
                 .document(mood.getFirestoreId())
-                .update(FirestoreConversion.MoodToFirestore(mood));
+                .update(FirestoreConversion.MoodToFirestore(mood, user))
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
@@ -391,13 +497,14 @@ public class FirestoreRepository implements Repository {
     @Override
     public ListenerRegistration getUserRequests(User user, final RequestsListener listener) {
 
-        return db
+        return this.db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
                 .whereEqualTo(FirestoreMapping.FIELD_REQUEST_TO, user.getUsername())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
+                        // We have to do this in case the user does not provide a listener.
                         if (listener == null)
                             return;
 
@@ -419,21 +526,23 @@ public class FirestoreRepository implements Repository {
     /**
      * This method attempts to create a Request in the database given the parameters.
      * @param request The Request we are trying to post to the database. The Request passed in should be a NEW request and the destination user exists.
-     * @return        Returns a Task of type Void. The task will succeed if it was able to write the document to the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> createRequest(Request request) {
+    public void createRequest(Request request, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         if (request.getFirestoreId() != null)
             throw new IllegalArgumentException("This request cannot be from the database -- it must be created as new.");
 
-        // TODO: 2019-10-31 https://github.com/CMPUT301F19T17/BigMood/issues/4
-        return db
+        // We target the requests collection and add a request. In order to avoid duplicates at a server-side level, we create a unique document ID by assembling a (from + to) string. We attach a success and failure listener.
+        this.db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
-                .add(FirestoreConversion.RequestToFirestore(request))
-                .continueWith(new Continuation<DocumentReference, Void>() {
+                .document(request.getFrom() + request.getTo())
+                .set(FirestoreConversion.RequestToFirestore(request))
+                .continueWith(new Continuation<Void, Void>() {
                     @Override
-                    public Void then(@NonNull Task<DocumentReference> task) throws Exception {
+                    public Void then(@NonNull Task<Void> task) throws Exception {
 
                         // This will propagate an error if there was an issue with the task.
                         task.getResult();
@@ -441,34 +550,37 @@ public class FirestoreRepository implements Repository {
                         return null;
 
                     }
-                });
+                })
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
     /**
      * This method handles the operation of "accepting" a request. This means that the recipient (the "to" field) has accepted the sender's (the "from" field) request to follow them. Therefore we need to add the recipient to the sender's follower list.
      * @param request The Request to accept. The Request passed in should be an OLD Request and MUST have a firestoreId.
-     * @return        Returns a Task of type Void. The task will succeed if it was able to complete the transaction of deleting the request and adding to the correct follower list.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> acceptRequest(Request request) {
+    public void acceptRequest(Request request, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         // If this document comes from the database (and we will know that for sure because we reference it by ID) then we know that both the "from" and "to" user exists. Therefore we don't have to do any user checking on the client side as we can be sure that both users exists to be able to complete the transaction.
         if (request.getFirestoreId() == null)
             throw new IllegalArgumentException("This request cannot be new -- it must be created from the database");
 
         // Create new batch object
-        WriteBatch batch = db.batch();
+        WriteBatch batch = this.db.batch();
 
         // Reference the document with the follower list in it
-        DocumentReference followerDocument = db
+        DocumentReference followerDocument = this.db
                 .collection(FirestoreMapping.COLLECTION_USERS)
                 .document(request.getFrom())
                 .collection(FirestoreMapping.COLLECTION_PRIVATE)
                 .document(FirestoreMapping.DOCUMENT_FOLLOWER);
 
         // Reference the document with the particular request associated with this method calll
-        DocumentReference requestDocument = db
+        DocumentReference requestDocument = this.db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
                 .document(request.getFirestoreId());
 
@@ -480,27 +592,33 @@ public class FirestoreRepository implements Repository {
         batch.update(followerDocument, arrayUpdateData);
         batch.delete(requestDocument);
 
-        // Attempt to commit the changes to the database
-        return batch.commit();
+        // Attempt to commit the changes to the database. We attach a success and failure listener.
+        batch.commit()
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 
     /**
      * This method handles the operation of "declining" a request. This means that the recipient (the "to" field) has declined the sender's (the "from" field) request to follow them. Therefore we just need to delete the request and not change anything else.
      * @param request The Request to decline. The Request passed in should be an OLD Request and MUST have a firestoreId.
-     * @return        Returns a Task of type Void. The task will succeed if it was able to delete the document from the database.
+     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
+     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     @Override
-    public Task<Void> declineRequest(Request request) {
+    public void declineRequest(Request request, OnSuccessListener<Void> successListener, OnFailureListener failureListener) {
 
         // If this document comes from the database (and we will know that for sure because we reference it by ID) then we know that both the "from" and "to" user exists. Therefore we don't have to do any user checking on the client side as we can be sure that both users exists to be able to complete the transaction.
         if (request.getFirestoreId() == null)
             throw new IllegalArgumentException("This request cannot be new -- it must be created from the database");
 
-        return db
+        // We target the request collection and delete the request with the same Firestore ID.
+        this.db
                 .collection(FirestoreMapping.COLLECTION_REQUESTS)
                 .document(request.getFirestoreId())
-                .delete();
+                .delete()
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
 
     }
 

@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         this.textInputPassword = (TextInputLayout) this.findViewById(R.id.text_input_password);
 
         // Get Id of button
-
         this.buttonLogin = (Button) this.findViewById(R.id.button_login);
 
         // Get Id of clickable Textview
@@ -70,12 +69,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                // Basically creates an or switch between both the username and password
+                // Basically creates an or switch between both the username and password. The reason for this is because we want ALL errors to appear, not just the first one.
                 boolean failed = false;
 
+                // Get the username and password. Trim the username to remove any leading or trailing spaces. We do NOT do this to the password.
                 String username = LoginActivity.this.textInputUsername.getEditText().getText().toString().trim();
                 String password = LoginActivity.this.textInputPassword.getEditText().getText().toString();
 
+                // If the username is empty, set an error and continue. If it isn't we clear an error if there is one.
                 if (username.isEmpty()) {
                     LoginActivity.this.textInputUsername.setError(LoginActivity.this.getString(R.string.error_empty_username));
                     failed = true;
@@ -83,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                     LoginActivity.this.textInputUsername.setError(null);
                 }
 
+                // If the password is empty, set an error and continue. If it isn't we clear an error if there is one.
                 if (password.isEmpty()) {
                     LoginActivity.this.textInputPassword.setError(LoginActivity.this.getString(R.string.error_empty_password));
                     failed = true;
@@ -90,66 +92,68 @@ public class LoginActivity extends AppCompatActivity {
                     LoginActivity.this.textInputPassword.setError(null);
                 }
 
+                // If any of the above failed there is no reason to submit so we return.
                 if (failed)
                     return;
-
-                // TODO: 2019-11-04 Nectarios: ScrollView
 
                 // Since we have to wait for an async task we have to disable the button so further attempts are not submitted. We enable it later on.
                 LoginActivity.this.buttonLogin.setEnabled(false);
 
                 // Validate the user
-                LoginActivity.this.appPreferences.getRepository().validateUser(username, password)
-                        .addOnSuccessListener(new OnSuccessListener<User>() {
-                            @Override
-                            public void onSuccess(User user) {
+                LoginActivity.this.appPreferences
+                        .getRepository()
+                        .validateUser(
+                                username,
+                                password,
+                                new OnSuccessListener<User>() {
+                                    @Override
+                                    public void onSuccess(User user) {
 
-                                // When the user is null that means that the read succeeded but either the username or password didn't match. Therefore we have to let the user know.
-                                if (user == null) {
-                                    Toast.makeText(LoginActivity.this, R.string.error_incorrect_user_pw, Toast.LENGTH_SHORT).show();
+                                        // When the user is null that means that the read succeeded but either the username or password didn't match. Therefore we have to let the user know.
+                                        if (user == null) {
+                                            Toast.makeText(LoginActivity.this, R.string.toast_error_incorrect_user_pw, Toast.LENGTH_SHORT).show();
 
-                                    // Enable the button again
-                                    LoginActivity.this.buttonLogin.setEnabled(true);
+                                            // Enable the button again
+                                            LoginActivity.this.buttonLogin.setEnabled(true);
 
-                                    return;
-                                }
+                                            return;
+                                        }
 
-                                // Set user in the ViewModel
-                                LoginActivity.this.appPreferences.setCurrentUser(user);
+                                        // Set user in the ViewModel
+                                        LoginActivity.this.appPreferences.login(user);
 
-                                // Go to the home screen
-                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                                LoginActivity.this.startActivity(intent);
+                                        // Go to the home screen
+                                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                        LoginActivity.this.startActivity(intent);
 
-                                // Clear password field
-                                LoginActivity.this.textInputPassword.getEditText().setText("");
+                                        // Clear password field
+                                        LoginActivity.this.textInputPassword.getEditText().setText("");
 
-                                // Enable the button again
-                                LoginActivity.this.buttonLogin.setEnabled(true);
+                                        // Enable the button again
+                                        LoginActivity.this.buttonLogin.setEnabled(true);
 
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
+                                    }
+                                },  // End of OnSuccessListener
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
 
-                                //
-                                Toast.makeText(LoginActivity.this, R.string.error_login_failed, Toast.LENGTH_SHORT).show();
+                                        // Create some text t
+                                        Toast.makeText(LoginActivity.this, R.string.toast_error_login, Toast.LENGTH_SHORT).show();
 
-                                // Log the error
-                                Log.d(HomeActivity.LOG_TAG, "User Validation failed: " + e.toString());
+                                        // Log the error
+                                        Log.d(HomeActivity.LOG_TAG, "User Validation failed: " + e.toString());
 
-                                // Enable the button again
-                                LoginActivity.this.buttonLogin.setEnabled(true);
+                                        // Enable the button again
+                                        LoginActivity.this.buttonLogin.setEnabled(true);
 
-                            }
-                        });
+                                    }
+                                }  // End of OnFailureListener
+                        );  // End of validateUser()
 
+            }  // End of onClick()
+        });  // End of setOnClickListener
 
-
-
-            }
-        });
 
 
     }

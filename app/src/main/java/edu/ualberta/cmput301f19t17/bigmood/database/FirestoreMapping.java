@@ -28,6 +28,8 @@ class FirestoreMapping {
 
     static final String FIELD_FOLLOWER_FOLLOWERLIST = "follower_list";
 
+
+    static final String FIELD_MOOD_OWNER = "owner";
     static final String FIELD_MOOD_STATE = "state";
     static final String FIELD_MOOD_DATETIME = "datetime";
     static final String FIELD_MOOD_SITUATION = "situation";
