@@ -60,40 +60,26 @@ public class US010401Test {
     public void checkEditMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-
-        solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
-        solo.pressSpinnerItem(1, SocialSituation.SEVERAL.getSituationCode()); //two to several
-
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check edit mood");
-
-        solo.clickOnView(solo.getView(R.id.action_save));
-
-        // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
         int originalNumListItems = moodArrayAdapter.getCount();
 
-
-        solo.clickOnMenuItem("Disgust"); //select the mood we just created (it will be 0 since the list is sorted newest -> oldest)
+        //select mood3
+        solo.clickOnMenuItem("Happy");
 
         solo.clickOnButton("EDIT");
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
 
         solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode()); //sad
-        solo.pressSpinnerItem(1, SocialSituation.CROWD.getSituationCode()); //crowd
+        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()); //crowd
 
         solo.clickOnView(solo.getView(R.id.action_save));
+
         //make sure the edit worked by checking that the SADNESS shows up
         solo.waitForText(EmotionalState.SADNESS.toString(), 1, 1000);
 
         //make sure no new items were added, and no items deleted
-        // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
+        solo.sleep(2000);
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
-
-//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
 
     }
 
