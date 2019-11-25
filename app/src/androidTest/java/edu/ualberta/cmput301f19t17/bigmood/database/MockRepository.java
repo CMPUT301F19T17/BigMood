@@ -121,7 +121,7 @@ public class MockRepository implements Repository {
                         new Mood("1", EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 1), SocialSituation.ALONE,   "user1 - mood1", new GeoPoint(1, 1), null),
                         new Mood("2", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 2), SocialSituation.ONE,     "user1 - mood2", new GeoPoint(2, 2), null),
                         new Mood("3", EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 3), SocialSituation.SEVERAL, "user1 - mood3", new GeoPoint(3, 3), null),
-                        new Mood("4", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 4), SocialSituation.CROWD,   "user1 - mood2", new GeoPoint(4, 4), null)
+                        new Mood("4", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 4), SocialSituation.CROWD,   "user1 - mood4", new GeoPoint(4, 4), null)
 
                 ))
         );
