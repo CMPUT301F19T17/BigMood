@@ -36,13 +36,13 @@ public class US020301Test {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
         solo.waitForText("HillyBillyBobTesterino", 0, 1000);
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
-        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test
