@@ -54,8 +54,8 @@ public class MockRepository implements Repository {
     }
 
     /**
-     * This is a helper function that takes as input a calendar and an incrementer. It adds the specified minute to the Calendar and returns a cloned Calendar. This is used to simplify some of the sytnax when setting up the state of the mock DB.
-     * @param calendar Calendar to cline
+     * This is a helper function that takes as input a calendar and an incrementer. It adds the specified minute to the Calendar and returns a cloned Calendar. This is used to simplify some of the syntax when setting up the state of the mock DB.
+     * @param calendar Calendar to clone
      * @param amount   Number of minutes to increment by
      * @return         A cloned calendar fast forwarded <code>amount</code> number of minutes.
      */
@@ -64,7 +64,7 @@ public class MockRepository implements Repository {
         // Clone the calendar
         calendar = (Calendar) calendar.clone();
 
-        // Add 1 min to the cloned calendar
+        // Add "amount" minutes to the cloned calendar
         calendar.add(Calendar.MINUTE, amount);
 
         // Return the cloned calendar
@@ -121,7 +121,7 @@ public class MockRepository implements Repository {
                         new Mood("1", EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 1), SocialSituation.ALONE,   "user1 - mood1", new GeoPoint(1, 1), null),
                         new Mood("2", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 2), SocialSituation.ONE,     "user1 - mood2", new GeoPoint(2, 2), null),
                         new Mood("3", EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 3), SocialSituation.SEVERAL, "user1 - mood3", new GeoPoint(3, 3), null),
-                        new Mood("4", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 4), SocialSituation.CROWD,   "user1 - mood2", new GeoPoint(4, 4), null)
+                        new Mood("4", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 4), SocialSituation.CROWD,   "user1 - mood4", new GeoPoint(4, 4), null)
 
                 ))
         );
