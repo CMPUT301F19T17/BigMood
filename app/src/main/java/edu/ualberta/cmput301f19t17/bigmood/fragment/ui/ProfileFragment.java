@@ -123,7 +123,7 @@ public class ProfileFragment extends Fragment {
                                             // Display toast to the user.
                                             Toast.makeText(
                                                     ProfileFragment.this.getContext(),
-                                                    ProfileFragment.this.getContext().getText(R.string.toast_error_user_dne),
+                                                    R.string.toast_error_user_dne,
                                                     Toast.LENGTH_LONG
                                             ).show();
 
@@ -148,7 +148,7 @@ public class ProfileFragment extends Fragment {
                                                                 // Display a success toast to the user.
                                                                 Toast.makeText(
                                                                         ProfileFragment.this.getContext(),
-                                                                        ProfileFragment.this.getContext().getText(R.string.toast_success_request_sent),
+                                                                        R.string.toast_success_request_sent,
                                                                         Toast.LENGTH_SHORT
                                                                 ).show();
 
@@ -168,8 +168,8 @@ public class ProfileFragment extends Fragment {
                                                                 // Display an error toast to the user describing that there was a problem with connecting to the database.
                                                                 Toast.makeText(
                                                                         ProfileFragment.this.getContext(),
-                                                                        ProfileFragment.this.getContext().getText(R.string.toast_error_db),
-                                                                        Toast.LENGTH_SHORT
+                                                                        R.string.toast_error_create_request,
+                                                                        Toast.LENGTH_LONG
                                                                 ).show();
 
                                                                 // Enable button again
@@ -193,7 +193,7 @@ public class ProfileFragment extends Fragment {
                                         // Display an error toast to the user describing that there was a problem with connecting to the database.
                                         Toast.makeText(
                                                 ProfileFragment.this.getContext(),
-                                                ProfileFragment.this.getContext().getText(R.string.toast_error_db),
+                                                R.string.toast_error_db,
                                                 Toast.LENGTH_SHORT
                                         ).show();
 
