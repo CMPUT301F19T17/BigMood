@@ -1,4 +1,4 @@
-package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.following;
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.GeoPoint;
@@ -28,6 +27,7 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewMoodDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -37,8 +37,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
  * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
  */
 public class FollowingFragment extends Fragment {
-
-    private FollowingViewModel followingViewModel;
 
     private AppPreferences appPreferences;
 
@@ -58,40 +56,31 @@ public class FollowingFragment extends Fragment {
      * @return                   Returns the inflated view
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.fragment_following, container, false);
         // Enable options menu
         this.setHasOptionsMenu(true);
 
-        this.followingViewModel = ViewModelProviders.of(this).get(FollowingViewModel.class);
         this.appPreferences = AppPreferences.getInstance();
 
         // Initialize a new ArrayList
         this.moodList = new ArrayList<>();
-        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.mood_item, moodList);
 
-        // TODO: 2019-11-13 Cameron: canned data
-        moodList.add(new Mood(EmotionalState.ANGER, Calendar.getInstance(), SocialSituation.OPTIONAL, "", new GeoPoint(54.23, 23.10), null));
-        moodList.add(new Mood(EmotionalState.ANGER, Calendar.getInstance(), SocialSituation.OPTIONAL, "", new GeoPoint(54.23, 23.10), null));
-
+        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.list_item_mood, moodList);
         moodAdapter.notifyDataSetChanged();
 
         //set up a reference to the listview we will be populating
         ListView moodListView = root.findViewById(R.id.following_mood_list);
         moodListView.setAdapter(moodAdapter);
 
-        // TODO: 2019-11-13 Cameron: Implement FireStore listener
         // Set up the MoodsListener to listen to updates in FireStore
-       /* this.listenerRegistration = this.appPreferences
+        this.listenerRegistration = this.appPreferences
                 .getRepository()
-                .getUserMoods(
+                .getFollowingMoods(
                         this.appPreferences.getCurrentUser(),
                         new MoodsListener() {
-                            /**
-                             * This method is called whenever the listener hears that there is an update in the moodList
-                             * in FireStore, and updates the list, and applies a filter, if the user has selected one
-                             * @param moodList the new list that has the updated values
-                             */
-                            /*@Override
+
+                            @Override
                             public void onUpdate(List<Mood> moodList) {
 
                                 FollowingFragment.this.moodList.clear();
@@ -101,7 +90,7 @@ public class FollowingFragment extends Fragment {
                                 FollowingFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
 
                             }
-                        });*/
+                        });
         // set the onItemClickListener for the mood list items. This will be called anytime a mood is clicked on in the lis
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -138,9 +127,11 @@ public class FollowingFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.action_maps_following)
-            Toast.makeText(this.getContext(), "Display Maps", Toast.LENGTH_SHORT).show();
-
+        if (item.getItemId() == R.id.action_maps_following) {
+            Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
+            MapDialogFragment mapDialogFragment = new MapDialogFragment(moodAdapter);
+            mapDialogFragment.show(getFragmentManager(), "FRAGMENT_VIEW_USER_MAP");
+        }
         return super.onOptionsItemSelected(item);
 
     }

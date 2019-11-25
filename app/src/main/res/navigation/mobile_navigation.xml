@@ -7,25 +7,25 @@
 
     <fragment
         android:id="@+id/navigation_user_moods"
-        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.user.UserMoodsFragment"
+        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.UserMoodsFragment"
         android:label="@string/title_user_moods"
         tools:layout="@layout/fragment_user_moods" />
 
     <fragment
         android:id="@+id/navigation_following"
-        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.following.FollowingFragment"
+        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.FollowingFragment"
         android:label="@string/title_following"
         tools:layout="@layout/fragment_following" />
 
     <fragment
         android:id="@+id/navigation_requests"
-        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.requests.RequestsFragment"
+        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.RequestsFragment"
         android:label="@string/title_requests"
         tools:layout="@layout/fragment_requests" />
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.profile.ProfileFragment"
+        android:name="edu.ualberta.cmput301f19t17.bigmood.fragment.ui.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 

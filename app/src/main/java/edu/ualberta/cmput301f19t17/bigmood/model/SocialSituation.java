@@ -8,12 +8,10 @@ import androidx.annotation.Nullable;
  */
 public enum SocialSituation {
 
-    OPTIONAL (0, "No situation provided"),
-    ALONE (1, "Alone"),
-    ONE (2, "One person"),
-    SEVERAL (3, "Two to several people"),
-    CROWD (4, "Crowd"),
-
+    ALONE (0, "Alone"),
+    ONE (1, "One person"),
+    SEVERAL (2, "Two to several people"),
+    CROWD (3, "Crowd"),
     ;
 
     private int situationCode;

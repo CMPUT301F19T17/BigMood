@@ -1,17 +1,13 @@
-package edu.ualberta.cmput301f19t17.bigmood.fragment.ui.requests;
+package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -29,7 +25,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Request;
  */
 public class RequestsFragment extends Fragment {
 
-    private RequestsViewModel requestsViewModel;
     private AppPreferences appPreferences;
 
     private ArrayList<Request> requestList;
@@ -46,14 +41,13 @@ public class RequestsFragment extends Fragment {
      * @return                   Returns the inflated view
      */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.requestsViewModel = ViewModelProviders.of(this).get(RequestsViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
         this.appPreferences = AppPreferences.getInstance();
 
         // Initialize a new ArrayList
         this.requestList = new ArrayList<>();
-        this.requestAdapter = new RequestAdapter(root.getContext(), R.layout.request_item, requestList);
+        this.requestAdapter = new RequestAdapter(root.getContext(), R.layout.list_item_request, requestList);
 
         ListView requestListView = root.findViewById(R.id.request_list);
         requestListView.setAdapter(requestAdapter);
@@ -62,7 +56,9 @@ public class RequestsFragment extends Fragment {
         this.listenerRegistration = this.appPreferences
                 .getRepository()
                 .getUserRequests(
+
                         this.appPreferences.getCurrentUser(),
+
                         new RequestsListener() {
                             /**
                              * This method is called whenever the listener hears that there is an update in the requestList
@@ -71,11 +67,14 @@ public class RequestsFragment extends Fragment {
                              */
                             @Override
                             public void onUpdate(List<Request> requestList) {
+
                                 RequestsFragment.this.requestList.clear();
                                 RequestsFragment.this.requestList.addAll(requestList);
                                 RequestsFragment.this.requestAdapter.notifyDataSetChanged();
+
                             }
                         });
+
         return root;
     }
 
@@ -84,8 +83,10 @@ public class RequestsFragment extends Fragment {
      */
     @Override
     public void onDestroyView() {
+
         this.listenerRegistration.remove();
         super.onDestroyView();
+
     }
 
 

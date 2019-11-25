@@ -14,9 +14,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
@@ -33,7 +30,7 @@ public class US040101Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule
@@ -43,14 +40,14 @@ public class US040101Test {
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // This is actually the sweet spots for sleep time
         // 1 second would be too low and my trash laptop cant handle that :(
         solo.sleep(2000);
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
-        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test

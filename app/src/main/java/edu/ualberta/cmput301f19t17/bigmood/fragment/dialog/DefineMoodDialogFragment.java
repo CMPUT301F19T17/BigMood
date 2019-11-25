@@ -1,6 +1,8 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -32,6 +34,8 @@ import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.SituationSpinnerAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
@@ -49,12 +53,17 @@ public class DefineMoodDialogFragment extends DialogFragment {
     private Toolbar toolbar;
 
     private OnButtonPressListener listener;
+
     private Mood moodToEdit = null;
+
+    private StateSpinnerAdapter stateSpinnerAdapter;
+    private SituationSpinnerAdapter situationSpinnerAdapter;
 
     private Spinner stateSpinner;
     private Spinner situationSpinner;
     private Spinner dateSpinner;
     private Spinner timeSpinner;
+
     private TextInputLayout reasonInputLayout;
 
     private ImageView imageView;
@@ -171,15 +180,27 @@ public class DefineMoodDialogFragment extends DialogFragment {
         // Bind toolbar XML to view
         this.toolbar = view.findViewById(R.id.toolbar_define_fragment);
 
-        // Find and bind elements
+        // Find and set state and situation spinner
         this.stateSpinner = view.findViewById(R.id.spinner_state);
         this.situationSpinner = view.findViewById(R.id.situation_spinner);
+
+        // Find and set the reason InputLayout
         this.reasonInputLayout = view.findViewById(R.id.text_input_reason);
 
+        // Find and set the emotional state ImageView
         this.imageView = view.findViewById(R.id.image);
 
+        // Find and set the date/time spinners
         this.dateSpinner = view.findViewById(R.id.spinner_date);
         this.timeSpinner = view.findViewById(R.id.spinner_time);
+
+        // If the context is null, we cannot proceed.
+        if (this.getContext() == null)
+            throw new IllegalStateException("Context is null, cannot create the array adapters");
+
+        // Create the state and spinner adapters
+        this.stateSpinnerAdapter = new StateSpinnerAdapter(this.getContext());
+        this.situationSpinnerAdapter = new SituationSpinnerAdapter(this.getContext());
 
         // Return view that has been created
         return view;
@@ -208,27 +229,11 @@ public class DefineMoodDialogFragment extends DialogFragment {
             }
         });
 
-        // TODO 2019-11-03 Cameron removed since i don't believe there is a way to set a preset for the spinner programmatically, which is necessary for setting it with an ArrayAdapter.
-        // TODO 2019-11-03 Cameron create custom ArrayAdapter to include the mood pictograms
-        // set up the spinner with the emotional states
-        final ArrayAdapter<EmotionalState> stateAdapter = new ArrayAdapter<>(
-                this.getContext(),
-                android.R.layout.simple_spinner_item,
-                EmotionalState.values()
-        );
-        stateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        this.stateSpinner.setAdapter(stateAdapter);
-
-        // set up the spinner with the social situations
-        final ArrayAdapter<SocialSituation> situationAdapter = new ArrayAdapter<>(
-                this.getContext(),
-                android.R.layout.simple_spinner_item,
-                SocialSituation.values()
-        );
-        situationAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-        this.situationSpinner.setAdapter(situationAdapter);
-
         final Calendar calendar;
+
+        // Bind adapters to spinners. This should populate the values in each spinner.
+        this.stateSpinner.setAdapter(this.stateSpinnerAdapter);
+        this.situationSpinner.setAdapter(this.situationSpinnerAdapter);
 
         // Here we populate values in the fragment if we have a mood and set the appropriate title.
         if (this.moodToEdit != null) {
@@ -240,31 +245,34 @@ public class DefineMoodDialogFragment extends DialogFragment {
             calendar = this.moodToEdit.getDatetime();
 
             // Populate state
-            int statePosition = stateAdapter.getPosition(this.moodToEdit.getState());
+            int statePosition = stateSpinnerAdapter.getPosition(this.moodToEdit.getState());
             this.stateSpinner.setSelection(statePosition);
 
-            // Populate
-            if (this.moodToEdit.getSituation() != null) {
-                int situationPosition = situationAdapter.getPosition(this.moodToEdit.getSituation());
-                this.situationSpinner.setSelection(situationPosition);
-            }
+            // Populate situation. The situation value can be null, but a null value in guaranteed to exist in the adapter's array
+            int situationPosition = situationSpinnerAdapter.getPosition(this.moodToEdit.getSituation());
+            this.situationSpinner.setSelection(situationPosition);
 
+            // If the string is non empty, set the text to that. If the string is empty, we leave it to the default value.
             if (! this.moodToEdit.getReason().equals(""))
                 this.reasonInputLayout.getEditText().setText(this.moodToEdit.getReason());
 
-            //TODO add location and image
+            // TODO populate location and image
 
         } else {
 
             // Set Title
             this.toolbar.setTitle(getString(R.string.title_dialog_add_mood));
 
-            // Set calendar to a new calendar since it's a new mood
+            // Set calendar to a new calendar since we're in the add mood case.
             calendar = Calendar.getInstance();
 
         }
 
-        // Set text of date spinner
+        // If the context is null, we cannot proceed.
+        if (this.getContext() == null)
+            throw new IllegalStateException("Context is null, cannot create the array adapters");
+
+        // Set text of date spinner. We are using a disabled spinner so we can be more consistent with the UI. We disable it so that the user cannot interact with it.
         dateSpinner.setAdapter(
                 new ArrayAdapter<String>(
                         this.getContext(),
@@ -273,7 +281,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 ));
         dateSpinner.setEnabled(false);
 
-        // Set text of time spinner
+        // Set text of time spinner. We are using a disabled spinner so we can be more consistent with the UI. We disable it so that the user cannot interact with it.
         timeSpinner.setAdapter(
                 new ArrayAdapter<String>(
                         this.getContext(),
@@ -282,41 +290,40 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 ));
         timeSpinner.setEnabled(false);
 
-        // TODO: 2019-11-06 Ranajay: Disabled for now since going to take a photo results in a crash
 
-//        // add click listener to the image to pick picture from gallery or camera
-//        this.imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String title = "Open Photo";
-//                CharSequence[] itemlist ={"Take a Photo",
-//                        "Pick from Gallery"};
-//
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                builder.setTitle(title);
-//                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
-//
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        switch (which) {
-//                            case 0:// Take Photo
-//                                // Do Take Photo task here
-//                                dispatchTakePictureIntent();
-//                                break;
-//                            case 1:// Choose Existing Photo
-//                                // Do Pick Photo task here
-//                                dispatchPickImageIntent();
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//                    }
-//                });
-//                AlertDialog alert = builder.create();
-//                alert.setCancelable(true);
-//                alert.show();
-//            }
-//        });
+        // add click listener to the image to pick picture from gallery or camera
+        this.imageView.setOnClickListener(new View.OnClickListener() {
+           @Override
+            public void onClick(View v) {
+                String title = "Open Photo";
+                CharSequence[] itemlist ={"Take a Photo",
+                        "Pick from Gallery"};
+
+               AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(title);
+                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:// Take Photo
+                                // Do Take Photo task here
+                                dispatchTakePictureIntent();
+                                break;
+                            case 1:// Choose Existing Photo
+                                // Do Pick Photo task here
+                                dispatchPickImageIntent();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.setCancelable(true);
+                alert.show();
+            }
+        });
 
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
         // This is where the core of the input validation will happen -- that is when the user tries to press Save.
@@ -325,11 +332,15 @@ public class DefineMoodDialogFragment extends DialogFragment {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_save) {
 
-                    // Get emotional state and social situation
-                    EmotionalState emotionalState = stateAdapter.getItem(stateSpinner.getSelectedItemPosition());
-                    SocialSituation socialSituation = situationAdapter.getItem(situationSpinner.getSelectedItemPosition());
+                    // Get emotional state from state spinner
+                    EmotionalState emotionalState = DefineMoodDialogFragment.this.stateSpinnerAdapter
+                            .getItem(stateSpinner.getSelectedItemPosition());
 
-                    // Get reason
+                    // Get social situation from situation spinner. Keep in mind this can be null, but that's fine because a null value is allowed (to represent no option).
+                    SocialSituation socialSituation = DefineMoodDialogFragment.this.situationSpinnerAdapter
+                            .getItem(situationSpinner.getSelectedItemPosition());
+
+                    // Get reason string
                     String reason = DefineMoodDialogFragment.this.reasonInputLayout
                             .getEditText()
                             .getText()
@@ -388,6 +399,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
                                 null
                         );
 
+                    Log.d(HomeActivity.LOG_TAG, String.format("MOOD INFO:\n\tState: {%s}\n\tSituation: {%s}", mood.getState().toString(), (mood.getSituation() == null ? "null" : mood.getSituation().toString()) ));
+
                     // Invoke the callback method with the mood and dismiss the fragment
                     DefineMoodDialogFragment.this.listener.onSavePressed(mood);
                     DefineMoodDialogFragment.this.dismiss();
@@ -400,9 +413,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
             }
         });
-
-
-
     }
 
     /**
@@ -425,6 +435,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
         }
 
     }
+
+    // TODO: 2019-11-23 Ranajay: Add comments, javadoc, and finish photograph implementation
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

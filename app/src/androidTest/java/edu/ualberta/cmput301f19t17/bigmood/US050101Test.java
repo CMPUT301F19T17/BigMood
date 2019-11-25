@@ -24,7 +24,7 @@ public class US050101Test {
 
     @BeforeClass //runs before anything else runs
     public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().setCurrentUser(new MockUser("CMPUT301", "CMPUT", "301"));
+        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
     }
 
     @Rule
@@ -40,7 +40,7 @@ public class US050101Test {
     public void checkUserDoesNotExist() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
         solo.clickOnText("Profile");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.textInputLayoutRequest)).getEditText(), "SuperMario");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "SuperMario");
         solo.clickOnButton("REQUEST");
         assertTrue(solo.waitForText("User does not exist", 1, 2000));
         solo.sleep(2000);
@@ -52,13 +52,13 @@ public class US050101Test {
         solo.clickOnText("Profile");
         String requester_username = "CMPUT301";
         String requested_username = "apple";
-        solo.typeText(((TextInputLayout) solo.getView(R.id.textInputLayoutRequest)).getEditText(), requested_username);
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), requested_username);
         solo.clickOnButton("REQUEST");
         assertTrue(solo.waitForText("Request sent", 1, 2000));
 
         solo.clickOnText("My Moods");
         solo.sleep(2000);
-        appPreferences.getInstance().setCurrentUser(new MockUser(requested_username, "Bob", "Smith"));
+        appPreferences.getInstance().login(new MockUser(requested_username, "Bob", "Smith"));
         solo.clickOnText("Profile");
         solo.sleep(2000);
         solo.clickOnText("Requests");

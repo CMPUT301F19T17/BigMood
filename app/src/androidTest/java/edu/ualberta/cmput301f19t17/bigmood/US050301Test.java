@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
  * In this class we are making sure that the moods belonging to the users that the main user is
  * following show up in reverse chronological order.
  */
+// TODO: 2019-11-25 Cameron: Refactor to use MockRepository
 public class US050301Test {
     private Solo solo;
     private AppPreferences appPreferences;

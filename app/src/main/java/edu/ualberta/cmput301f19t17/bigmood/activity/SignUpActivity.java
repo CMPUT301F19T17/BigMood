@@ -112,73 +112,108 @@ public class SignUpActivity extends AppCompatActivity {
                     SignUpActivity.this.button.setEnabled(false);
 
                     // Get repository and check if the user exists.
-                    SignUpActivity.this.appPreferences.getRepository()
-                            .userExists(username)
-                            .addOnSuccessListener(new OnSuccessListener<Boolean>() {
-                                @Override
-                                public void onSuccess(Boolean aBoolean) {
+                    SignUpActivity.this.appPreferences
+                            .getRepository()
+                            .userExists(
 
-                                    // If the user exists, then print an error message and return.
-                                    if (aBoolean) {
+                                    username,
 
-                                        Toast.makeText(
-                                                SignUpActivity.this,
-                                                R.string.toast_error_user_exists,
-                                                Toast.LENGTH_LONG
-                                        ).show();
+                                    new OnSuccessListener<Boolean>() {
+                                        @Override
+                                        public void onSuccess(Boolean aBoolean) {
 
-                                        // Enable the button again
-                                        SignUpActivity.this.button.setEnabled(true);
+                                            // This block of code is run when the userExists() function succeeds (not when the user exists, we check that in the next line). //
 
-                                        return;
-                                    }
+                                            // If the user exists, then print an error message and return.
+                                            if (aBoolean) {
 
-                                    // At this point the user does NOT exist so we get the repository and register a user
-                                    SignUpActivity.this.appPreferences.getRepository()
-                                            .registerUser(
-                                                    username,
-                                                    password,
-                                                    firstName,
-                                                    lastName
-                                            )
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
+                                                Toast.makeText(
+                                                        SignUpActivity.this,
+                                                        R.string.toast_error_user_exists,
+                                                        Toast.LENGTH_LONG
+                                                ).show();
 
-                                                    // If the registration succeeds, print a toast message and finish()
-                                                    Toast.makeText(
-                                                            SignUpActivity.this,
-                                                            R.string.toast_success_registration,
-                                                            Toast.LENGTH_SHORT
-                                                    ).show();
+                                                // Enable the button again
+                                                SignUpActivity.this.button.setEnabled(true);
 
-                                                    // Go back to login page. We don't have to show the button because this activity will be destroyed and upon a second call the button will be recreated again.
-                                                    SignUpActivity.this.finish();
+                                                return;
+                                            }
 
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
+                                            // At this point the user does NOT exist so we get the repository and register a user
+                                            SignUpActivity.this.appPreferences
+                                                    .getRepository()
+                                                    .registerUser(
 
-                                                    // If the registration failed, display a toast to the user.
-                                                    Toast.makeText(
-                                                            SignUpActivity.this,
-                                                            SignUpActivity.this.getString(R.string.toast_error_registration),
-                                                            Toast.LENGTH_LONG
-                                                    ).show();
+                                                            username,
+                                                            password,
+                                                            firstName,
+                                                            lastName,
 
-                                                    // Enable the button again
-                                                    SignUpActivity.this.button.setEnabled(true);
+                                                            new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+
+                                                                    // If the registration succeeds, print a toast message and finish()
+                                                                    Toast.makeText(
+                                                                            SignUpActivity.this,
+                                                                            R.string.toast_success_registration,
+                                                                            Toast.LENGTH_SHORT
+                                                                    ).show();
+
+                                                                    // Go back to login page. We don't have to show the button because this activity will be destroyed and upon a second call the button will be recreated again.
+                                                                    SignUpActivity.this.finish();
+
+                                                                }
+                                                            },  // End of OnSuccessListener for registerUser()
+
+                                                            new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+
+                                                                    // If the registration failed, display a toast to the user.
+                                                                    Toast.makeText(
+                                                                            SignUpActivity.this,
+                                                                            SignUpActivity.this.getString(R.string.toast_error_registration),
+                                                                            Toast.LENGTH_LONG
+                                                                    ).show();
+
+                                                                    // Enable the button again
+                                                                    SignUpActivity.this.button.setEnabled(true);
+
+                                                                }
+                                                            }  // End of OnFailureListener for registerUser()
+
+                                                    );  // End of registerUser()
 
 
-                                                }
-                                            });  // End register user
+                                        }
+                                    },  // End of OnSuccessListener for userExists()
 
-                                }
-                            });  // End check user
+                                    new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
 
-                }  // End if validateAll()
+                                            // This block of code is run when the userExists() function fails. //
+
+                                            // Log error
+                                            Log.e(HomeActivity.LOG_TAG, "FAILED TO CHECK USER EXISTENCE: " + e.toString());
+
+                                            // Display error toast.
+                                            Toast.makeText(
+                                                    SignUpActivity.this,
+                                                    SignUpActivity.this.getString(R.string.toast_error_db),
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+
+                                            // Enable the button again
+                                            SignUpActivity.this.button.setEnabled(true);
+
+                                        }
+                                    }  // End of OnFailureListener for userExists()
+
+                            );  // End of userExists()
+
+                }  // End of validateAll()
 
             }
         });  // End set onClickListener
