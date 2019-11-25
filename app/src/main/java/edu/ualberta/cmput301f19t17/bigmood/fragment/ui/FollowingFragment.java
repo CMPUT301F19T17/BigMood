@@ -18,7 +18,6 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
  * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
  */
 public class FollowingFragment extends Fragment {
-
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
      * This is where we inflate all the views and *if applicable* populate all the fields.
@@ -33,7 +32,6 @@ public class FollowingFragment extends Fragment {
 
         // Enable options menu
         this.setHasOptionsMenu(true);
-
         return root;
 
     }

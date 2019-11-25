@@ -115,7 +115,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         // Set state to the nice name defined by the enumeration
         stateTextView.setText(this.moodToView.getState().toString());
 
-        // Set image based on enum
+        // Set emoticon based on enum
         Resources res = this.getContext().getResources();
         Drawable emoticon = res.getDrawable(this.moodToView.getState().getDrawableId());
         emoteImageView.setImageDrawable(emoticon);
@@ -137,7 +137,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         if (this.moodToView.getImage() == null) {
             // draw "no picture" image
         } else {
-            //photoImageView.setImageBitmap(mood.getImage());
+            //photoImageView.setImageBitmap(this.moodToView.getImage());
         }
         if (this.moodToView.getLocation() == null) {
             // draw "no location" image
