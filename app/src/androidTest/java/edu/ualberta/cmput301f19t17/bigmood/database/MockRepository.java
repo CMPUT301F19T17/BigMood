@@ -163,6 +163,11 @@ public class MockRepository implements Repository {
     // Utility commands //
 
 
+    /**
+     * Gets any specified user object from the internal DB given a username.
+     * @param username Username of the user
+     * @return         User object representing a user.
+     */
     public User getUser(String username) {
 
         User user = this.userList.get(username);
@@ -220,6 +225,11 @@ public class MockRepository implements Repository {
     // Listener Destruction Commands //
 
 
+    /**
+     * This removes a specific type of listener from the internal lists in order to signify the destruction of a ListenerRegistration
+     *
+     * @param listener The listener to remove
+     */
     public void removeUserMoodsListener(MoodsListener listener) {
 
         for (MoodsListener l : this.userMoodsListeners) {
@@ -233,6 +243,11 @@ public class MockRepository implements Repository {
 
     }
 
+    /**
+     * This removes a specific type of listener from the internal lists in order to signify the destruction of a ListenerRegistration
+     *
+     * @param listener The listener to remove
+     */
     public void removeFollowingMoodsListener(MoodsListener listener) {
 
         for (MoodsListener l : this.followingMoodsListeners) {
@@ -246,6 +261,11 @@ public class MockRepository implements Repository {
 
     }
 
+    /**
+     * This removes a specific type of listener from the internal lists in order to signify the destruction of a ListenerRegistration
+     *
+     * @param listener The listener to remove
+     */
     public void removeFollowingListener(FollowingListener listener) {
 
         for (FollowingListener l : this.followingListeners) {
@@ -259,6 +279,11 @@ public class MockRepository implements Repository {
 
     }
 
+    /**
+     * This removes a specific type of listener from the internal lists in order to signify the destruction of a ListenerRegistration
+     *
+     * @param listener The listener to remove
+     */
     public void removeRequestsListener(RequestsListener listener) {
 
         for (RequestsListener l : this.requestsListeners) {
@@ -276,6 +301,11 @@ public class MockRepository implements Repository {
     // Listener update commands //
 
 
+    /**
+     * Polls the DB for any new information, and goes through the respective listener list and updates every listener with the new information it retrieved.
+     *
+     * @param user The user under which to perform the update. Required for the query (to get the information to update)
+     */
     private void updateUserMoodsListeners(User user) {
 
         List<Mood> moodList = new ArrayList<>(this.moodList.get(user.getUsername()));
@@ -287,6 +317,11 @@ public class MockRepository implements Repository {
 
     }
 
+    /**
+     * Polls the DB for any new information, and goes through the respective listener list and updates every listener with the new information it retrieved.
+     *
+     * @param user The user under which to perform the update. Required for the query (to get the information to update)
+     */
     private void updateFollowingMoodsListeners(User user) {
 
         List<String> followingList = new ArrayList<>(this.followerList.get(user.getUsername()));
@@ -313,6 +348,11 @@ public class MockRepository implements Repository {
 
     }
 
+    /**
+     * Polls the DB for any new information, and goes through the respective listener list and updates every listener with the new information it retrieved.
+     *
+     * @param user The user under which to perform the update. Required for the query (to get the information to update)
+     */
     private void updateFollowingListeners(User user) {
 
         List<String> followerList = new ArrayList<>(this.followerList.get(user.getUsername()));
@@ -322,6 +362,11 @@ public class MockRepository implements Repository {
 
     }
 
+    /**
+     * Polls the DB for any new information, and goes through the respective listener list and updates every listener with the new information it retrieved.
+     *
+     * @param user The user under which to perform the update. Required for the query (to get the information to update)
+     */
     private void updateRequestsListeners(User user) {
 
         // Original DB list
