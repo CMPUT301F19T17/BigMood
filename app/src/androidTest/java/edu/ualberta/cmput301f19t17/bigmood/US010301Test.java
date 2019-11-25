@@ -57,6 +57,9 @@ public class US010301Test {
 
     @Test
     public void testDisplayStateTimeDate() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+
         // DON'T USE clickInList it's very buggy
         // click on the FIRST occurrence of the Happy mood (in this case mood3)
         solo.clickOnMenuItem("Happy");
@@ -68,6 +71,8 @@ public class US010301Test {
 
     @Test
     public void  testDisplayStateTimeDateSituation() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
         //click on mood4
         solo.clickOnMenuItem("Sad");
 
@@ -80,6 +85,8 @@ public class US010301Test {
 
     @Test
     public void  testDisplayStateTimeDateSituationReason() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
         //click on mood3
         solo.clickOnMenuItem("Happy");
 
