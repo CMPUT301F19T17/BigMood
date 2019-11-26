@@ -74,7 +74,6 @@ public class UserMoodsFragment extends Fragment {
         this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.list_item_mood, moodList);
 
         ListView moodListView = root.findViewById(R.id.mood_list);
-
         moodListView.setAdapter(moodAdapter);
 
         FloatingActionButton fab = root.findViewById(R.id.floatingActionButton);
@@ -158,14 +157,12 @@ public class UserMoodsFragment extends Fragment {
                                         );  // End of createMood()
 
                             }
-
                         });  // End setOnButtonPressListener
 
                 // Show the add mood fragment once the save button listener has been defined.
                 addMoodFragment.show(getFragmentManager(), "FRAGMENT_DEFINE_MOOD_ADD");
 
             }
-
         }); // End setOnClickListener
 
         // Set the on item click listener for the ListView. Recall that we have to display something, and then on an delete or edit event, we must do something else.
@@ -372,6 +369,7 @@ public class UserMoodsFragment extends Fragment {
                 });
 
             }  // end of menu initialization
+
             // We now have a complete menu but in order to render it properly we need to set the item that is selected to checked. We iterate through every state and if it matches with the current filter, set its checked state to true.
             for (EmotionalState state : EmotionalState.values()) {
                 MenuItem menuItem = this.menu.getMenu().findItem(state.getStateCode());
@@ -398,6 +396,4 @@ public class UserMoodsFragment extends Fragment {
         return true;
     }
 
-
 }
-

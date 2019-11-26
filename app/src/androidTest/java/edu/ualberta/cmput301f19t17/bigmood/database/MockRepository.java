@@ -54,8 +54,8 @@ public class MockRepository implements Repository {
     }
 
     /**
-     * This is a helper function that takes as input a calendar and an incrementer. It adds the specified minute to the Calendar and returns a cloned Calendar. This is used to simplify some of the sytnax when setting up the state of the mock DB.
-     * @param calendar Calendar to cline
+     * This is a helper function that takes as input a calendar and an incrementer. It adds the specified minute to the Calendar and returns a cloned Calendar. This is used to simplify some of the syntax when setting up the state of the mock DB.
+     * @param calendar Calendar to clone
      * @param amount   Number of minutes to increment by
      * @return         A cloned calendar fast forwarded <code>amount</code> number of minutes.
      */
@@ -64,7 +64,7 @@ public class MockRepository implements Repository {
         // Clone the calendar
         calendar = (Calendar) calendar.clone();
 
-        // Add 1 min to the cloned calendar
+        // Add "amount" minutes to the cloned calendar
         calendar.add(Calendar.MINUTE, amount);
 
         // Return the cloned calendar
@@ -203,7 +203,7 @@ public class MockRepository implements Repository {
      * It is only used for testing, so as to stop clogging up the user with 50+ moods
      * @param user The user whose moods we want to delete
      */
-    void deleteAllUserMoods(User user) {
+    public void deleteAllUserMoods(User user) {
 
         User dbUser = this.userList.get(user.getUsername());
         List<Mood> dbMoodList = this.moodList.get(user.getUsername());
