@@ -183,12 +183,12 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMapView) {
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
-        LatLng ny = new LatLng(40.7143528, -74.0059731);
-//        googleMap.addMarker(new MarkerOptions().position(ny)
-//                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
-//                .title("Marker in NY")
-//                .snippet("Test marker!"));
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
+//        LatLng ny = new LatLng(40.7143528, -74.0059731);
+////        googleMap.addMarker(new MarkerOptions().position(ny)
+////                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
+////                .title("Marker in NY")
+////                .snippet("Test marker!"));
+////        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
 
         /**
          * DO NOT DELETE CODE BELOW
