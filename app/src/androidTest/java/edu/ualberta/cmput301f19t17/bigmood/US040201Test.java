@@ -9,7 +9,6 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -18,7 +17,6 @@ import org.junit.Test;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
-import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 import static org.junit.Assert.assertEquals;
