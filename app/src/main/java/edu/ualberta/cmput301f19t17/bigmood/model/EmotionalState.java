@@ -3,6 +3,8 @@ package edu.ualberta.cmput301f19t17.bigmood.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
 import edu.ualberta.cmput301f19t17.bigmood.R;
 
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_AZURE;
@@ -38,6 +40,7 @@ public enum EmotionalState {
         this.stateCode = stateCode;
         this.displayName = displayName;
         this.drawableId = drawableId;
+        this.markerColor = markerColor;
     }
 
     /**

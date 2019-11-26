@@ -30,7 +30,6 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
-import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 
 /**
@@ -184,11 +183,12 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMapView) {
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
-        /*LatLng ny = new LatLng(40.7143528, -74.0059731);
-        googleMap.addMarker(new MarkerOptions().position(ny)
-                .title("Marker in NY")
-                .snippet("Test marker!"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));*/
+        LatLng ny = new LatLng(40.7143528, -74.0059731);
+//        googleMap.addMarker(new MarkerOptions().position(ny)
+//                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
+//                .title("Marker in NY")
+//                .snippet("Test marker!"));
+//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
 
         /**
          * DO NOT DELETE CODE BELOW
