@@ -78,7 +78,7 @@ public class US010301Test {
         assertTrue(photographImageViewTag == R.drawable.ic_placeholder_image_black_24dp);
 
         // Needs to be refactored b/c at the time this was written the location is hardcoded to [32.32 N, 142.22 E] and not null
-        // When refactoring got to ViewMoodDialogFragment and reposition setTag for map image view
+        // When refactoring go to ViewMoodDialogFragment and reposition setTag for map image view
         Integer mapImageViewTag = (Integer) solo.getView(R.id.image_view_placeholder_location).getTag();
         assertTrue(mapImageViewTag == R.drawable.ic_placeholder_image_black_24dp);
     }
