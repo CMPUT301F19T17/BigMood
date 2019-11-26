@@ -21,6 +21,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/textview_app_name"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="false"
+                android:text="@string/app_name"
+                app:autoSizeMaxTextSize="35sp"
+                app:autoSizeTextType="uniform"
+                app:fontFamily="sans-serif-light"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_image_right"
+                app:layout_constraintStart_toStartOf="@+id/guideline_image_left"
+                app:layout_constraintTop_toBottomOf="@+id/imageview_app_icon" />
+
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_image_top"
                 android:layout_width="wrap_content"
@@ -43,9 +63,12 @@
                 app:layout_constraintGuide_percent="0.67" />
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/imageview_app_icon"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:contentDescription="@string/app_name"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_image_right"
@@ -53,7 +76,7 @@
                 app:layout_constraintTop_toTopOf="@+id/guideline_image_top"
                 app:layout_constraintVertical_bias="0.0"
                 app:layout_constraintWidth_max="140dp"
-                app:srcCompat="@drawable/ic_placeholder_image_black_24dp" />
+                app:srcCompat="@drawable/ic_launcher_foreground" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_username"
@@ -61,13 +84,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                app:layout_constraintTop_toBottomOf="@+id/textview_app_name"
                 app:layout_constraintWidth_max="400dp">
 
                 <com.google.android.material.textfield.TextInputEditText
