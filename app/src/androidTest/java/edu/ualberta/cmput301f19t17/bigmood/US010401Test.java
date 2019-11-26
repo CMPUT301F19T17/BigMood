@@ -64,7 +64,7 @@ public class US010401Test {
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
 
         solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode()); //sad
-        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()); //crowd
+        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()+1); //crowd
 
         solo.clickOnView(solo.getView(R.id.action_save));
 

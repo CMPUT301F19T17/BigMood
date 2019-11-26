@@ -224,22 +224,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         String moodReason = mood.getReason();
         BitmapDescriptor icon;
 
-        int moodState = mood.getState().getStateCode();
-        if (moodState == EmotionalState.HAPPINESS.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
-        } else if (moodState == EmotionalState.SADNESS.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-        } else if (moodState == EmotionalState.FEAR.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-        } else if (moodState == EmotionalState.DISGUST.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-        } else if (moodState == EmotionalState.ANGER.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-        } else if (moodState == EmotionalState.SURPRISE.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA);
-        } else {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
-        }
+        icon = BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor());
+
         googleMap.addMarker(new MarkerOptions().position(moodLocation)
                 .icon(icon)
                 .title(moodDate)
