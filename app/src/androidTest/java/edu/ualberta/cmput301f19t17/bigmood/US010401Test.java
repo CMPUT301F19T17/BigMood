@@ -1,16 +1,13 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
-import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -19,13 +16,10 @@ import org.junit.Test;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
-import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertEquals;
-
-// TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
 
 public class US010401Test {
     private Solo solo;
@@ -70,7 +64,7 @@ public class US010401Test {
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
 
         solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode()); //sad
-        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()); //crowd
+        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()+1); //crowd
 
         solo.clickOnView(solo.getView(R.id.action_save));
 

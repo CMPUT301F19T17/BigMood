@@ -15,12 +15,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
@@ -29,9 +26,7 @@ import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapDialogFragment;
 import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewMoodDialogFragment;
-import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
-import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 /**
  * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
@@ -47,6 +42,7 @@ public class FollowingFragment extends Fragment {
 
     private View menuItemFilter = null;
     private PopupMenu menu = null;
+
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
      * This is where we inflate all the views and *if applicable* populate all the fields.
@@ -58,6 +54,7 @@ public class FollowingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_following, container, false);
+
         // Enable options menu
         this.setHasOptionsMenu(true);
 
@@ -86,11 +83,13 @@ public class FollowingFragment extends Fragment {
                                 FollowingFragment.this.moodList.clear();
                                 FollowingFragment.this.moodList.addAll(moodList);
                                 FollowingFragment.this.moodAdapter.notifyDataSetChanged();
+
                                 // This refresh the filter with the updated data
                                 FollowingFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
 
                             }
                         });
+
         // set the onItemClickListener for the mood list items. This will be called anytime a mood is clicked on in the lis
         moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -103,6 +102,18 @@ public class FollowingFragment extends Fragment {
         });
 
         return root;
+    }
+
+    /**
+     * We need to unbind the ListenerRegistration so that updates do not occur in the background, so we have to make sure we do that upon exit only.
+     */
+    @Override
+    public void onDestroyView() {
+
+        this.listenerRegistration.remove();
+
+        super.onDestroyView();
+
     }
 
     /**
@@ -135,6 +146,5 @@ public class FollowingFragment extends Fragment {
         return super.onOptionsItemSelected(item);
 
     }
-
 
 }

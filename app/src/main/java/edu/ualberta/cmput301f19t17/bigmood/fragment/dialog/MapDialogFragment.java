@@ -30,7 +30,6 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
-import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 
 /**
@@ -184,11 +183,12 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMapView) {
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
-        /*LatLng ny = new LatLng(40.7143528, -74.0059731);
-        googleMap.addMarker(new MarkerOptions().position(ny)
-                .title("Marker in NY")
-                .snippet("Test marker!"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));*/
+//        LatLng ny = new LatLng(40.7143528, -74.0059731);
+////        googleMap.addMarker(new MarkerOptions().position(ny)
+////                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
+////                .title("Marker in NY")
+////                .snippet("Test marker!"));
+////        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
 
         /**
          * DO NOT DELETE CODE BELOW
@@ -224,22 +224,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         String moodReason = mood.getReason();
         BitmapDescriptor icon;
 
-        int moodState = mood.getState().getStateCode();
-        if (moodState == EmotionalState.HAPPINESS.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
-        } else if (moodState == EmotionalState.SADNESS.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-        } else if (moodState == EmotionalState.FEAR.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-        } else if (moodState == EmotionalState.DISGUST.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-        } else if (moodState == EmotionalState.ANGER.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-        } else if (moodState == EmotionalState.SURPRISE.getStateCode()) {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA);
-        } else {
-            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
-        }
+        icon = BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor());
+
         googleMap.addMarker(new MarkerOptions().position(moodLocation)
                 .icon(icon)
                 .title(moodDate)
