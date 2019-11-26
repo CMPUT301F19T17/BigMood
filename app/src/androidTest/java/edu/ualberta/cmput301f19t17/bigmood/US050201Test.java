@@ -14,48 +14,54 @@ import org.junit.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 
 import static org.junit.Assert.assertTrue;
 
 public class US050201Test {
-    private Solo solo;
-    private AppPreferences appPreferences;
 
-    @BeforeClass //runs before anything else runs
-    public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
+    private Solo solo;
+    private static AppPreferences appPreferences;
+    private static MockRepository mockRepository;
+
+    @BeforeClass
+    public static void setRepository() {
+
+        // Set app preferences
+        US050201Test.appPreferences = AppPreferences.getInstance();
+
+        // Create new in-memory database and set the app preferences to use it
+        US050201Test.mockRepository = new MockRepository();
+        US050201Test.appPreferences.setRepository(US050201Test.mockRepository);
+
+        // Login with a user from the database using a specialized method in MockRepository
+        US050201Test.appPreferences.login(US050201Test.mockRepository.getUser("user1"));
+
     }
 
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);
 
-    @Before //Clears the mood list before each test
-    public void setUp() throws Exception {
+    @Before //runs before every test
+    public void setUp() {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance(); // used to call deleteAllMoods method
     }
 
     @Test
-    public void checkUserDoesNotExist() {
+    public void acceptRequestTest(){
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-        solo.clickOnText("Profile");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "SuperMario");
-        solo.clickOnButton("REQUEST");
-        assertTrue(solo.waitForText("User does not exist", 1, 2000));
-        solo.sleep(2000);
-    }
-
-    @Test
-    public void acceptRequest(){
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        // switch to the Following tab
+        solo.clickOnText("Requests");
         solo.clickOnButton("ACCEPT");
         assertTrue(solo.waitForText("Request successfully accepted.", 1, 2000));
 
     }
     @Test
-    public void rejectRequest(){
+    public void rejectRequestTest(){
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        // switch to the Following tab
+        solo.clickOnText("Requests");
         solo.clickOnButton("REJECT");
         assertTrue(solo.waitForText("Request successfully rejected.", 1, 2000));
 
