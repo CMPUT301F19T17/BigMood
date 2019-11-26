@@ -183,14 +183,15 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMapView) {
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
-//        LatLng ny = new LatLng(40.7143528, -74.0059731);
-////        googleMap.addMarker(new MarkerOptions().position(ny)
-////                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
-////                .title("Marker in NY")
-////                .snippet("Test marker!"));
-////        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
+        //canned data
+/*      LatLng ny = new LatLng(40.7143528, -74.0059731);
+        googleMap.addMarker(new MarkerOptions().position(ny)
+                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
+                .title("Marker in NY")
+                .snippet("Test marker!"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));*/
 
-        /**
+        /*
          * DO NOT DELETE CODE BELOW
          * WILL IMPLEMENT THIS CODE AFTER WE FIGURE HOW TO GET THE LOCATION OF A MOOD
          * THE CODE ABOVE IS A TEST OF THE MAP
@@ -217,6 +218,11 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
      */
     public void makeMoodMarker(GoogleMap googleMap, Mood mood) {
         GeoPoint geoPoint = mood.getLocation();
+
+        //ensure we aren't trying to add moods without locations
+        if (geoPoint == null)
+            return;
+
         LatLng moodLocation = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
         Calendar calendar = mood.getDatetime();
         String moodDate = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).format(calendar.getTime());
