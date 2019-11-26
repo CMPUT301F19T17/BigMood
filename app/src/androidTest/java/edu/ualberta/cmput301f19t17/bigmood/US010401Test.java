@@ -25,8 +25,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertEquals;
 
-// TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
-
 public class US010401Test {
     private Solo solo;
     private static AppPreferences appPreferences;

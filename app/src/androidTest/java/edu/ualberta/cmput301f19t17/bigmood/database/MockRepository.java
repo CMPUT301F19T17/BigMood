@@ -203,7 +203,7 @@ public class MockRepository implements Repository {
      * It is only used for testing, so as to stop clogging up the user with 50+ moods
      * @param user The user whose moods we want to delete
      */
-    void deleteAllUserMoods(User user) {
+    public void deleteAllUserMoods(User user) {
 
         User dbUser = this.userList.get(user.getUsername());
         List<Mood> dbMoodList = this.moodList.get(user.getUsername());
