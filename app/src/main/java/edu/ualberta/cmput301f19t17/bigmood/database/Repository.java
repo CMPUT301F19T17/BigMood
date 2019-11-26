@@ -83,16 +83,6 @@ public interface Repository {
      */
     void deleteMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
 
-//    /**
-//     * This method is used to delete all of the moods that belong to a user.
-//     * It is only used for testing, so as to stop clogging up the user with 50+ moods
-//     * @param user The user who's moods we want to delete
-//     * @param successListener A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request)
-//     * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
-//     */
-//    @VisibleForTesting
-//    void deleteAllMoods(User user, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
-
     /**
      * this method attempts to modify a Mood in the database given the parameters.
      * @param user The User where we would find the given Mood.

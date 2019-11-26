@@ -43,13 +43,13 @@ public class US010501Test {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         appPreferences = AppPreferences.getInstance();
 
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
         // TODO: 2019-11-06 Cameron:
         solo.waitForText("HillyBillyBobTesterino", 0, 2000);
     }
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
-        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class US010501Test {
         //make sure there are no new elements in the list (ie, after we added the mood, it was deleted)
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
 
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
+//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
 
     }
 

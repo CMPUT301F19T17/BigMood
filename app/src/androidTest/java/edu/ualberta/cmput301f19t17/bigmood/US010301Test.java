@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
@@ -26,11 +27,22 @@ import static org.junit.Assert.assertTrue;
 
 public class US010301Test {
     private Solo solo;
-    private AppPreferences appPreferences;
+    private static AppPreferences appPreferences;
+    private static MockRepository mockRepository;
 
-    @BeforeClass //runs before anything else runs
-    public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
+    @BeforeClass
+    public static void setRepository() {
+
+        // Set app preferences
+        US010301Test.appPreferences = AppPreferences.getInstance();
+
+        // Create new in-memory database and set the app preferences to use it
+        US010301Test.mockRepository = new MockRepository();
+        US010301Test.appPreferences.setRepository(US010301Test.mockRepository);
+
+        // Login with a user from the database using a specialized method in MockRepository
+        US010301Test.appPreferences.login(US010301Test.mockRepository.getUser("user1"));
+
     }
 
     @Rule
@@ -39,74 +51,51 @@ public class US010301Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance(); // used to call deleteAllMoods method
-        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        solo.waitForText("text", 0, 1000);
-    }
-    @AfterClass //runs after all tests have run
-    public static void cleanUp() {
-        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+        appPreferences = AppPreferences.getInstance();
+        solo.sleep(1000);
     }
 
     @Test
     public void testDisplayStateTimeDate() {
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
-        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
 
-        solo.clickInList(1, 0);
+        // DON'T USE clickInList it's very buggy
+        // click on the FIRST occurrence of the Happy mood (in this case mood3)
+        solo.clickOnMenuItem("Happy");
 
         Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
         assertTrue(R.drawable.ic_emoticon_happy == drawableID);
-
         assertTrue(solo.waitForText("Happy", 1, 2000));
     }
 
     @Test
     public void  testDisplayStateTimeDateSituation() {
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
-        solo.pressSpinnerItem(0, EmotionalState.SURPRISE.getStateCode());
-        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode());
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
-
-        solo.clickInList(1, 0);
+        //click on mood4
+        solo.clickOnMenuItem("Sad");
 
         Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertEquals(R.drawable.ic_emoticon_surprise, (int) drawableID);
+        assertEquals(R.drawable.ic_emoticon_sad, (int) drawableID);
 
-        assertTrue(solo.waitForText("Surprise", 1, 2000));
+        assertTrue(solo.waitForText("Sad", 1, 2000));
         assertTrue(solo.waitForText("Crowd", 1, 2000));
     }
 
     @Test
     public void  testDisplayStateTimeDateSituationReason() {
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
-        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode());
-        solo.pressSpinnerItem(3, SocialSituation.ALONE.getSituationCode());
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "Stepped on poop");
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
-
-        solo.clickInList(1, 0);
-
-        solo.waitForDialogToClose();
-
-        solo.clickInList(1, 0);
+        //click on mood3
+        solo.clickOnMenuItem("Happy");
 
         Integer drawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_disgust == drawableID);
+        assertTrue(R.drawable.ic_emoticon_happy == drawableID);
 
-        assertTrue(solo.waitForText("Disgusted", 1, 2000));
-        assertTrue(solo.waitForText("Alone", 1, 2000));
-        assertTrue(solo.waitForText("Stepped on poop", 1, 2000));
+        assertTrue(solo.waitForText("Happy", 1, 2000));
+        assertTrue(solo.waitForText("Two to several people", 1, 2000));
+        assertTrue(solo.waitForText("user1 - mood3", 1, 2000));
     }
 
     /**
