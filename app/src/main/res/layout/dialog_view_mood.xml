@@ -51,7 +51,7 @@
                 android:contentDescription="@string/description_placeholder_emote"
                 app:layout_constraintStart_toStartOf="@+id/textview_label_emotional_state"
                 app:layout_constraintTop_toBottomOf="@+id/textview_label_emotional_state"
-                app:srcCompat="@drawable/ic_placeholder_image_black_24dp" />
+                app:srcCompat="@drawable/ic_no_image_black_24dp" />
 
             <TextView
                 android:id="@+id/textview_label_date"
@@ -179,7 +179,7 @@
                 app:layout_constraintEnd_toEndOf="@+id/textview_label_image"
                 app:layout_constraintStart_toStartOf="@+id/textview_label_image"
                 app:layout_constraintTop_toBottomOf="@+id/textview_label_image"
-                app:srcCompat="@drawable/ic_placeholder_image_black_24dp" />
+                app:srcCompat="@drawable/ic_no_image_black_24dp" />
 
             <TextView
                 android:id="@+id/textview_label_location"
@@ -220,7 +220,7 @@
                     android:id="@+id/image_view_placeholder_location"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_placeholder_image_black_24dp"/>
+                    app:srcCompat="@drawable/ic_no_location_black_24dp"/>
 
             </FrameLayout>
 

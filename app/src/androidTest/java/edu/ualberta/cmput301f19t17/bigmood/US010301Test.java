@@ -20,6 +20,7 @@ import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class US010301Test {
@@ -57,45 +58,56 @@ public class US010301Test {
     public void testDisplayBasicMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
-        // Add a happy mood
+        // Add a surprise mood
+        EmotionalState emotionalState = EmotionalState.SURPRISE;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.HAPPINESS.toString());
+        solo.clickOnText(emotionalState.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.HAPPINESS.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString(), 1, 2000));
+        assertTrue(emotionalState.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalState.toString(), 1, 2000));
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.placeholder_situation), 1, 2000));
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.placeholder_reason), 1, 2000));
 
         Integer photographImageViewTag = (Integer) solo.getView(R.id.image_view_placeholder_photo).getTag();
-        assertTrue(photographImageViewTag == R.drawable.ic_placeholder_image_black_24dp);
+        assertTrue(photographImageViewTag == R.drawable.ic_no_image_black_24dp);
 
         // Needs to be refactored b/c at the time this was written the location is hardcoded to [32.32 N, 142.22 E] and not null
         // When refactoring go to ViewMoodDialogFragment and reposition setTag for map image view
         Integer mapImageViewTag = (Integer) solo.getView(R.id.image_view_placeholder_location).getTag();
-        assertTrue(mapImageViewTag == R.drawable.ic_placeholder_image_black_24dp);
+        assertTrue(mapImageViewTag == R.drawable.ic_no_image_black_24dp);
+
+
     }
 
+    // NOT DONE: check photograph and map
     @Test // A full mood refers to a mood where the state, social situation, reason, photograph, and map are all provided
     public void testDisplayFullMood() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
         // Add an anger mood
+        EmotionalState emotionalState = EmotionalState.ANGER;
+        SocialSituation socialSituation = SocialSituation.CROWD;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.ANGER.toString());
+        solo.clickOnText(emotionalState.toString());
 
         View situationSpinner = solo.getView(R.id.situation_spinner);
         solo.clickOnView(situationSpinner);
-        solo.clickOnText(SocialSituation.CROWD.toString());
+        solo.clickOnText(socialSituation.toString());
 
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(),"some reason");
         solo.clickOnView(solo.getView(R.id.action_save));
@@ -104,11 +116,30 @@ public class US010301Test {
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.ANGER.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.ANGER.toString(), 1, 2000));
-        assertTrue(solo.waitForText(SocialSituation.CROWD.toString(), 1, 2000));
+        assertTrue(emotionalState.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalState.toString(), 1, 2000));
+        assertTrue(solo.waitForText(socialSituation.toString(), 1, 2000));
         assertTrue(solo.waitForText("some reason", 1, 2000));
         // missing photograph and map check
+    }
+
+    @Test
+    public void testViewUserMood() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        solo.clickInList(1, 0);
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.menu_option_edit), 1, 2000));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.menu_option_delete), 1, 2000));
+    }
+
+    @Test
+    public void testViewFollowingMood() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_following));
+        solo.clickInList(1, 0);
+        assertFalse(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.menu_option_edit), 1, 2000));
+        assertFalse(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.menu_option_delete), 1, 2000));
     }
 
     /**

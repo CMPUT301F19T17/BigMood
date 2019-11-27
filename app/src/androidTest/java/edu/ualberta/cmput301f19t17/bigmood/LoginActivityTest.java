@@ -55,8 +55,8 @@ public class LoginActivityTest {
     @Test
     public void testWrongUsername() {
         solo.assertCurrentActivity("Wrong activity", LoginActivity.class);
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "NotForTestingOnly");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "password");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "wrongUsername");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "p1");
         solo.clickOnView(solo.getView(R.id.button_login));
         assertTrue(solo.waitForText("Username/password incorrect", 1, 1000));
     }
@@ -64,8 +64,8 @@ public class LoginActivityTest {
     @Test
     public void testWrongPassword() {
         solo.assertCurrentActivity("Wrong activity", LoginActivity.class);
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "ForTestingOnly");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "HELLO");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "user1");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_password)).getEditText(), "wrongPassword");
         solo.clickOnView(solo.getView(R.id.button_login));
         assertTrue(solo.waitForText("Username/password incorrect", 1, 1000));
     }
