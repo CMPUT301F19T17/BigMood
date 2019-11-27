@@ -124,7 +124,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         TextView situationTextView = view.findViewById(R.id.textview_placeholder_situation);
         TextView reasonTextView = view.findViewById(R.id.textview_placeholder_reason);
         ImageView photoImageView = view.findViewById(R.id.image_view_placeholder_photo);
-        locationImageView = view.findViewById(R.id.imageview_placeholder_location);
+        locationImageView = view.findViewById(R.id.image_view_placeholder_location);
 
         // Set state to the nice name defined by the enumeration
         stateTextView.setText(this.moodToView.getState().toString());

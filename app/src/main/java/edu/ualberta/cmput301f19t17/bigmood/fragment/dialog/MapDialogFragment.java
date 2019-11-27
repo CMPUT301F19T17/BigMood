@@ -133,8 +133,6 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         }
     }
 
-
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
