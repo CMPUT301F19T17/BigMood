@@ -39,6 +39,7 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.navigation:navigation-runtime:2.1.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -50,6 +51,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
+    implementation 'com.master.android:permissionhelper:2.1'
 
 }
 

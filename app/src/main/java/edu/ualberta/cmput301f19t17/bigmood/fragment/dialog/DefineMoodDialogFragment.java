@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.dialog;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -7,6 +8,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.text.TextUtils;
+import android.widget.Button;
+import android.widget.Toast;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +24,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.master.permissionhelper.PermissionHelper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -28,6 +43,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
@@ -39,16 +55,18 @@ import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
+import edu.ualberta.cmput301f19t17.bigmood.model.LocationHelper;
 
 import static android.app.Activity.RESULT_OK;
 
 /**
  * DefineMoodDialogFragment is used to create a new mood, or edit a currently existing mood
  */
-public class DefineMoodDialogFragment extends DialogFragment {
+public class DefineMoodDialogFragment extends DialogFragment implements OnMapReadyCallback {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_PICK_IMAGE = 2;
+
 
     private Toolbar toolbar;
 
@@ -67,6 +85,27 @@ public class DefineMoodDialogFragment extends DialogFragment {
     private TextInputLayout reasonInputLayout;
 
     private ImageView imageView;
+
+    private View mapContainer;
+
+
+    private LocationHelper locationHelper;
+    private PermissionHelper permissionHelper;
+    private GoogleMap googleMap;
+    private MapView mMapView;
+    private View addLocation;
+    private LatLng savedLatLng;
+
+    // set up the mLocationUpdatesListener
+    private LocationHelper.LocationRequestUpdatesListener mLocationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (isAdded() && googleMap != null) {
+                LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                addMarkerAtLocation(currentLatLng);
+            }
+        }
+    };
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -202,9 +241,45 @@ public class DefineMoodDialogFragment extends DialogFragment {
         this.stateSpinnerAdapter = new StateSpinnerAdapter(this.getContext());
         this.situationSpinnerAdapter = new SituationSpinnerAdapter(this.getContext());
 
+        // Find and set the map container and add location label
+        this.mapContainer = view.findViewById(R.id.map_container);
+        this.addLocation = view.findViewById(R.id.add_location_label);
+
+        // initialize the locationhelper
+        locationHelper = new LocationHelper(getContext());
+        locationHelper.setLocationUpdatesListener(mLocationUpdatesListener);
+
         // Return view that has been created
         return view;
 
+    }
+
+    /**
+     * This method adds a marker on the googleMap reference, given a latitude and longitude
+     * @param latLng the latitude and longitude at which we are adding a marker
+     */
+    private void addMarkerAtLocation(LatLng latLng) {
+        if (googleMap != null) {
+            googleMap.clear();
+            googleMap.addMarker(new MarkerOptions().position(latLng));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            this.savedLatLng = latLng;
+        }
+    }
+
+    /**
+     * This method calls the onRequestPermissionsResult in the superclass of DefineMoodDialogFragment,
+     * and calls that same method on our permissionHelper if it is not null.
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (permissionHelper != null) {
+            permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     /**
@@ -296,10 +371,10 @@ public class DefineMoodDialogFragment extends DialogFragment {
            @Override
             public void onClick(View v) {
                 String title = "Open Photo";
-                CharSequence[] itemlist ={"Take a Photo",
+                CharSequence[] itemlist = {"Take a Photo",
                         "Pick from Gallery"};
 
-               AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle(title);
                 builder.setItems(itemlist, new DialogInterface.OnClickListener() {
 
@@ -308,11 +383,11 @@ public class DefineMoodDialogFragment extends DialogFragment {
                         switch (which) {
                             case 0:// Take Photo
                                 // Do Take Photo task here
-                                dispatchTakePictureIntent();
+                                askForCameraPermission();
                                 break;
                             case 1:// Choose Existing Photo
                                 // Do Pick Photo task here
-                                dispatchPickImageIntent();
+                                askForGalleryPermission();
                                 break;
                             default:
                                 break;
@@ -322,6 +397,14 @@ public class DefineMoodDialogFragment extends DialogFragment {
                 AlertDialog alert = builder.create();
                 alert.setCancelable(true);
                 alert.show();
+            }
+        });
+
+        //onClickListener for the addLocation button
+        this.addLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                askForLocationPermission();
             }
         });
 
@@ -371,8 +454,6 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
                     }
 
-                    // TODO add image, location - canned for now
-
                     // Declare mood. Can be initialized as an "old" mood (with firestoreId) or a "new" mood (without firestoreId).
                     Mood mood;
 
@@ -384,7 +465,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
                                 calendar,
                                 socialSituation,
                                 reason,
-                                new GeoPoint(32.32, 142.22),
+                                new GeoPoint(savedLatLng != null ? savedLatLng.latitude : 0,
+                                        savedLatLng != null ? savedLatLng.longitude : 0),
                                 null
                         );
 
@@ -395,7 +477,8 @@ public class DefineMoodDialogFragment extends DialogFragment {
                                 calendar,
                                 socialSituation,
                                 reason,
-                                new GeoPoint(32.32, 142.22),
+                                new GeoPoint(savedLatLng != null ? savedLatLng.latitude : 0,
+                                        savedLatLng != null ? savedLatLng.longitude : 0),
                                 null
                         );
 
@@ -413,6 +496,199 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
             }
         });
+
+        mMapView = (MapView) view.findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+
+        mMapView.onResume(); // needed to get the map to display immediately
+
+        //initalize the MapsInitializer
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // set up the mapView to update asynchronously whenever theres an update
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                DefineMoodDialogFragment.this.googleMap = googleMap;
+                DefineMoodDialogFragment.this.googleMap.getUiSettings().setAllGesturesEnabled(false);
+
+                if (moodToEdit != null && moodToEdit.getLocation() != null && moodToEdit.getLocation().getLatitude() != 0) {
+                    addLocation.setVisibility(View.GONE);
+                    LatLng currentLatLng = new LatLng(moodToEdit.getLocation().getLatitude(), moodToEdit.getLocation().getLongitude());
+                    addMarkerAtLocation(currentLatLng);
+                }
+            }
+        });
+
+    }
+
+    /**
+     * This method is called when the user wants to add a location.
+     * It makes sure the app is allowed to access the device's location
+     */
+    private void askForLocationPermission() {
+        permissionHelper = new PermissionHelper(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+        permissionHelper.request(new PermissionHelper.PermissionCallback() {
+            @Override
+            public void onPermissionGranted() {
+                // initialize the locationHelper and hide the addLocationButton
+                locationHelper.init();
+                addLocation.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onIndividualPermissionGranted(String[] grantedPermission) {
+
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                Toast.makeText(getContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionDeniedBySystem() {
+
+            }
+        });
+    }
+
+    /**
+     * This method is called when the user wants to add an image from their photo gallery.
+     * It makes sure the app is allowed to access the device's gallery
+     */
+    private void askForGalleryPermission() {
+        permissionHelper = new PermissionHelper(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+        permissionHelper.request(new PermissionHelper.PermissionCallback() {
+            @Override
+            public void onPermissionGranted() {
+                // pick the image from the gallery
+                dispatchPickImageIntent();
+            }
+
+            @Override
+            public void onIndividualPermissionGranted(String[] grantedPermission) {
+
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                Toast.makeText(getContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionDeniedBySystem() {
+
+            }
+        });
+    }
+
+    /**
+     * This method is called when the user wants to add an image by taking a new picture using the camera
+     * It makes sure the app is allowed to access the device's camera
+     */
+    private void askForCameraPermission() {
+        permissionHelper = new PermissionHelper(this, new String[]{Manifest.permission.CAMERA}, 100);
+        permissionHelper.request(new PermissionHelper.PermissionCallback() {
+            @Override
+            public void onPermissionGranted() {
+                // take the picture
+                dispatchTakePictureIntent();
+            }
+
+            @Override
+            public void onIndividualPermissionGranted(String[] grantedPermission) {
+
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                Toast.makeText(getContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionDeniedBySystem() {
+
+            }
+        });
+    }
+
+    /**
+     * This method is called when the user leaves this app to do something else, like add a picture
+     * @param outState the state that the app is in, save it so that we can pick up where we left off
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * This method is called when the user returns to this app from another app, like the camera
+     * It resumes from the outState that is saved in onSaveInstanceState (i believe)
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMapView.onResume();
+    }
+
+    /**
+     * From https://developer.android.com/guide/components/activities/activity-lifecycle
+     * "The system calls this method as the first indication that the user is leaving your activity...
+     * it indicates that the activity is no longer in the foreground"
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapView.onPause();
+    }
+
+    /**
+     * From https://developer.android.com/guide/components/activities/activity-lifecycle
+     * "onDestroy() is called before the activity is destroyed. The system invokes this callback either because:
+     * the activity is finishing (due to the user completely dismissing the activity or due to finish() being called on the activity), or
+     * the system is temporarily destroying the activity due to a configuration change (such as device rotation or multi-window mode)"
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (locationHelper != null) {
+            locationHelper.stopLocationUpdates();
+        }
+        if (mMapView != null) {
+            mMapView.onDestroy();
+        }
+    }
+
+    /**
+     * This method is called when the view itself (DefineMoodDialogFragment that is) is destroyed
+     */
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    /**
+     * This method is called when the phone we are running on has a small amount of RAM memory left
+     * I believe that calling mMapView.onLowMemory()
+     */
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
+    }
+
+    /**
+     * This method is called when the map is ready
+     * @param googleMap The map that is now ready
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        this.googleMap.getUiSettings().setAllGesturesEnabled(false);
     }
 
     /**
@@ -476,5 +752,7 @@ public class DefineMoodDialogFragment extends DialogFragment {
 
         }
     }
+
+
 
 }
