@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
@@ -196,19 +198,19 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
          * WILL IMPLEMENT THIS CODE AFTER WE FIGURE HOW TO GET THE LOCATION OF A MOOD
          * THE CODE ABOVE IS A TEST OF THE MAP
          */
-
-        for (int i = 0; i < moodAdapter.getCount(); i++ ) {
-            Mood moodToMark = moodAdapter.getItem(i);
-            if (moodToMark != null) {
-                makeMoodMarker(googleMap, moodToMark);
+        if (moodAdapter.getCount() == 0) {
+            Toast.makeText(this.getContext(), "There is no mood to display!", Toast.LENGTH_SHORT).show();
+        } else {
+            for (int i = 0; i < moodAdapter.getCount(); i++) {
+                Mood moodToMark = moodAdapter.getItem(i);
+                if (moodToMark != null) {
+                    makeMoodMarker(googleMap, moodToMark);
+                }
             }
+            // Center the camera at the most recent mood (?)
+            Mood recentMood = moodAdapter.getItem(0);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(recentMood.getLocation().getLatitude(), recentMood.getLocation().getLongitude())));
         }
-
-        // Center the camera at the most recent mood (?)
-        Mood recentMood = moodAdapter.getItem(0);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(recentMood.getLocation().getLatitude(), recentMood.getLocation().getLongitude())));
-
-
     }
 
     /**
