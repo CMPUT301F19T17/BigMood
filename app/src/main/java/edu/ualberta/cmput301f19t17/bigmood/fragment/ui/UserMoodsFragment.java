@@ -60,6 +60,7 @@ public class UserMoodsFragment extends Fragment {
      * @param savedInstanceState A bundle that holds the state of the fragment
      * @return Returns the inflated view
      */
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_user_moods, container, false);
 
