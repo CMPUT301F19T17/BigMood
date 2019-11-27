@@ -195,7 +195,8 @@ public class Mood implements Parcelable {
         out.writeString(this.datetime.getTimeZone().getID());
 
         // Write the situation as a string (from the enumeration)
-        out.writeString(this.situation.name());
+        // if (this.situation != null)
+            out.writeString(this.situation.name());
 
         // Write the reason as a string
         out.writeString(this.reason);

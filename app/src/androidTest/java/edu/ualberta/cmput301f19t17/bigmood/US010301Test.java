@@ -1,7 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
-import android.widget.Spinner;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
