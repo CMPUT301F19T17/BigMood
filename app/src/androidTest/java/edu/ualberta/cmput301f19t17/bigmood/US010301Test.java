@@ -39,10 +39,6 @@ public class US010301Test {
 
         // Login with a user from the database using a specialized method in MockRepository
         US010301Test.appPreferences.login(US010301Test.mockRepository.getUser("user1"));
-
-        // Clear the user's mood list
-        US010301Test.mockRepository.deleteAllUserMoods(US010301Test.appPreferences.getCurrentUser());
-
     }
 
     @Rule
@@ -51,6 +47,11 @@ public class US010301Test {
     @Before
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
+
+        // Clear the user's mood list
+        US010301Test.mockRepository.deleteAllUserMoods(US010301Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
     @Test // A basic mood refers to a mood where only the state is provided and the social situation, reason, photograph, and map are not provided
@@ -60,6 +61,10 @@ public class US010301Test {
         // Add a happy mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
+        //Add a slight the delay until the dialog has been opened (time may vary)
+        //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
+
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
         solo.clickOnText(EmotionalState.HAPPINESS.toString());
@@ -88,6 +93,9 @@ public class US010301Test {
         // Add an anger mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
+        //Add a slight the delay until the dialog has been opened (time may vary)
+        //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);

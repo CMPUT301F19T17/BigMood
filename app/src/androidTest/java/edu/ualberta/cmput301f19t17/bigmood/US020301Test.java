@@ -39,8 +39,6 @@ public class US020301Test {
 
         // Login with a user from the database using a specialized method in MockRepository
         US020301Test.appPreferences.login(US020301Test.mockRepository.getUser("user1"));
-        // Delete all previous mood
-        US020301Test.mockRepository.deleteAllUserMoods(US020301Test.mockRepository.getUser("user1"));
     }
 
     @Rule
@@ -49,8 +47,10 @@ public class US020301Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-        solo.sleep(1000);
+        // Clear the user's mood list
+        US020301Test.mockRepository.deleteAllUserMoods(US020301Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
     @Test
@@ -59,6 +59,10 @@ public class US020301Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
+        //Add a slight the delay until the dialog has been opened (time may vary)
+        //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
+
         solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()+1);
 
         solo.clickOnView(solo.getView(R.id.action_save));
@@ -66,7 +70,6 @@ public class US020301Test {
 
         solo.clickInList(0);
         assertTrue(solo.waitForText(SocialSituation.SEVERAL.toString()));
-
     }
 
     /**
