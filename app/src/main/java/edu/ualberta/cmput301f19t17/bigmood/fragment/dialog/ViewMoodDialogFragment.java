@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +16,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,6 +40,10 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
     private Toolbar toolbar;
     protected Mood moodToView;
+
+    private MapView mMapView;
+    private GoogleMap googleMap;
+    private View locationImageView;
 
     /**
      * This is the default constructor for the dialog. newInstance() methods. Technically a user of this class should not use this constructor. If it happens, the class will eventually log a message when spawned.
@@ -110,7 +124,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         TextView situationTextView = view.findViewById(R.id.textview_placeholder_situation);
         TextView reasonTextView = view.findViewById(R.id.textview_placeholder_reason);
         ImageView photoImageView = view.findViewById(R.id.image_view_placeholder_photo);
-        ImageView locationImageView = view.findViewById(R.id.map_container);
+        locationImageView = view.findViewById(R.id.imageview_placeholder_location);
 
         // Set state to the nice name defined by the enumeration
         stateTextView.setText(this.moodToView.getState().toString());
@@ -147,8 +161,49 @@ public class ViewMoodDialogFragment extends DialogFragment {
             locationImageView.setTag(R.drawable.ic_placeholder_image_black_24dp);
         }
 
+        mMapView = (MapView) view.findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+
+        mMapView.onResume(); // needed to get the map to display immediately
+
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                ViewMoodDialogFragment.this.googleMap = googleMap;
+                ViewMoodDialogFragment.this.googleMap.getUiSettings().setAllGesturesEnabled(false);
+
+                if (moodToView != null && moodToView.getLocation() != null && moodToView.getLocation().getLatitude() != 0) {
+                    locationImageView.setVisibility(View.GONE);
+                    mMapView.setVisibility(View.VISIBLE);
+                    LatLng currentLatLng = new LatLng(moodToView.getLocation().getLatitude(), moodToView.getLocation().getLongitude());
+                    addMarkerAtLocation(currentLatLng);
+                }
+            }
+        });
+
         return this.buildDialog(view);
 
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+    }
+
+    private void addMarkerAtLocation(LatLng latLng) {
+        if (googleMap != null) {
+            googleMap.clear();
+            googleMap.addMarker(new MarkerOptions().position(latLng));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
     }
 
     /**
