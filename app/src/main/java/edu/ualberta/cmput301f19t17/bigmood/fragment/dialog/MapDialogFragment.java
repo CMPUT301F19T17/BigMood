@@ -8,10 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,17 +38,18 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
  * their mood. This is currently not implemented yet.
  * */
 public class MapDialogFragment extends DialogFragment implements OnMapReadyCallback {
+
+    private static final String MAP_VIEW_BUNDLE_KEY = "edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapViewBundleKey";
+
     private MapView mapView;
     private GoogleMap googleMap;
     private MoodAdapter moodAdapter;
     private Toolbar toolbar;
-    private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     /**
      * This is the constructor. We pass in a moodAdapter then show the map with the marker being the mood in the adapter
      * @param moodAdapter
      */
-
     public MapDialogFragment(MoodAdapter moodAdapter) {
         this.moodAdapter = moodAdapter;
     }
@@ -81,14 +81,15 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.dialog_view_user_map, null, false);
 
-
         Bundle mapViewBundle = null;
+
+        // If we're returning from a previosuly saved instance, restore it as such
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
         }
 
         this.toolbar = view.findViewById(R.id.toolbar_view_map);
-        this.mapView = view.findViewById(R.id.map_view);
+        this.mapView = view.findViewById(R.id.mapview_mood);
         this.mapView.onCreate(mapViewBundle);
         this.mapView.getMapAsync(this);
 
@@ -133,11 +134,16 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         }
     }
 
+    /**
+     * Create a bundle that will save the state of the map view if the app is switched out
+     * @param outState
+     */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         Bundle mapViewBundle = outState.getBundle(MAP_VIEW_BUNDLE_KEY);
+
         if (mapViewBundle == null) {
             mapViewBundle = new Bundle();
             outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle);
@@ -146,28 +152,45 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         mapView.onSaveInstanceState(mapViewBundle);
     }
 
+    /**
+     * Override onResume() in order to tell the MapView to react to this event
+     */
     @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
     }
 
-
+    /**
+     * Override onStop() in order to tell the MapView to react to this event
+     */
     @Override
     public void onStop() {
         super.onStop();
         mapView.onStop();
     }
+
+    /**
+     * Override onPause() in order to tell the MapView to react to this event
+     */
     @Override
     public void onPause() {
         mapView.onPause();
         super.onPause();
     }
+
+    /**
+     * Override onDestroy() in order to tell the MapView to react to this event
+     */
     @Override
     public void onDestroy() {
         mapView.onDestroy();
         super.onDestroy();
     }
+
+    /**
+     * Override onLowMemory() in order to tell the MapView to react to this event
+     */
     @Override
     public void onLowMemory() {
         super.onLowMemory();
@@ -232,10 +255,12 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
         icon = BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor());
 
-        googleMap.addMarker(new MarkerOptions().position(moodLocation)
+        googleMap.addMarker(new MarkerOptions()
+                .position(moodLocation)
                 .icon(icon)
                 .title(moodDate)
-                .snippet(moodTime + " " + moodReason));
+                .snippet(moodTime + " " + moodReason)
+        );
     }
 
 }
