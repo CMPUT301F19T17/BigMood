@@ -8,6 +8,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -20,6 +21,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class US010401Test {
     private Solo solo;
@@ -69,12 +71,20 @@ public class US010401Test {
         solo.clickOnView(solo.getView(R.id.action_save));
 
         //make sure the edit worked by checking that the SADNESS shows up
-        solo.waitForText(EmotionalState.SADNESS.toString(), 1, 1000);
+        assertTrue(solo.waitForText(EmotionalState.SADNESS.toString(), 1, 1000));
 
         //make sure no new items were added, and no items deleted
         solo.sleep(2000);
         assertEquals(originalNumListItems, moodArrayAdapter.getCount());
 
+    }
+    /**
+     * Closes the activity after each test
+     * @throws Exception
+     */
+    @After
+    public void tearDown() throws Exception{
+        solo.finishOpenedActivities();
     }
 
 }

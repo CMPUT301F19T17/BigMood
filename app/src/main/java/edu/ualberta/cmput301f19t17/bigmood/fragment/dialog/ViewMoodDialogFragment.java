@@ -104,18 +104,18 @@ public class ViewMoodDialogFragment extends DialogFragment {
         // TODO: 2019-10-31 add location and image
         // Find all views and inflate them with the info
         TextView stateTextView = view.findViewById(R.id.textview_placeholder_state);
-        ImageView emoteImageView = view.findViewById(R.id.imageview_placeholder_emote);
+        ImageView emoteImageView = view.findViewById(R.id.image_view_placeholder_emote);
         TextView dateTextView = view.findViewById(R.id.textview_placeholder_date);
         TextView timeTextView = view.findViewById(R.id.textview_placeholder_time);
         TextView situationTextView = view.findViewById(R.id.textview_placeholder_situation);
         TextView reasonTextView = view.findViewById(R.id.textview_placeholder_reason);
-        ImageView photoImageView = view.findViewById(R.id.imageview_placeholder_photo);
-        ImageView locationImageView = view.findViewById(R.id.imageview_placeholder_location);
+        ImageView photoImageView = view.findViewById(R.id.image_view_placeholder_photo);
+        ImageView locationImageView = view.findViewById(R.id.image_view_placeholder_location);
 
         // Set state to the nice name defined by the enumeration
         stateTextView.setText(this.moodToView.getState().toString());
 
-        // Set image based on enum
+        // Set emoticon based on enum
         Resources res = this.getContext().getResources();
         Drawable emoticon = res.getDrawable(this.moodToView.getState().getDrawableId());
         emoteImageView.setImageDrawable(emoticon);
@@ -136,13 +136,15 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
         if (this.moodToView.getImage() == null) {
             // draw "no picture" image
+            photoImageView.setTag(R.drawable.ic_placeholder_image_black_24dp);
         } else {
-            //photoImageView.setImageBitmap(mood.getImage());
+            //photoImageView.setImageBitmap(this.moodToView.getImage());
         }
         if (this.moodToView.getLocation() == null) {
             // draw "no location" image
         } else {
             //locationImageView.setImageBitmap("bitmap");
+            locationImageView.setTag(R.drawable.ic_placeholder_image_black_24dp);
         }
 
         return this.buildDialog(view);

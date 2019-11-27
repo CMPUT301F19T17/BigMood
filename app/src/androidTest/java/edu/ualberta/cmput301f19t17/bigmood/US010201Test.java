@@ -16,18 +16,32 @@ import org.junit.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
-import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
+import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 import static org.junit.Assert.assertTrue;
 
 public class US010201Test {
     private Solo solo;
-    private AppPreferences appPreferences;
+    private static AppPreferences appPreferences;
+    private static MockRepository mockRepository;
 
-    @BeforeClass //runs before anything else runs
-    public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
+    // Sets up MockRepository to be used for testing. Gets ran before everything else.
+    @BeforeClass
+    public static void setRepository() {
+
+        // Set app preferences
+        US010201Test.appPreferences = AppPreferences.getInstance();
+
+        // Create new in-memory database and set the app preferences to use it
+        US010201Test.mockRepository = new MockRepository();
+        US010201Test.appPreferences.setRepository(US010201Test.mockRepository);
+
+        // Login with a user from the database using a specialized method in MockRepository
+        US010201Test.appPreferences.login(US010201Test.mockRepository.getUser("user1"));
+
+        // Clear the user's mood list
+        US010201Test.mockRepository.deleteAllUserMoods(US010201Test.appPreferences.getCurrentUser());
     }
 
     @Rule
@@ -36,118 +50,169 @@ public class US010201Test {
     @Before //runs before every test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 1000);
     }
 
     @Test
     public void testHappyEmoticon() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // Add a happy mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.HAPPINESS.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
+        // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(R.drawable.ic_emoticon_happy == listItemDrawableID);
+        assertTrue(EmotionalState.HAPPINESS.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString(), 1, 2000));
 
+        // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_happy == imageViewDrawableID);
+        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
+        assertTrue(EmotionalState.HAPPINESS.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString(), 1, 2000));
 
-        assertTrue(solo.waitForText("Happy", 1, 2000));
     }
 
     @Test
     public void testSadEmoticon() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // Add a sad mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode());
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.SADNESS.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
+        // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(R.drawable.ic_emoticon_sad == listItemDrawableID);
+        assertTrue(EmotionalState.SADNESS.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.SADNESS.toString(), 1, 2000));
 
+        // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_sad == imageViewDrawableID);
-
-        assertTrue(solo.waitForText("Sad", 1, 2000));
+        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
+        assertTrue(EmotionalState.SADNESS.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.SADNESS.toString(), 1, 2000));
     }
 
     @Test
     public void testAngerEmoticon() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // Add an anger mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.ANGER.getStateCode());
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.ANGER.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
+        // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(R.drawable.ic_emoticon_anger == listItemDrawableID);
+        assertTrue(EmotionalState.ANGER.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.ANGER.toString(), 1, 2000));
 
+        // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_anger == imageViewDrawableID);
-
-        assertTrue(solo.waitForText("Angry", 1, 2000));
+        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
+        assertTrue(EmotionalState.ANGER.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.ANGER.toString(), 1, 2000));
     }
 
     @Test
     public void testDisgustEmoticon() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // Add a disgust mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode());
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.DISGUST.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
+        // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(R.drawable.ic_emoticon_disgust == listItemDrawableID);
+        assertTrue(EmotionalState.DISGUST.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString(), 1, 2000));
 
+        // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_disgust == imageViewDrawableID);
-
-        assertTrue(solo.waitForText("Disgusted", 1, 2000));
+        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
+        assertTrue(EmotionalState.DISGUST.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString(), 1, 2000));
     }
 
     @Test
     public void testFearEmoticon() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // Add a fear mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.FEAR.getStateCode());
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.FEAR.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
+        // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(R.drawable.ic_emoticon_fear == listItemDrawableID);
+        assertTrue(EmotionalState.FEAR.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.FEAR.toString(), 1, 2000));
 
+        // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_fear == imageViewDrawableID);
-
-        assertTrue(solo.waitForText("Afraid", 1, 2000));
+        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
+        assertTrue(EmotionalState.FEAR.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.FEAR.toString(), 1, 2000));
     }
 
     @Test
     public void testSurpriseEmoticon() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        // Add a surprise mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.SURPRISE.getStateCode());
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.SURPRISE.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
+        // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(R.drawable.ic_emoticon_surprise == listItemDrawableID);
+        assertTrue(EmotionalState.SURPRISE.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.SURPRISE.toString(), 1, 2000));
 
+        // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.imageview_placeholder_emote).getTag();
-        assertTrue(R.drawable.ic_emoticon_surprise == imageViewDrawableID);
-
-        assertTrue(solo.waitForText("Surprise", 1, 2000));
+        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
+        assertTrue(EmotionalState.SURPRISE.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(EmotionalState.SURPRISE.toString(), 1, 2000));
     }
 
     /**
@@ -165,6 +230,7 @@ public class US010201Test {
      */
     @AfterClass //runs after all tests have run
     public static void cleanUp() {
-//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+        // Clear the user's mood list
+        US010201Test.mockRepository.deleteAllUserMoods(US010201Test.appPreferences.getCurrentUser());
     }
 }
