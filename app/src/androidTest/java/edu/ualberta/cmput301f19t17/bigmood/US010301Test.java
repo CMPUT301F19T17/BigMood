@@ -48,7 +48,7 @@ public class US010301Test {
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);
 
-    @Before //Clears the mood list before each test
+    @Before
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
