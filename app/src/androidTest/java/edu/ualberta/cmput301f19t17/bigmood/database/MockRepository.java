@@ -204,8 +204,7 @@ public class MockRepository implements Repository {
     }
 
     /**
-     * This method is used to delete all of the moods that belong to a user.
-     * It is only used for testing, so as to stop clogging up the user with 50+ moods
+     * This method is used to delete all of the moods that belong to a user. To avoid a crash I cannot automatically update the views when testing, so you MUST UPDATE THE VIEWS BY YOURSELF.
      * @param user The user whose moods we want to delete
      */
     public void deleteAllUserMoods(User user) {
@@ -220,9 +219,6 @@ public class MockRepository implements Repository {
         }
 
         dbMoodList.clear();
-
-        this.updateUserMoodsListeners(user);
-        this.updateFollowingMoodsListeners(user);
 
     }
 
