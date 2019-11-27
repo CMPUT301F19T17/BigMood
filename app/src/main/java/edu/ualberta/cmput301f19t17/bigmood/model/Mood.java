@@ -163,12 +163,12 @@ public class Mood implements Parcelable {
 
         this.firestoreId = in.readString();
 
-        this.state = EmotionalState.valueOf(in.readString());
+        this.state = EmotionalState.findByStateCode(in.readInt());
 
         this.datetime = Calendar.getInstance(TimeZone.getTimeZone(in.readString()));
         this.datetime.setTimeInMillis(in.readLong());
 
-        this.situation = SocialSituation.valueOf(in.readString());
+        this.situation = SocialSituation.findBySituationCode(in.readInt());
         this.reason = in.readString();
         this.location = new GeoPoint(in.readLong(), in.readLong());
 
@@ -188,15 +188,17 @@ public class Mood implements Parcelable {
         out.writeString(this.firestoreId);
 
         // Write the state as a string (from the enumeration)
-        out.writeString(this.state.name());
+        out.writeInt(this.state.getStateCode());
 
         // Write timestamp and time zone ID
         out.writeLong(this.datetime.getTimeInMillis());
         out.writeString(this.datetime.getTimeZone().getID());
 
-        // Write the situation as a string (from the enumeration)
-        // if (this.situation != null)
-            out.writeString(this.situation.name());
+        // Write the situation as a string (from the enumeration). We have to handle the else case because of the order-sensitive nature of the parcel writing
+        if (this.situation != null)
+            out.writeInt(this.situation.getSituationCode());
+        else
+            out.writeInt(-1);
 
         // Write the reason as a string
         out.writeString(this.reason);
