@@ -1,8 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -10,7 +8,6 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -19,12 +16,8 @@ import org.junit.Test;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
-import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 // TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
 /**
@@ -56,17 +49,13 @@ public class US010101Test {
     @Before //runs before every test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-//      appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());\
-        //solo.waitForText("HillyBillyBobTesterino", 0, 1000);
 
-//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
-        //solo.sleep(3000);
+        // Delete all moods and refresh the list manually. We click on the second mathc because we are already in the user moods (and the title is the first match). I realize this is a bit hacky but Robotium doesn't exactly make it easy to click on the navigation bar
+        US010101Test.mockRepository.deleteAllUserMoods(appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
+
     }
-
-/*    @AfterClass //runs after all tests have run
-    public static void cleanUp() {
-//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
-    }*/
 
     @Test
     public void checkAddMood() {
@@ -83,13 +72,8 @@ public class US010101Test {
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
-        //make sure the added mood is displayed
+        // TODO: make sure the added mood is displayed
 
-
-        /*ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
-
-        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString()));
-        assertEquals(1, moodArrayAdapter.getCount());*/
     }
 
     @Test
