@@ -156,6 +156,11 @@ public class MockRepository implements Repository {
         requestList.addAll(new ArrayList<>(Collections.singletonList(
                 new Request("user3user2", "user3", "user2")
         )));
+        // one more pending request from `user3` to `user2` for testing purpose
+        requestList.addAll(new ArrayList<>(Collections.singletonList(
+                new Request("user3user2", "user3", "user2")
+        )));
+
 
     }
 
