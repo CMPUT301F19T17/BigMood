@@ -86,6 +86,7 @@
     <string name="error_empty_password">Password cannot be empty</string>
     <string name="toast_success_request_sent">Request successfully sent.</string>
 
-    <string name="maps_key">AIzaSyC2DClq_TGEeVHpfSvDLt4UWRE8LSDOvWk</string>
+    <string name="title_user_maps">My Moods (Location)</string>
+    <string name="title_following_maps">Following (Location)</string>
 
 </resources>

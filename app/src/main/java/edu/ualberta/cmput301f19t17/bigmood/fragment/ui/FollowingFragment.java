@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -139,9 +138,10 @@ public class FollowingFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         if (item.getItemId() == R.id.action_maps_following) {
-            Toast.makeText(this.getContext(), "Display User Maps", Toast.LENGTH_SHORT).show();
-            MapDialogFragment mapDialogFragment = new MapDialogFragment(moodAdapter);
+
+            MapDialogFragment mapDialogFragment = new MapDialogFragment(moodAdapter, MapDialogFragment.Title.FOLLOWER);
             mapDialogFragment.show(getFragmentManager(), "FRAGMENT_VIEW_USER_MAP");
+
         }
         return super.onOptionsItemSelected(item);
 

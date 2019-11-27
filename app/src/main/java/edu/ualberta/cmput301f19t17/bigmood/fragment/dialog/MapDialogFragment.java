@@ -41,17 +41,47 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     private static final String MAP_VIEW_BUNDLE_KEY = "edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapViewBundleKey";
 
+    public enum Title {
+
+        USER(R.string.title_user_maps),
+        FOLLOWER(R.string.title_following_maps)
+        ;
+
+        private int stringId;
+
+        Title(int stringId) {
+            this.stringId = stringId;
+        }
+
+        public int getStringId() {
+            return stringId;
+        }
+    }
+
+    private Title title;
+
+    private Toolbar toolbar;
+
+    private MoodAdapter moodAdapter;
+
     private MapView mapView;
     private GoogleMap googleMap;
-    private MoodAdapter moodAdapter;
-    private Toolbar toolbar;
 
     /**
      * This is the constructor. We pass in a moodAdapter then show the map with the marker being the mood in the adapter
      * @param moodAdapter
      */
-    public MapDialogFragment(MoodAdapter moodAdapter) {
+    public MapDialogFragment(MoodAdapter moodAdapter, Title title) {
+
+        if (moodAdapter == null)
+            throw new IllegalArgumentException("MoodAdapter cannot be null");
+
+        if (title == null)
+            throw new IllegalArgumentException("Title cannot be null");
+
         this.moodAdapter = moodAdapter;
+        this.title = title;
+
     }
 
     /**
@@ -79,7 +109,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.dialog_view_user_map, null, false);
+        View view = inflater.inflate(R.layout.dialog_view_map, null, false);
 
         Bundle mapViewBundle = null;
 
@@ -106,6 +136,13 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Title is an enum and it cannot be null, so this is safe to do.
+        if (this.getContext() != null)
+            this.toolbar.setTitle(this.getContext().getString(this.title.getStringId()));
+        else
+            throw new IllegalStateException("Context was null, this should not happen!");
+
         this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
