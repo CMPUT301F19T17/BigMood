@@ -9,9 +9,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.Toast;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,27 +20,25 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.master.permissionhelper.PermissionHelper;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
+import com.master.permissionhelper.PermissionHelper;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
@@ -53,9 +48,9 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.SituationSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+import edu.ualberta.cmput301f19t17.bigmood.model.LocationHelper;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
-import edu.ualberta.cmput301f19t17.bigmood.model.LocationHelper;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -88,16 +83,15 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     private View mapContainer;
 
-
     private LocationHelper locationHelper;
     private PermissionHelper permissionHelper;
     private GoogleMap googleMap;
-    private MapView mMapView;
+    private MapView mapView;
     private View addLocation;
     private LatLng savedLatLng;
 
-    // set up the mLocationUpdatesListener
-    private LocationHelper.LocationRequestUpdatesListener mLocationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
+    // set up the locationUpdatesListener
+    private LocationHelper.LocationRequestUpdatesListener locationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
         @Override
         public void onLocationChanged(Location location) {
             if (isAdded() && googleMap != null) {
@@ -247,7 +241,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
         // initialize the locationhelper
         locationHelper = new LocationHelper(getContext());
-        locationHelper.setLocationUpdatesListener(mLocationUpdatesListener);
+        locationHelper.setLocationUpdatesListener(locationUpdatesListener);
 
         // Return view that has been created
         return view;
@@ -497,10 +491,10 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             }
         });
 
-        mMapView = (MapView) view.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
+        mapView = (MapView) view.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
 
-        mMapView.onResume(); // needed to get the map to display immediately
+        mapView.onResume(); // needed to get the map to display immediately
 
         //initalize the MapsInitializer
         try {
@@ -510,7 +504,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         }
 
         // set up the mapView to update asynchronously whenever theres an update
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 DefineMoodDialogFragment.this.googleMap = googleMap;
@@ -633,7 +627,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     /**
@@ -644,7 +638,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     /**
@@ -659,8 +653,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         if (locationHelper != null) {
             locationHelper.stopLocationUpdates();
         }
-        if (mMapView != null) {
-            mMapView.onDestroy();
+        if (mapView != null) {
+            mapView.onDestroy();
         }
     }
 
@@ -673,12 +667,12 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     /**
      * This method is called when the phone we are running on has a small amount of RAM memory left
-     * I believe that calling mMapView.onLowMemory()
+     * I believe that calling mapView.onLowMemory()
      */
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     /**
