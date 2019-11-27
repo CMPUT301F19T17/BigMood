@@ -7,6 +7,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -66,5 +67,14 @@ public class US020301Test {
         solo.clickInList(0);
         assertTrue(solo.waitForText(SocialSituation.SEVERAL.toString()));
 
+    }
+
+    /**
+     * Closes the activity after each test
+     * @throws Exception
+     */
+    @After
+    public void tearDown() throws Exception{
+        solo.finishOpenedActivities();
     }
 }

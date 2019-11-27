@@ -9,6 +9,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -79,8 +80,10 @@ public class US040201Test {
             }
         }
         // This assert also guarantees the filter at startup stay at None
-        // Call sleep for 1 second every time we count the number of Mood on the screen
-        solo.sleep(1000);
+        // Call sleep for 3 second every time we count the number of Mood on the screen
+        // The time of sleep may vary between each system's processor power
+
+        solo.sleep(3000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
@@ -108,13 +111,13 @@ public class US040201Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.sleep(1000);
+        solo.sleep(3000);
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
         // 2) Try to delete that Mood
         solo.clickOnMenuItem("Happy");
         solo.clickOnButton("DELETE");
-        solo.sleep(1000);
+        solo.sleep(3000);
         assertEquals(mood_quantity, moodArrayAdapter.getCount());
 
         // 3) Edit a mood
@@ -122,18 +125,24 @@ public class US040201Test {
         solo.clickOnButton("EDIT");
         solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.sleep(1000);
+        solo.sleep(3000);
         // The number of Happy Mood should be decrease by 1
         assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
         // Check if our Happy turn into Sad
         solo.clickOnView(filter);
         solo.clickOnMenuItem("Sad");
-        solo.sleep(1000);
+        solo.sleep(3000);
         // The number of Sad Mood should increase by 1
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
-//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-
     }
 
+    /**
+     * Closes the activity after each test
+     * @throws Exception
+     */
+    @After
+    public void tearDown() throws Exception{
+        solo.finishOpenedActivities();
+    }
 } 
