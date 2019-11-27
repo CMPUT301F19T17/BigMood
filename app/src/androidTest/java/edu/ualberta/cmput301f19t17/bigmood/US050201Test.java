@@ -36,7 +36,7 @@ public class US050201Test {
         US050201Test.appPreferences.setRepository(US050201Test.mockRepository);
 
         // Login with a user from the database using a specialized method in MockRepository
-        US050201Test.appPreferences.login(US050201Test.mockRepository.getUser("user1"));
+        US050201Test.appPreferences.login(US050201Test.mockRepository.getUser("user2"));
 
     }
 
@@ -48,24 +48,36 @@ public class US050201Test {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
 
+    // NOT DONE
     @Test
     public void acceptRequestTest(){
+        // Logged in as user2 who already has a pending request from user3
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-        // switch to the Following tab
-        solo.clickOnText("Requests");
-        solo.clickOnButton("ACCEPT");
-        assertTrue(solo.waitForText("Request successfully accepted.", 1, 2000));
 
+        // Go to Requests and accept the request from user3
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_requests));
+        solo.clickOnButton(solo.getCurrentActivity().getResources().getString(R.string.label_request_accept));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_success_request_accept), 1, 2000));
+
+        // Go to Following and check that user3's recent mood is there
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_following));
+        // waiting on the implementation of displaying the username of the person being followed
     }
+
+    // NOT DONE
     @Test
     public void rejectRequestTest(){
+        // Logged in as user2 who already has a pending request from user3
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-        // switch to the Following tab
-        solo.clickOnText("Requests");
-        solo.clickOnButton("REJECT");
-        assertTrue(solo.waitForText("Request successfully rejected.", 1, 2000));
 
+        // Go to Requests and reject the request from user3
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_requests));
+        solo.clickOnButton(solo.getCurrentActivity().getResources().getString(R.string.label_request_reject));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_success_request_reject), 1, 2000));
 
+        // Go to Following and check that user3's recent mood is not there
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_following));
+        // waiting on the implementation of displaying the username of the person being followed
     }
     /**
      * Closes the activity after each test

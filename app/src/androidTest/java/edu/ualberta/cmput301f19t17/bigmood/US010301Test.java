@@ -1,6 +1,7 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 import android.view.View;
+import android.widget.Spinner;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -51,8 +52,6 @@ public class US010301Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-        solo.sleep(1000);
     }
 
     @Test // A basic mood refers to a mood where only the state is provided and the social situation, reason, photograph, and map are not provided
@@ -62,7 +61,9 @@ public class US010301Test {
         // Add a happy mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.HAPPINESS.toString());
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
@@ -88,8 +89,15 @@ public class US010301Test {
         // Add an anger mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.pressSpinnerItem(0, EmotionalState.ANGER.getStateCode());
-        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()+1); // the +1 is to account for the default value in the situation spinner that is not in the enum SocialSituation
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.ANGER.toString());
+
+        View situationSpinner = solo.getView(R.id.situation_spinner);
+        solo.clickOnView(situationSpinner);
+        solo.clickOnText(SocialSituation.CROWD.toString());
+
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(),"some reason");
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();

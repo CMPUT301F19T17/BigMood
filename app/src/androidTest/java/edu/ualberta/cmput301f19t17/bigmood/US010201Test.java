@@ -59,8 +59,11 @@ public class US010201Test {
         // Add a happy mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
-        solo.pressSpinnerItem(0, 0);
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.HAPPINESS.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
@@ -84,8 +87,11 @@ public class US010201Test {
         // Add a sad mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode());
-        solo.pressSpinnerItem(0, 1);
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.SADNESS.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
@@ -108,8 +114,11 @@ public class US010201Test {
         // Add an anger mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //solo.pressSpinnerItem(0, EmotionalState.ANGER.getStateCode());
-        solo.pressSpinnerItem(0, 4);
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.ANGER.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
@@ -132,8 +141,11 @@ public class US010201Test {
         // Add a disgust mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode());
-        solo.pressSpinnerItem(0, 3);
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.DISGUST.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
@@ -156,8 +168,11 @@ public class US010201Test {
         // Add a fear mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //solo.pressSpinnerItem(0, EmotionalState.FEAR.getStateCode());
-        solo.pressSpinnerItem(0, 2);
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.FEAR.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
@@ -180,8 +195,11 @@ public class US010201Test {
         // Add a surprise mood
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //solo.pressSpinnerItem(0, EmotionalState.SURPRISE.getStateCode());
-        solo.pressSpinnerItem(0, 5);
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(EmotionalState.SURPRISE.toString());
+
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
