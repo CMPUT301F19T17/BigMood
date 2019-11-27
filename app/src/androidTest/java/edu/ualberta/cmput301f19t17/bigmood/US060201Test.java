@@ -33,10 +33,6 @@ public class US060201Test {
 
         // Login with a user from the database using a specialized method in MockRepository
         US060201Test.appPreferences.login(US060201Test.mockRepository.getUser("user1"));
-
-        // Clear the user's mood list
-        US060201Test.mockRepository.deleteAllUserMoods(US060201Test.appPreferences.getCurrentUser());
-
     }
 
     @Rule
@@ -45,6 +41,10 @@ public class US060201Test {
     @Before
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
+        // Clear the user's mood list
+        US060201Test.mockRepository.deleteAllUserMoods(US060201Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
     @Test

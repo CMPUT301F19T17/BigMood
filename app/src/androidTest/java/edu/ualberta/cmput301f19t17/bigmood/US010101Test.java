@@ -52,6 +52,12 @@ public class US010101Test {
     @Before //runs before every test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
+
+        // Delete all moods and refresh the list manually. We click on the second mathc because we are already in the user moods (and the title is the first match). I realize this is a bit hacky but Robotium doesn't exactly make it easy to click on the navigation bar
+        US010101Test.mockRepository.deleteAllUserMoods(appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
+
     }
 
     @Test

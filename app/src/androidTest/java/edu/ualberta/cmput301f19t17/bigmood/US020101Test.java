@@ -37,8 +37,6 @@ public class US020101Test {
 
         // Login with a user from the database using a specialized method in MockRepository
         US020101Test.appPreferences.login(US020101Test.mockRepository.getUser("user1"));
-        // Delete all previous mood
-        US020101Test.mockRepository.deleteAllUserMoods(US020101Test.mockRepository.getUser("user1"));
     }
 
     @Rule
@@ -47,8 +45,10 @@ public class US020101Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-        solo.sleep(1000);
+        // Clear the user's mood list
+        US020101Test.mockRepository.deleteAllUserMoods(US020101Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
     @Test
@@ -69,6 +69,9 @@ public class US020101Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
+        //Add a slight the delay until the dialog has been opened (time may vary)
+        //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
 
         solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "chk len too long");
         solo.clickOnView(solo.getView(R.id.action_save));

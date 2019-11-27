@@ -39,11 +39,6 @@ public class US040201Test {
 
         // Login with a user from the database using a specialized method in MockRepository
         US040201Test.appPreferences.login(US040201Test.mockRepository.getUser("user1"));
-        // Delete all previous mood
-        US040201Test.mockRepository.deleteAllUserMoods(US040201Test.mockRepository.getUser("user1"));
-
-
-
     }
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);
@@ -51,8 +46,10 @@ public class US040201Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-        solo.sleep(1000);
+        // Clear the user's mood list
+        US040201Test.mockRepository.deleteAllUserMoods(US040201Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
 
@@ -134,7 +131,6 @@ public class US040201Test {
         solo.sleep(3000);
         // The number of Sad Mood should increase by 1
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
-
     }
 
     /**
