@@ -5,11 +5,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,12 +19,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,9 +41,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 import com.master.permissionhelper.PermissionHelper;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
@@ -52,6 +59,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static android.app.Activity.RESULT_OK;
+import static edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity.LOG_TAG;
 
 /**
  * DefineMoodDialogFragment is used to create a new mood, or edit a currently existing mood
@@ -80,25 +88,65 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     private ImageView imageView;
 
-    private View mapContainer;
-
     private LocationHelper locationHelper;
     private PermissionHelper permissionHelper;
+
     private GoogleMap googleMap;
     private MapView mapView;
-    private View addLocation;
+
+    private View placeholderLocation;
+    private View placeholderImage;
+
+    private TextView buttonAttachImage;
+    private TextView buttonAttachLocation;
+
+    private ProgressBar progressBarImage;
+    private ProgressBar progressBarLocation;
+
     private LatLng savedLatLng;
+
+    private String currentPhotoPath;
 
     // set up the locationUpdatesListener
     private LocationHelper.LocationRequestUpdatesListener locationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
         @Override
         public void onLocationChanged(Location location) {
             if (isAdded() && googleMap != null) {
+
+                DefineMoodDialogFragment.this.placeholderLocation.setVisibility(View.GONE);
+                DefineMoodDialogFragment.this.mapView.setVisibility(View.VISIBLE);
+
+                DefineMoodDialogFragment.this.buttonAttachLocation.setEnabled(false);
+                DefineMoodDialogFragment.this.buttonAttachLocation.setTypeface(Typeface.DEFAULT);
+
+
+                DefineMoodDialogFragment.this.buttonAttachLocation.setTextColor(
+                        getResources().getColor(R.color.colorPrimaryDark)
+                );
+
+                DefineMoodDialogFragment.this.progressBarLocation.setProgress(100);
+
+                Handler handler = new Handler();
+                handler.postDelayed(
+
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                DefineMoodDialogFragment.this.progressBarLocation.setProgress(0);
+                                DefineMoodDialogFragment.this.progressBarLocation.setVisibility(View.INVISIBLE);
+                            }
+                        },
+
+                        1000
+                );
+
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 addMarkerAtLocation(currentLatLng);
+
             }
         }
     };
+
 
     /**
      * This is an interface contained by this class to define the method for the save action. A class can either implement this or define it as a new anonymous class
@@ -164,6 +212,10 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         this.listener = listener;
     }
 
+
+    // Spawning dialog //
+
+
     /**
      * of the on*()methods, this is the first. When we first want to create the dialog we set the theme to the fullscreen theme so that the edges match the parent. Here we also check for the existence of a mood in the arguments bundle and set it to our instance variable.
      * @param savedInstanceState a bundle that holds the state of the fragment
@@ -220,7 +272,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         this.reasonInputLayout = view.findViewById(R.id.text_input_reason);
 
         // Find and set the emotional state ImageView
-        this.imageView = view.findViewById(R.id.image);
+        this.imageView = view.findViewById(R.id.imageview_image);
 
         // Find and set the date/time spinners
         this.dateSpinner = view.findViewById(R.id.spinner_date);
@@ -235,44 +287,26 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         this.situationSpinnerAdapter = new SituationSpinnerAdapter(this.getContext());
 
         // Find and set the map container and add location label
-        this.mapContainer = view.findViewById(R.id.map_container);
-        this.addLocation = view.findViewById(R.id.add_location_label);
+        this.placeholderImage = view.findViewById(R.id.label_no_image);
+        this.placeholderLocation = view.findViewById(R.id.label_no_location);
+
+        // Find and set the textview buttons
+        this.buttonAttachImage = view.findViewById(R.id.textview_button_attach_image);
+        this.buttonAttachLocation = view.findViewById(R.id.textview_button_attach_location);
+
+        // Fina and set the progress bars
+        this.progressBarImage = view.findViewById(R.id.progressbar_image);
+        this.progressBarLocation = view.findViewById(R.id.progressbar_location);
 
         // initialize the locationhelper
-        locationHelper = new LocationHelper(getContext());
-        locationHelper.setLocationUpdatesListener(locationUpdatesListener);
+        this.locationHelper = new LocationHelper(getContext());
+        this.locationHelper.setLocationUpdatesListener(locationUpdatesListener);
+
+        this.mapView = (MapView) view.findViewById(R.id.mapview_location);
 
         // Return view that has been created
         return view;
 
-    }
-
-    /**
-     * This method adds a marker on the googleMap reference, given a latitude and longitude
-     * @param latLng the latitude and longitude at which we are adding a marker
-     */
-    private void addMarkerAtLocation(LatLng latLng) {
-        if (googleMap != null) {
-            googleMap.clear();
-            googleMap.addMarker(new MarkerOptions().position(latLng));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            this.savedLatLng = latLng;
-        }
-    }
-
-    /**
-     * This method calls the onRequestPermissionsResult in the superclass of DefineMoodDialogFragment,
-     * and calls that same method on our permissionHelper if it is not null.
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (permissionHelper != null) {
-            permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 
     /**
@@ -285,6 +319,10 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
         super.onViewCreated(view, savedInstanceState);
 
+        // If the context is null, we cannot proceed.
+        if (this.getContext() == null || this.getActivity() == null || this.getActivity().getApplicationContext() == null)
+            throw new IllegalStateException("Context is null, cannot proceed.");
+
         // Inflate Menu resource onto the toolbar
         this.toolbar.inflateMenu(R.menu.define_mood);
 
@@ -292,7 +330,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         this.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(HomeActivity.LOG_TAG, "Close button clicked");
+                Log.d(LOG_TAG, "Close button clicked");
                 DefineMoodDialogFragment.this.dismiss();
             }
         });
@@ -324,7 +362,13 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             if (! this.moodToEdit.getReason().equals(""))
                 this.reasonInputLayout.getEditText().setText(this.moodToEdit.getReason());
 
-            // TODO populate location and image
+            if (this.moodToEdit.getLocation() != null) {
+
+                // If there is a location, immediately hide/unhide the views
+                this.placeholderLocation.setVisibility(View.INVISIBLE);
+                this.mapView.setVisibility(View.VISIBLE);
+
+            }
 
         } else {
 
@@ -336,9 +380,30 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
         }
 
-        // If the context is null, we cannot proceed.
-        if (this.getContext() == null)
-            throw new IllegalStateException("Context is null, cannot create the array adapters");
+        // Initialize the map
+        this.mapView.onCreate(savedInstanceState);
+        this.mapView.onResume(); // needed to get the map to display immediately
+
+        // Initialize the MapsInitializer
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // set up the mapView to update asynchronously whenever there's an update
+        this.mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                DefineMoodDialogFragment.this.googleMap = googleMap;
+                DefineMoodDialogFragment.this.googleMap.getUiSettings().setAllGesturesEnabled(false);
+
+                if (moodToEdit != null && moodToEdit.getLocation() != null) {
+                    LatLng currentLatLng = new LatLng(moodToEdit.getLocation().getLatitude(), moodToEdit.getLocation().getLongitude());
+                    addMarkerAtLocation(currentLatLng);
+                }
+            }
+        });
 
         // Set text of date spinner. We are using a disabled spinner so we can be more consistent with the UI. We disable it so that the user cannot interact with it.
         dateSpinner.setAdapter(
@@ -358,47 +423,49 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                 ));
         timeSpinner.setEnabled(false);
 
-
-        // add click listener to the image to pick picture from gallery or camera
-        this.imageView.setOnClickListener(new View.OnClickListener() {
-           @Override
+        // onClickListener for the attach location button
+        this.buttonAttachLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                String title = "Open Photo";
-                CharSequence[] itemlist = {"Take a Photo",
-                        "Pick from Gallery"};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(title);
-                builder.setItems(itemlist, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:// Take Photo
-                                // Do Take Photo task here
-                                askForCameraPermission();
-                                break;
-                            case 1:// Choose Existing Photo
-                                // Do Pick Photo task here
-                                askForGalleryPermission();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.setCancelable(true);
-                alert.show();
+                askForLocationPermission();
             }
         });
 
-        //onClickListener for the addLocation button
-        this.addLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                askForLocationPermission();
-            }
+        // add click listener to the image to pick picture from gallery or camera
+        this.buttonAttachImage.setOnClickListener(new View.OnClickListener() {
+           @Override
+            public void onClick(View v) {
+
+                CharSequence[] itemList = {
+                        DefineMoodDialogFragment.this.getText(R.string.dialog_option_take_photo),
+                        DefineMoodDialogFragment.this.getText(R.string.dialog_option_gallery)
+                };
+
+               AlertDialog alert = new AlertDialog.Builder(getContext())
+                       .setTitle(DefineMoodDialogFragment.this.getString(R.string.title_attach_image))
+                       .setItems(itemList, new DialogInterface.OnClickListener() {
+
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               switch (which) {
+                                   case 0:// Take Photo
+                                       // Do Take Photo task here
+                                       askForCameraPermission();
+                                       break;
+
+                                   case 1:// Choose Existing Photo
+                                       // Do Pick Photo task here
+                                       askForGalleryPermission();
+                                       break;
+                               }
+                           }
+                       })
+                       .create();
+
+               alert.setCancelable(true);
+               alert.show();
+
+           }
         });
 
         // Set the OnMenuItemClickListener for the one menu option we have, which is SAVE. Just for extendability we check if the ID matches.
@@ -475,7 +542,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                                 null
                         );
 
-                    Log.d(HomeActivity.LOG_TAG, String.format("MOOD INFO:\n\tState: {%s}\n\tSituation: {%s}", mood.getState().toString(), (mood.getSituation() == null ? "null" : mood.getSituation().toString()) ));
+                    Log.d(LOG_TAG, String.format("MOOD INFO:\n\tState: {%s}\n\tSituation: {%s}", mood.getState().toString(), (mood.getSituation() == null ? "null" : mood.getSituation().toString()) ));
 
                     // Invoke the callback method with the mood and dismiss the fragment
                     DefineMoodDialogFragment.this.listener.onSavePressed(mood);
@@ -490,33 +557,171 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             }
         });
 
-        mapView = (MapView) view.findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
+    }
 
-        mapView.onResume(); // needed to get the map to display immediately
+    /**
+     * of the on*()methods, this is the fourth. We set the width and height of the view and also set its animation.
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
 
-        //initalize the MapsInitializer
-        try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
-        } catch (Exception e) {
-            e.printStackTrace();
+        Dialog dialog = this.getDialog();
+
+        if (dialog != null) {
+
+            int width = ViewGroup.LayoutParams.MATCH_PARENT;
+            int height = ViewGroup.LayoutParams.MATCH_PARENT;
+
+            dialog.getWindow().setLayout(width, height);
+            dialog.getWindow().setWindowAnimations(R.style.AppTheme_Slide);
+
         }
 
-        // set up the mapView to update asynchronously whenever theres an update
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                DefineMoodDialogFragment.this.googleMap = googleMap;
-                DefineMoodDialogFragment.this.googleMap.getUiSettings().setAllGesturesEnabled(false);
+    }
 
-                if (moodToEdit != null && moodToEdit.getLocation() != null && moodToEdit.getLocation().getLatitude() != 0) {
-                    addLocation.setVisibility(View.GONE);
-                    LatLng currentLatLng = new LatLng(moodToEdit.getLocation().getLatitude(), moodToEdit.getLocation().getLongitude());
-                    addMarkerAtLocation(currentLatLng);
-                }
-            }
-        });
 
+    // Lifecycle handling //
+
+
+    /**
+     * This method is called when the user leaves this app to do something else, like add a picture
+     * @param outState the state that the app is in, save it so that we can pick up where we left off
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * This method is called when the user returns to this app from another app, like the camera
+     * It resumes from the outState that is saved in onSaveInstanceState (i believe)
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    /**
+     * From https://developer.android.com/guide/components/activities/activity-lifecycle
+     * "The system calls this method as the first indication that the user is leaving your activity...
+     * it indicates that the activity is no longer in the foreground"
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    /**
+     * From https://developer.android.com/guide/components/activities/activity-lifecycle
+     * "onDestroy() is called before the activity is destroyed. The system invokes this callback either because:
+     * the activity is finishing (due to the user completely dismissing the activity or due to finish() being called on the activity), or
+     * the system is temporarily destroying the activity due to a configuration change (such as device rotation or multi-window mode)"
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (locationHelper != null) {
+            locationHelper.stopLocationUpdates();
+        }
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
+    }
+
+    /**
+     * This method is called when the view itself (DefineMoodDialogFragment that is) is destroyed
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    /**
+     * This method is called when the phone we are running on has a small amount of RAM memory left
+     * I believe that calling mapView.onLowMemory()
+     */
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    /**
+     * This method is called when the map is ready
+     * @param googleMap The map that is now ready
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        this.googleMap.getUiSettings().setAllGesturesEnabled(false);
+    }
+
+    /**
+     * This method calls the onRequestPermissionsResult in the superclass of DefineMoodDialogFragment,
+     * and calls that same method on our permissionHelper if it is not null.
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (permissionHelper != null) {
+            permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    // TODO: 2019-11-23 Ranajay: Add comments, javadoc, and finish photograph implementation
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//
+            this.imageView.setImageURI(Uri.parse(this.currentPhotoPath));
+            this.showImageView();
+
+        } else if ( (requestCode == REQUEST_PICK_IMAGE) && (resultCode == RESULT_OK) && (data != null) && (data.getData() != null) ) {
+
+            // Image was successfully picked, we have to turn off the placeholder and turn on the imageview
+            this.placeholderImage.setVisibility(View.INVISIBLE);
+            this.imageView.setVisibility(View.VISIBLE);
+
+            this.imageView.setImageURI(data.getData());
+            this.showImageView();
+
+        }
+    }
+
+    private void showImageView() {
+
+        this.placeholderImage.setVisibility(View.INVISIBLE);
+        this.imageView.setVisibility(View.VISIBLE);
+
+    }
+
+
+    // Location related //
+
+
+    /**
+     * This method adds a marker on the googleMap reference, given a latitude and longitude
+     * @param latLng the latitude and longitude at which we are adding a marker
+     */
+    private void addMarkerAtLocation(LatLng latLng) {
+        if (googleMap != null) {
+            googleMap.clear();
+            googleMap.addMarker(new MarkerOptions().position(latLng));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            this.savedLatLng = latLng;
+        }
     }
 
     /**
@@ -526,11 +731,15 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     private void askForLocationPermission() {
         permissionHelper = new PermissionHelper(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
         permissionHelper.request(new PermissionHelper.PermissionCallback() {
+
             @Override
             public void onPermissionGranted() {
                 // initialize the locationHelper and hide the addLocationButton
                 locationHelper.init();
-                addLocation.setVisibility(View.GONE);
+
+                progressBarLocation.setVisibility(View.VISIBLE);
+                progressBarLocation.setProgress(50);
+
             }
 
             @Override
@@ -547,8 +756,13 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             public void onPermissionDeniedBySystem() {
 
             }
+
         });
     }
+
+
+    // Image related //
+
 
     /**
      * This method is called when the user wants to add an image from their photo gallery.
@@ -610,108 +824,46 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         });
     }
 
-    /**
-     * This method is called when the user leaves this app to do something else, like add a picture
-     * @param outState the state that the app is in, save it so that we can pick up where we left off
-     */
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
 
     /**
-     * This method is called when the user returns to this app from another app, like the camera
-     * It resumes from the outState that is saved in onSaveInstanceState (i believe)
+     * Creates the intent to take a picture. Adapted from https://developer.android.com/training/camera/photobasics.html#java
      */
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    /**
-     * From https://developer.android.com/guide/components/activities/activity-lifecycle
-     * "The system calls this method as the first indication that the user is leaving your activity...
-     * it indicates that the activity is no longer in the foreground"
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    /**
-     * From https://developer.android.com/guide/components/activities/activity-lifecycle
-     * "onDestroy() is called before the activity is destroyed. The system invokes this callback either because:
-     * the activity is finishing (due to the user completely dismissing the activity or due to finish() being called on the activity), or
-     * the system is temporarily destroying the activity due to a configuration change (such as device rotation or multi-window mode)"
-     */
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (locationHelper != null) {
-            locationHelper.stopLocationUpdates();
-        }
-        if (mapView != null) {
-            mapView.onDestroy();
-        }
-    }
-
-    /**
-     * This method is called when the view itself (DefineMoodDialogFragment that is) is destroyed
-     */
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    /**
-     * This method is called when the phone we are running on has a small amount of RAM memory left
-     * I believe that calling mapView.onLowMemory()
-     */
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-
-    /**
-     * This method is called when the map is ready
-     * @param googleMap The map that is now ready
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        this.googleMap.getUiSettings().setAllGesturesEnabled(false);
-    }
-
-    /**
-     * of the on*()methods, this is the fourth. We set the width and height of the view and also set its animation.
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Dialog dialog = this.getDialog();
-
-        if (dialog != null) {
-
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
-
-            dialog.getWindow().setLayout(width, height);
-            dialog.getWindow().setWindowAnimations(R.style.AppTheme_Slide);
-
-        }
-
-    }
-
-    // TODO: 2019-11-23 Ranajay: Add comments, javadoc, and finish photograph implementation
-
     private void dispatchTakePictureIntent() {
+
+        // Create intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+            // Create the File where the photo should go
+            File photoFile;
+
+            try {
+
+                photoFile = createImageFile();
+
+            } catch (IOException e) {
+
+                // Error occurred while creating the File
+                Log.e(HomeActivity.LOG_TAG, "Local file saving failed, cannot take image.", e);
+                return;
+
+            }
+
+            // Continue only if the file was successfully created
+            if (photoFile != null) {
+
+                Uri photoURI = FileProvider.getUriForFile(
+                        this.getContext(),
+                        "edu.ualberta.cmput301f19t17.bigmood.fileprovider",
+                        photoFile);
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+            }
         }
+
     }
 
     private void dispatchPickImageIntent() {
@@ -722,31 +874,31 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(imageBitmap);
-        } else if (requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+    /**
+     * Creates an image file in the temporary app directory. Adapted from https://developer.android.com/training/camera/photobasics.html#java
+     * @return A file
+     * @throws IOException In case the file fails to write to disk
+     */
+    private File createImageFile() throws IOException {
 
-            Cursor cursor = getContext().getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.CANADA).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+        // Get the storage directory
+        File storageDir = this.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-            //imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-            imageView.setImageURI(data.getData());
+        // Create a file object with the name, suffix and location
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+        );
 
-        }
+        // Save a file: path for use with ACTION_VIEW intents
+        this.currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
-
 
 
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true">
@@ -21,7 +20,6 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:fillViewport="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -161,23 +159,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/label_image"
-                app:layout_constraintStart_toStartOf="@+id/image"
+                app:layout_constraintStart_toStartOf="@+id/framelayout_image"
                 app:layout_constraintTop_toBottomOf="@+id/text_input_reason" />
 
-            <ImageView
-                android:id="@+id/image"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@+id/map_container"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textview_title_image"
-                app:layout_constraintWidth_max="192dp"
-                app:srcCompat="@drawable/ic_no_image_black_24dp" />
 
             <TextView
                 android:id="@+id/textview_title_location"
@@ -186,41 +170,142 @@
                 android:layout_height="wrap_content"
                 android:text="@string/label_location"
                 app:layout_constraintBaseline_toBaselineOf="@+id/textview_title_image"
-                app:layout_constraintStart_toStartOf="@+id/map_container" />
+                app:layout_constraintStart_toStartOf="@+id/framelayout_map" />
 
             <FrameLayout
-                android:id="@+id/map_container"
+                android:id="@+id/framelayout_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toStartOf="@+id/framelayout_map"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textview_title_image"
+                app:layout_constraintWidth_max="192dp">
+
+                <ImageView
+                    android:id="@+id/imageview_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/label_image"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/label_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#aa000000"
+                    android:gravity="center"
+                    android:text="@string/label_no_image"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:visibility="visible" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/framelayout_map"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/image"
+                app:layout_constraintStart_toEndOf="@+id/framelayout_image"
                 app:layout_constraintTop_toBottomOf="@+id/textview_title_location"
-                app:layout_constraintWidth_max="192dp"
-                android:clickable="true">
+                app:layout_constraintWidth_max="192dp">
 
                 <com.google.android.gms.maps.MapView
-                    android:id="@+id/mapView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <TextView
-                    android:id="@+id/add_location_label"
+                    android:id="@+id/mapview_location"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Add Location"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/label_no_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#aa000000"
+                    android:gravity="center"
+                    android:text="@string/label_no_location"
                     android:textColor="#ffffff"
                     android:textSize="14sp"
-                    android:gravity="center"
-                    android:background="#aa000000"/>
+                    android:visibility="visible" />
 
             </FrameLayout>
 
+            <TextView
+                android:id="@+id/textview_button_attach_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:linksClickable="true"
+                android:padding="8dp"
+                android:text="@string/label_attach_location"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/progressbar_location"
+                app:layout_constraintStart_toStartOf="@+id/progressbar_location"
+                app:layout_constraintTop_toBottomOf="@+id/progressbar_location"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/textview_button_attach_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:linksClickable="true"
+                android:padding="8dp"
+                android:text="@string/label_attach_image"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/progressbar_image"
+                app:layout_constraintStart_toStartOf="@+id/progressbar_image"
+                app:layout_constraintTop_toBottomOf="@+id/progressbar_image"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ProgressBar
+                android:id="@+id/progressbar_image"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="@+id/framelayout_image"
+                app:layout_constraintStart_toStartOf="@+id/framelayout_image"
+                app:layout_constraintTop_toBottomOf="@+id/framelayout_image" />
+
+            <ProgressBar
+                android:id="@+id/progressbar_location"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="@+id/framelayout_map"
+                app:layout_constraintStart_toStartOf="@+id/framelayout_map"
+                app:layout_constraintTop_toBottomOf="@+id/framelayout_map" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

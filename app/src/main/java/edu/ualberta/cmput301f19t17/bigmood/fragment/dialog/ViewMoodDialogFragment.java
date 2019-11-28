@@ -16,7 +16,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -40,7 +39,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
     private Toolbar toolbar;
     protected Mood moodToView;
 
-    private MapView mMapView;
+    private MapView mapView;
     private GoogleMap googleMap;
     private ImageView locationImageView;
 
@@ -150,23 +149,19 @@ public class ViewMoodDialogFragment extends DialogFragment {
         // If a photograph is provided, add it. Else, let it take the default value in the resource layout.
         if (this.moodToView.getImage() == null) {
             // draw "no picture" image
-            photoImageView.setTag(R.drawable.ic_no_image_black_24dp); // set tag was used for testing purposes to check the correct image is displayed, since there's no way to do it using robotium.
-        } else {
-            //photoImageView.setImageBitmap(this.moodToView.getImage());
+            photoImageView.setTag(R.drawable.ic_no_location_black_24dp);
         }
 
         // If a location is provided, add it. Else, let it take the default value in the resource layout.
         if (this.moodToView.getLocation() == null) {
             // draw "no location" image
-            locationImageView.setTag(R.drawable.ic_no_location_black_24dp); // set tag was used for testing purposes to check the correct image is displayed, since there's no way to do it using robotium.
-        } else {
-            //locationImageView.setImageBitmap("bitmap");
+            locationImageView.setTag(R.drawable.ic_no_location_black_24dp);
         }
 
-        mMapView = (MapView) view.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
+        mapView = (MapView) view.findViewById(R.id.mapview_location);
+        mapView.onCreate(savedInstanceState);
 
-        mMapView.onResume(); // needed to get the map to display immediately
+        mapView.onResume(); // needed to get the map to display immediately
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -174,7 +169,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
             e.printStackTrace();
         }
 
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 ViewMoodDialogFragment.this.googleMap = googleMap;
@@ -182,7 +177,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
                 if (moodToView != null && moodToView.getLocation() != null && moodToView.getLocation().getLatitude() != 0) {
                     locationImageView.setVisibility(View.GONE);
-                    mMapView.setVisibility(View.VISIBLE);
+                    mapView.setVisibility(View.VISIBLE);
                     LatLng currentLatLng = new LatLng(moodToView.getLocation().getLatitude(), moodToView.getLocation().getLongitude());
                     addMarkerAtLocation(currentLatLng);
                 }

@@ -5,6 +5,7 @@ import android.view.View;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
@@ -12,9 +13,15 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Map;
+
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+
+import static org.junit.Assert.assertTrue;
 
 public class US060201Test {
     private Solo solo;
@@ -51,12 +58,25 @@ public class US060201Test {
     public void testUserMoodMap() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
+        //No mood added
+
         View userMap = solo.getCurrentActivity().findViewById(R.id.action_maps_user);
         solo.clickOnView(userMap);
-        solo.sleep(2000);
-        // This XY coordinate is hard-coded, seems like Robotium has no method for click on a drawable
-        // This XY should be the top left (X) button of the top toolbar for exiting
-        solo.clickOnScreen(75, 113);
+        assertTrue(solo.searchText(solo.getCurrentActivity().getText(R.string.toast_error_mood_adapter_empty).toString()));
+        solo.goBack();
+
+        //Add a Happy mood
+
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+        solo.clickOnView(fab);
+            //Add a slight the delay until the dialog has been opened (time may vary)
+            //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
+        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
+        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.clickOnView(userMap);
+        assertTrue(solo.waitForLogMessage(solo.getCurrentActivity().getText(R.string.title_user_maps).toString()));
+        assertTrue(solo.waitForLogMessage(solo.getCurrentActivity().getText(R.string.toast_success_mood_marker_added).toString()+1));
 
     }
 }

@@ -12,6 +12,11 @@
     <string name="title_dialog_edit_mood">Edit Mood</string>
     <string name="title_activity_sign_up">Create Account</string>
 
+    <string name="title_user_maps">My Moods (Location)</string>
+    <string name="title_following_maps">Following (Location)</string>
+    <string name="title_attach_image">Attach Image</string>
+
+
     <string name="menu_option_save">SAVE</string>
     <string name="menu_option_edit">EDIT</string>
     <string name="menu_option_delete">DELETE</string>
@@ -48,7 +53,13 @@
 
     <string name="message_request">wants to follow you!</string>
 
-    <string name="label_add_location">Tap to Add Location</string>
+    <string name="label_attach_image">Attach Image</string>
+    <string name="label_attach_location">Attach Location</string>
+    <string name="label_no_location">No Location</string>
+    <string name="label_no_image">No Image</string>
+
+    <string name="dialog_option_take_photo">Take Photo</string>
+    <string name="dialog_option_gallery">Pick from Gallery</string>
 
     <string name="toast_error_db">Failed to complete operation. Please try again.</string>
     <string name="toast_error_registration">Failed to register. Please try again.</string>
@@ -86,7 +97,8 @@
     <string name="error_empty_password">Password cannot be empty</string>
     <string name="toast_success_request_sent">Request successfully sent.</string>
 
-    <string name="title_user_maps">My Moods (Location)</string>
-    <string name="title_following_maps">Following (Location)</string>
+    <string name="toast_error_mood_adapter_empty">Oops! There is no mood to show.</string>
+    <string name="toast_success_mood_marker_added">Numbers of mood location marker added: </string>
+
 
 </resources>
