@@ -1,6 +1,5 @@
 package edu.ualberta.cmput301f19t17.bigmood.model;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -19,28 +18,30 @@ public class Mood implements Parcelable {
 
     // Tag for Parceling
     public static final String TAG_MOOD_OBJECT = "edu.ualberta.cmput301f19t17.bigmood.model.MOOD_OBJECT";
+    private static final int PARCELABLE_NULL_SITUATION = -78934865;
 
     // Stored because it is required for deletion. Once we pull the data from the DB there is no way to distinguish it from other Mood objects, so we have to store this information.
     private final String firestoreId;
+    private final String imageId;
 
     // Mood instance variables
-    private EmotionalState state;
-    private Calendar datetime;
-    private SocialSituation situation;
-    private String reason;
-    private GeoPoint location;
-    private Bitmap image;
+    private final EmotionalState state;
+    private final Calendar datetime;
+    private final SocialSituation situation;
+    private final String reason;
+    private final GeoPoint location;
+
 
     /**
      * Base constructor for a NEW mood. This constructor should not be used to recreate a mood from the database, since the firestoreId will be null.
+     * @param imageId   An optional image that the user can attach to the mood.
      * @param state     The emotional state of the mood. This can be any one of the categories defined in the EmotionalState enum.
      * @param datetime  The Calendar object representing the date and time that the mood was created.
      * @param situation An optional social situation of the mood. This can be any one of the categories defined in the SocialSituation enum.
      * @param reason    An optional textual reason describing why the user felt the mood. This cannot be null.
      * @param location  An optional location representing the longitude and latitude of the mood.
-     * @param image     An optional image that the user can attach to the mood.
      */
-    public Mood(EmotionalState state, Calendar datetime, SocialSituation situation, String reason, GeoPoint location, Bitmap image) {
+    public Mood(String imageId, EmotionalState state, Calendar datetime, SocialSituation situation, String reason, GeoPoint location) {
         this.firestoreId = null;
 
         if (state == null || datetime == null)
@@ -49,26 +50,27 @@ public class Mood implements Parcelable {
         if (reason == null)
             throw new IllegalArgumentException("`reason` cannot be null. Use an empty string instead.");
 
+        this.imageId = imageId;
+
         this.state = state;
         this.datetime = datetime;
         this.situation = situation;
         this.reason = reason;
         this.location = location;
-        this.image = image;
 
     }
 
     /**
      * Base constructor for an OLD mood. This constructor should not be used to create a new mood, as you would have to define a firestoreId.
      * @param firestoreId The Firestore ID associated with the current mood. We have to keep this information within the mood itself so that it can be identified for deletion, for example.
+     * @param imageId     An optional image that the user can attach to the mood.
      * @param state       The emotional state of the mood. This can be any one of the categories defined in the EmotionalState enum.
      * @param datetime    The Calendar object representing the date and time that the mood was created.
      * @param situation   An optional social situation of the mood. This can be any one of the categories defined in the SocialSituation enum.
      * @param reason      An optional textual reason describing why the user felt the mood. This cannot be null.
      * @param location    An optional location representing the longitude and latitude of the mood.
-     * @param image       An optional image that the user can attach to the mood.
      */
-    public Mood(String firestoreId, EmotionalState state, Calendar datetime, SocialSituation situation, String reason, GeoPoint location, Bitmap image) {
+    public Mood(String firestoreId, String imageId, EmotionalState state, Calendar datetime, SocialSituation situation, String reason, GeoPoint location) {
 
         if (state == null || datetime == null)
             throw new IllegalArgumentException("state and datetime are required arguments, and cannot be null.");
@@ -77,13 +79,13 @@ public class Mood implements Parcelable {
             throw new IllegalArgumentException("Reason cannot be null. Use an empty string instead.");
 
         this.firestoreId = firestoreId;
+        this.imageId = imageId;
 
         this.state = state;
         this.datetime = datetime;
         this.situation = situation;
         this.reason = reason;
         this.location = location;
-        this.image = image;
     }
 
     /**
@@ -148,8 +150,38 @@ public class Mood implements Parcelable {
      * @return Returns the image as a <code>Bitmap</code> or a <code>null</code> if the information was not included.
      */
     @Nullable
-    public Bitmap getImage() {
-        return image;
+    public String getImageId() {
+        return imageId;
+    }
+
+    /**
+     * This method compares THIS mood with another mood to see if they have the same attributes.
+     * @param other the other mood
+     * @return Returns true if the two moods have the same attributes, and false otherwise
+     */
+    @Override
+    public boolean equals(Object other) {
+
+        // Return true if the object to compare is the object itself
+        if (other == this)
+            return true;
+
+        // Double check that the object passed in is an instance of this class.
+        if (! (other instanceof Mood))
+            return false;
+
+        // Cast other to another object
+        Mood mood = (Mood) other;
+
+        // Do comparison
+        return (this.imageId.equals(mood.getImageId()) &&
+                this.state == mood.getState() &&
+                this.datetime == mood.getDatetime() &&
+                this.situation == mood.getSituation() &&
+                this.reason.equals(mood.getReason()) &&
+                this.location == mood.getLocation()
+        );
+
     }
 
     // PARCELABLE METHODS //
@@ -162,17 +194,24 @@ public class Mood implements Parcelable {
     private Mood(Parcel in) {
 
         this.firestoreId = in.readString();
+        this.imageId = in.readString();
 
         this.state = EmotionalState.findByStateCode(in.readInt());
 
         this.datetime = Calendar.getInstance(TimeZone.getTimeZone(in.readString()));
         this.datetime.setTimeInMillis(in.readLong());
 
-        this.situation = SocialSituation.findBySituationCode(in.readInt());
+        int situationCode = in.readInt();
+
+        // Remember this could have been null, which in that case would be set to the special int value. If it is, we know that it should be null. Otherwise we leave it up to the situation to find the EmotionalState
+        if (situationCode == Mood.PARCELABLE_NULL_SITUATION)
+            this.situation = null;
+        else
+            this.situation = SocialSituation.findBySituationCode(situationCode);
+
+        // get reason and geopoint
         this.reason = in.readString();
         this.location = new GeoPoint(in.readLong(), in.readLong());
-
-//        this.image = ? // (Bitmap.class.getClassLoader());
 
     }
 
@@ -184,21 +223,24 @@ public class Mood implements Parcelable {
     @Override
     public void writeToParcel(Parcel out, int flags) {
 
-        // Write the firestore Id, if applicable
+        // Write the firestore Id. This can be null.
         out.writeString(this.firestoreId);
 
-        // Write the state as a string (from the enumeration)
+        // Write the image Id. This can be null.
+        out.writeString(this.imageId);
+
+        // Write the state as a string (from the enumeration). This cannot be null.
         out.writeInt(this.state.getStateCode());
 
-        // Write timestamp and time zone ID
-        out.writeLong(this.datetime.getTimeInMillis());
+        // Write timestamp and time zone ID. This cannot be null.
         out.writeString(this.datetime.getTimeZone().getID());
+        out.writeLong(this.datetime.getTimeInMillis());
 
-        // Write the situation as a string (from the enumeration). We have to handle the else case because of the order-sensitive nature of the parcel writing
+        // Write the situation as a string (from the enumeration). We have to handle the else case because of the order-sensitive nature of the parcel writing. We also cannot write an enumeration directly so while this value can be null, we can't just call .getSituationCode() or else we risk a NullPointerException.
         if (this.situation != null)
             out.writeInt(this.situation.getSituationCode());
         else
-            out.writeInt(-1);
+            out.writeInt(Mood.PARCELABLE_NULL_SITUATION);
 
         // Write the reason as a string
         out.writeString(this.reason);
@@ -234,20 +276,6 @@ public class Mood implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    /**
-     * This method compares THIS mood with another mood to see if they have the same attributes.
-     * @param other the other mood
-     * @return Returns true if the two moods have the same attributes, and false otherwise
-     */
-    public boolean equals(Mood other) {
-        return (this.state == other.getState() &&
-                this.datetime == other.getDatetime() &&
-                this.situation == other.getSituation() &&
-                this.reason.equals(other.getReason()) &&
-                this.location == other.getLocation());
-        // TODO: 2019-11-27 Cameron: add image check
     }
 
 }

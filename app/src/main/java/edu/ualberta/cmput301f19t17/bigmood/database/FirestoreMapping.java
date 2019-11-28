@@ -16,6 +16,8 @@ class FirestoreMapping {
 
     static final String COLLECTION_PRIVATE = "private";
 
+    static final String STORAGE_IMAGE_DIRECTORY = "images";
+
     // Documents //
     static final String DOCUMENT_CREDENTIAL = "credential";
     static final String DOCUMENT_FOLLOWER = "follower";
@@ -30,11 +32,11 @@ class FirestoreMapping {
 
 
     static final String FIELD_MOOD_OWNER = "owner";
+    static final String FIELD_MOOD_IMAGEID = "imageId";
     static final String FIELD_MOOD_STATE = "state";
     static final String FIELD_MOOD_DATETIME = "datetime";
     static final String FIELD_MOOD_SITUATION = "situation";
     static final String FIELD_MOOD_REASON = "reason";
-    static final String FIELD_MOOD_IMAGE = "image";
     static final String FIELD_MOOD_LOCATION = "location";
 
     static final String FIELD_REQUEST_FROM = "from";

@@ -1,7 +1,5 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
-
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -63,12 +61,12 @@ public class US060301Test {
         //should be the first mood
         Calendar calendar1 = (Calendar) baseCalendar.clone();
         calendar1.add(Calendar.MINUTE, 5);
-        Mood mood1 = new Mood(EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "Games are fun", new GeoPoint(53.5184, -113.5023), null);
+        Mood mood1 = new Mood(null, EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "Games are fun", new GeoPoint(53.5184, -113.5023));
         mockRepository.createMood(follow2, mood1, null, null);
 
         //should be the second mood
         Calendar calendar2 = (Calendar) baseCalendar.clone();
-        Mood mood2 = new Mood(EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "Line too long", new GeoPoint(53.5179, -113.4965), null);
+        Mood mood2 = new Mood(null, EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "Line too long", new GeoPoint(53.5179, -113.4965));
         mockRepository.createMood(follow3, mood2, null, null);
     }
 

@@ -37,8 +37,12 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask;
 import com.master.permissionhelper.PermissionHelper;
 
 import java.io.File;
@@ -50,6 +54,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.SituationSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
@@ -68,6 +73,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_PICK_IMAGE = 2;
+    private static final String IMAGE_FILE_EXTENSION = "jpg";
 
 
     private Toolbar toolbar;
@@ -106,6 +112,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     private LatLng savedLatLng;
 
     private String currentPhotoPath;
+    private Uri imageUri;
 
     // set up the locationUpdatesListener
     private LocationHelper.LocationRequestUpdatesListener locationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
@@ -116,13 +123,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                 DefineMoodDialogFragment.this.placeholderLocation.setVisibility(View.GONE);
                 DefineMoodDialogFragment.this.mapView.setVisibility(View.VISIBLE);
 
-                DefineMoodDialogFragment.this.buttonAttachLocation.setEnabled(false);
-                DefineMoodDialogFragment.this.buttonAttachLocation.setTypeface(Typeface.DEFAULT);
-
-
-                DefineMoodDialogFragment.this.buttonAttachLocation.setTextColor(
-                        getResources().getColor(R.color.colorPrimaryDark)
-                );
+                DefineMoodDialogFragment.this.disableTextViewButton(DefineMoodDialogFragment.this.buttonAttachLocation);
 
                 DefineMoodDialogFragment.this.progressBarLocation.setProgress(100);
 
@@ -304,6 +305,9 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
         this.mapView = (MapView) view.findViewById(R.id.mapview_location);
 
+        this.currentPhotoPath = null;
+        this.imageUri = null;
+
         // Return view that has been created
         return view;
 
@@ -335,11 +339,11 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             }
         });
 
-        final Calendar calendar;
-
         // Bind adapters to spinners. This should populate the values in each spinner.
         this.stateSpinner.setAdapter(this.stateSpinnerAdapter);
         this.situationSpinner.setAdapter(this.situationSpinnerAdapter);
+
+        final Calendar calendar;
 
         // Here we populate values in the fragment if we have a mood and set the appropriate title.
         if (this.moodToEdit != null) {
@@ -476,15 +480,15 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                 if (item.getItemId() == R.id.action_save) {
 
                     // Get emotional state from state spinner
-                    EmotionalState emotionalState = DefineMoodDialogFragment.this.stateSpinnerAdapter
+                    final EmotionalState emotionalState = DefineMoodDialogFragment.this.stateSpinnerAdapter
                             .getItem(stateSpinner.getSelectedItemPosition());
 
                     // Get social situation from situation spinner. Keep in mind this can be null, but that's fine because a null value is allowed (to represent no option).
-                    SocialSituation socialSituation = DefineMoodDialogFragment.this.situationSpinnerAdapter
+                    final SocialSituation socialSituation = DefineMoodDialogFragment.this.situationSpinnerAdapter
                             .getItem(situationSpinner.getSelectedItemPosition());
 
                     // Get reason string
-                    String reason = DefineMoodDialogFragment.this.reasonInputLayout
+                    final String reason = DefineMoodDialogFragment.this.reasonInputLayout
                             .getEditText()
                             .getText()
                             .toString()
@@ -514,39 +518,84 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
                     }
 
-                    // Declare mood. Can be initialized as an "old" mood (with firestoreId) or a "new" mood (without firestoreId).
-                    Mood mood;
+                    // If the user did not pick an image, don't do any of the following
+                    if (imageUri == null) {
 
-                    // If we have an old mood, pass the firestoreId along.
-                    if (DefineMoodDialogFragment.this.moodToEdit != null)
-                        mood = new Mood(
-                                DefineMoodDialogFragment.this.moodToEdit.getFirestoreId(),
+                        DefineMoodDialogFragment.this.saveMoodAndReturn(
+
+                                null,
                                 emotionalState,
                                 calendar,
                                 socialSituation,
-                                reason,
-                                new GeoPoint(savedLatLng != null ? savedLatLng.latitude : 0,
-                                        savedLatLng != null ? savedLatLng.longitude : 0),
-                                null
+                                reason
+
                         );
 
-                    // If we don't have an old mood, we have to create a brand new one, without the firestoreId.
-                    else
-                        mood = new Mood(
-                                emotionalState,
-                                calendar,
-                                socialSituation,
-                                reason,
-                                new GeoPoint(savedLatLng != null ? savedLatLng.latitude : 0,
-                                        savedLatLng != null ? savedLatLng.longitude : 0),
-                                null
-                        );
+                        return true;
 
-                    Log.d(LOG_TAG, String.format("MOOD INFO:\n\tState: {%s}\n\tSituation: {%s}", mood.getState().toString(), (mood.getSituation() == null ? "null" : mood.getSituation().toString()) ));
+                    }
 
-                    // Invoke the callback method with the mood and dismiss the fragment
-                    DefineMoodDialogFragment.this.listener.onSavePressed(mood);
-                    DefineMoodDialogFragment.this.dismiss();
+                    DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.VISIBLE);
+                    DefineMoodDialogFragment.this.progressBarImage.setProgress(0);
+
+                    DefineMoodDialogFragment.this.disableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
+
+                    AppPreferences preferences = AppPreferences.getInstance();
+
+                    preferences
+                            .getRepository()
+                            .uploadImage(
+
+                                    preferences.getCurrentUser(),
+                                    DefineMoodDialogFragment.this.imageUri,
+                                    DefineMoodDialogFragment.IMAGE_FILE_EXTENSION,
+
+                                    new OnSuccessListener<String>() {
+                                        @Override
+                                        public void onSuccess(String s) {
+
+                                            // Call the save and return method, which will save our mood to the database. We know the image has been uploaded, which is pointed to by s.
+                                            DefineMoodDialogFragment.this.saveMoodAndReturn(
+
+                                                    s,
+                                                    emotionalState,
+                                                    calendar,
+                                                    socialSituation,
+                                                    reason
+
+                                            );
+
+                                        }
+                                    },
+
+                                    new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                            Toast.makeText(
+                                                    DefineMoodDialogFragment.this.getContext(),
+                                                    "Image failed to upload. Please try again.",
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+
+                                            DefineMoodDialogFragment.this.enableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
+
+                                        }
+                                    },
+
+                                    new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+
+                                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+
+                                            DefineMoodDialogFragment.this.progressBarImage.setProgress((int) progress);
+
+                                        }
+                                    }
+
+                            );
+
                     return true;
 
                 }  // End if statement on R.id.action_save
@@ -580,6 +629,44 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     }
 
+
+    private void saveMoodAndReturn(String imageId, EmotionalState emotionalState, Calendar calendar, SocialSituation socialSituation, String reason) {
+
+        // Declare mood. Can be initialized as an "old" mood (with firestoreId) or a "new" mood (without firestoreId).
+        Mood mood;
+        GeoPoint geoPoint = null;
+
+        if (this.savedLatLng != null)
+            geoPoint = new GeoPoint(this.savedLatLng.latitude, this.savedLatLng.longitude);
+
+        // If we have an old mood, pass the firestoreId along.
+        if (this.moodToEdit != null)
+            mood = new Mood(
+                    this.moodToEdit.getFirestoreId(),
+                    imageId,
+                    emotionalState,
+                    calendar,
+                    socialSituation,
+                    reason,
+                    geoPoint
+            );
+
+        // If we don't have an old mood, we have to create a brand new one, without the firestoreId.
+        else
+            mood = new Mood(
+                    imageId,
+                    emotionalState,
+                    calendar,
+                    socialSituation,
+                    reason,
+                    geoPoint
+            );
+
+        // Invoke the callback method with the mood and dismiss the fragment
+        this.listener.onSavePressed(mood);
+        this.dismiss();
+
+    }
 
     // Lifecycle handling //
 
@@ -682,19 +769,26 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//
-            this.imageView.setImageURI(Uri.parse(this.currentPhotoPath));
+            // Get URI from the current photo path that would have been set given execution is here
+            Uri uri = Uri.fromFile(new File(this.currentPhotoPath));
+
+            // Set the image URI member variable and the imageview URI
+            this.imageUri = uri;
+            this.imageView.setImageURI(uri);
+
+            // Show the imageview
             this.showImageView();
 
         } else if ( (requestCode == REQUEST_PICK_IMAGE) && (resultCode == RESULT_OK) && (data != null) && (data.getData() != null) ) {
 
-            // Image was successfully picked, we have to turn off the placeholder and turn on the imageview
-            this.placeholderImage.setVisibility(View.INVISIBLE);
-            this.imageView.setVisibility(View.VISIBLE);
+            // Get URI from the data bundle
+            Uri uri = data.getData();
 
-            this.imageView.setImageURI(data.getData());
+            // Set the image URI member variable and the imageview URI
+            this.imageUri = uri;
+            this.imageView.setImageURI(uri);
+
+            // Show the imageview
             this.showImageView();
 
         }
@@ -891,7 +985,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         // Create a file object with the name, suffix and location
         File image = File.createTempFile(
                 imageFileName,
-                ".jpg",
+                "." + DefineMoodDialogFragment.IMAGE_FILE_EXTENSION,
                 storageDir
         );
 
@@ -900,5 +994,25 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         return image;
     }
 
+    private void disableTextViewButton(TextView button) {
 
+        button.setEnabled(false);
+        button.setTypeface(Typeface.DEFAULT);
+
+        button.setTextColor(
+                getResources().getColor(R.color.colorPrimaryDark)
+        );
+
+    }
+
+    private void enableTextViewButton(TextView button) {
+
+        button.setEnabled(true);
+        button.setTypeface(Typeface.DEFAULT_BOLD);
+
+        button.setTextColor(
+                getResources().getColor(R.color.colorAccent)
+        );
+
+    }
 }

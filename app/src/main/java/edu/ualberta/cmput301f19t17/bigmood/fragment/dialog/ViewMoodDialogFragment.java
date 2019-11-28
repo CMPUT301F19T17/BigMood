@@ -147,7 +147,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
             reasonTextView.setText(this.moodToView.getReason());
 
         // If a photograph is provided, add it. Else, let it take the default value in the resource layout.
-        if (this.moodToView.getImage() == null) {
+        if (this.moodToView.getImageId() == null) {
             // draw "no picture" image
             photoImageView.setTag(R.drawable.ic_no_location_black_24dp);
         }

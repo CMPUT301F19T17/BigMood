@@ -1,8 +1,12 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.net.Uri;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask;
 
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
@@ -91,6 +95,17 @@ public interface Repository {
      * @param failureListener A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
      */
     void updateMood(User user, Mood mood, OnSuccessListener<Void> successListener, OnFailureListener failureListener);
+
+    /**
+     * This method attempts to upload an image pointed to the Uri to Firebase storage
+     *
+     * @param user               The user to which to save the image under
+     * @param imageUri           The URI of the image to save
+     * @param successListener    A SuccessListener of type <code>UploadTask.TaskSnapshot</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request).
+     * @param failureListener    A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param onProgressListener An OnProgressListener of type <code>UploadTask.TaskSnapshot</code>. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     */
+    void uploadImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, OnProgressListener<UploadTask.TaskSnapshot> onProgressListener);
 
     /**
      * This method gets as a List the set of all Requests belonging to a particular User.

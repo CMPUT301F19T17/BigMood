@@ -1,5 +1,7 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -20,6 +22,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +49,9 @@ public class FirestoreRepository implements Repository {
     // Firestore database object
     private FirebaseFirestore db;
 
+    // Firebase storage object
+    private FirebaseStorage storage;
+
     /**
      * This method gets the single instance of the FirestoreRepository class. If it does not exist it creates one. No public constructor is available.
      * @return Returns the instance of the repository class
@@ -62,8 +70,8 @@ public class FirestoreRepository implements Repository {
      */
     private FirestoreRepository() {
         this.db = FirebaseFirestore.getInstance();
+        this.storage = FirebaseStorage.getInstance();
     }
-
 
     // USER RELATED METHODS //
 
@@ -486,6 +494,41 @@ public class FirestoreRepository implements Repository {
 
     }
 
+    /**
+     * This method attempts to upload an image pointed to the Uri to Firebase storage
+     *
+     * @param user               The user to which to save the image under
+     * @param imageUri           The URI of the image to save
+     * @param fileExtension      The file extension of the image. Should always be .jpg.
+     * @param successListener    A SuccessListener of type <code>String</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request). The result of this task will have the string containing the unique ID of the uploaded file.
+     * @param failureListener    A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param onProgressListener An OnProgressListener of type <code>UploadTask.TaskSnapshot</code>. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     */
+    @Override
+    public void uploadImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, OnProgressListener<UploadTask.TaskSnapshot> onProgressListener) {
+
+        final String imageId = String.format(
+                "%s_%s.%s",
+                user.getUsername(),
+                System.currentTimeMillis(),
+                fileExtension
+        );
+
+        this.storage
+                .getReference(FirestoreMapping.STORAGE_IMAGE_DIRECTORY)
+                .child(imageId)
+                .putFile(imageUri)
+                .addOnFailureListener(failureListener)
+                .addOnProgressListener(onProgressListener)
+                .continueWith(new Continuation<UploadTask.TaskSnapshot, String>() {
+                    @Override
+                    public String then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        return imageId;
+                    }
+                })
+                .addOnSuccessListener(successListener);
+
+    }
 
     // REQUEST RELATED METHODS //
 
