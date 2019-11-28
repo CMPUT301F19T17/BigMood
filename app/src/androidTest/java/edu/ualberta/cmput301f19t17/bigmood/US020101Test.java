@@ -58,9 +58,9 @@ public class US020101Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check reason length is too long.");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "check reason length is too long.");
         solo.clickOnView(solo.getView(R.id.action_save));
-        assertTrue(solo.waitForText("Reason too long"));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.error_reason_too_long),1,2000));
 
     }
 
@@ -70,9 +70,9 @@ public class US020101Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
 
-        solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "chk len too long");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "chk len too long");
         solo.clickOnView(solo.getView(R.id.action_save));
-        assertTrue(solo.waitForText("Reason cannot be longer than 3 words"));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.error_reason_word_count),1,2000));
     }
 
     /**

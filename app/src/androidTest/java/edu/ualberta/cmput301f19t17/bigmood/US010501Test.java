@@ -62,10 +62,11 @@ public class US010501Test {
 
         //select mood3
         solo.clickOnMenuItem("Happy");
-        solo.clickOnButton("DELETE");
+        solo.sleep(2000); // Wait for the dialog fragment to load up
+        solo.clickOnButton(solo.getCurrentActivity().getResources().getString(R.string.menu_option_delete));
 
         //wait for 1 seconds
-        solo.sleep(1000);
+        solo.sleep(5000);
 
         //make sure there are no new elements in the list (ie, after we added the mood, it was deleted)
         assertEquals(originalNumListItems-1, moodArrayAdapter.getCount());

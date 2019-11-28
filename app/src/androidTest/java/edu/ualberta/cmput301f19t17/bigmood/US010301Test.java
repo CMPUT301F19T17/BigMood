@@ -1,6 +1,8 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -20,6 +22,7 @@ import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -85,6 +88,11 @@ public class US010301Test {
         // When refactoring go to ViewMoodDialogFragment and reposition setTag for map image view
         Integer mapImageViewTag = (Integer) solo.getView(R.id.image_view_placeholder_location).getTag();
         assertTrue(mapImageViewTag == R.drawable.ic_no_image_black_24dp);
+
+        //ImageView photoImageView = (ImageView) solo.getView(R.id.image_view_placeholder_location);
+        //Drawable photoDefault = solo.getCurrentActivity().getResources().getDrawable(R.drawable.ic_no_image_black_24dp);
+        //assertEquals(photoImageView.getDrawable(), null);
+
 
 
     }

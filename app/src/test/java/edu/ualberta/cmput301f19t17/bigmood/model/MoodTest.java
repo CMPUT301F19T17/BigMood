@@ -27,6 +27,7 @@ public class MoodTest {
         Assertions.assertEquals(gp, mood.getLocation());
         Assertions.assertNull(mood.getImage());
         Assertions.assertNull(mood.getFirestoreId());
+        //Assertions.assertFalse(mood.getImage() != null);
     }
 
 }

@@ -54,19 +54,67 @@ public class US020301Test {
     }
 
     @Test
-    public void checkSocialSituation() {
+    public void checkSocialSituationAlone() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
+        solo.sleep(3000);
 
-        solo.pressSpinnerItem(3, SocialSituation.SEVERAL.getSituationCode()+1);
-
+        View situationSpinner = solo.getView(R.id.situation_spinner);
+        solo.clickOnView(situationSpinner);
+        solo.clickOnText(SocialSituation.ALONE.toString());
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
+        solo.clickInList(1, 0);
+        assertTrue(solo.waitForText("Alone",1,2000));
+    }
 
-        solo.clickInList(0);
-        assertTrue(solo.waitForText(SocialSituation.SEVERAL.toString()));
+    @Test
+    public void checkSocialSituationOneOther() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+        solo.clickOnView(fab);
+        solo.sleep(3000);
 
+        View situationSpinner = solo.getView(R.id.situation_spinner);
+        solo.clickOnView(situationSpinner);
+        solo.clickOnText(SocialSituation.ONE.toString());
+        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.waitForDialogToClose();
+        solo.clickInList(1, 0);
+        assertTrue(solo.waitForText("One person",1,2000));
+    }
+
+    @Test
+    public void checkSocialSituationSeveral() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+        solo.clickOnView(fab);
+        solo.sleep(3000);
+
+        View situationSpinner = solo.getView(R.id.situation_spinner);
+        solo.clickOnView(situationSpinner);
+        solo.clickOnText(SocialSituation.SEVERAL.toString());
+        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.waitForDialogToClose();
+        solo.clickInList(1, 0);
+        assertTrue(solo.waitForText("Two to several people",1,2000));
+    }
+
+    @Test
+    public void checkSocialSituationCrowd() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+        solo.clickOnView(fab);
+        solo.sleep(3000);
+
+        View situationSpinner = solo.getView(R.id.situation_spinner);
+        solo.clickOnView(situationSpinner);
+        solo.clickOnText(SocialSituation.CROWD.toString());
+        solo.clickOnView(solo.getView(R.id.action_save));
+        solo.waitForDialogToClose();
+        solo.clickInList(1, 0);
+        assertTrue(solo.waitForText("Crowd",1,2000));
     }
 
     /**

@@ -75,6 +75,7 @@ public class US040201Test {
         for (EmotionalState state : EmotionalState.values()) {
             for (int i = 0; i < mood_quantity; i++) {
                 solo.clickOnView(fab);
+                solo.sleep(2000);
                 solo.pressSpinnerItem(0, state.getStateCode());
                 solo.clickOnView(solo.getView(R.id.action_save));
             }
@@ -109,6 +110,7 @@ public class US040201Test {
 
         // 1) Try to add a Mood
         solo.clickOnView(fab);
+        solo.sleep(2000);
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.sleep(3000);
