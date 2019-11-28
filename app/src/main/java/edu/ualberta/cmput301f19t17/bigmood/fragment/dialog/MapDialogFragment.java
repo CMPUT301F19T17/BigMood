@@ -239,6 +239,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
      */
     @Override
     public void onMapReady(GoogleMap googleMapView) {
+
+        this.getView().setContentDescription("MAP READY");
         Log.d(HomeActivity.LOG_TAG, getString(R.string.title_user_maps));
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
@@ -256,7 +258,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
          * THE CODE ABOVE IS A TEST OF THE MAP
          */
         if (moodAdapter.getCount() == 0) {
-            Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_LONG).show();
             Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_error_mood_adapter_empty));
         } else {
             for (int i = 0; i < moodAdapter.getCount(); i++) {
