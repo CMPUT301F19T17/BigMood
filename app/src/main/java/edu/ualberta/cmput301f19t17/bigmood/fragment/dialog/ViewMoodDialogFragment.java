@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,7 +42,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
     private MapView mMapView;
     private GoogleMap googleMap;
-    private View locationImageView;
+    private ImageView locationImageView;
 
     /**
      * This is the default constructor for the dialog. newInstance() methods. Technically a user of this class should not use this constructor. If it happens, the class will eventually log a message when spawned.
@@ -148,17 +147,20 @@ public class ViewMoodDialogFragment extends DialogFragment {
         if (! this.moodToView.getReason().equals(""))
             reasonTextView.setText(this.moodToView.getReason());
 
+        // If a photograph is provided, add it. Else, let it take the default value in the resource layout.
         if (this.moodToView.getImage() == null) {
             // draw "no picture" image
-            photoImageView.setTag(R.drawable.ic_placeholder_image_black_24dp);
+            photoImageView.setTag(R.drawable.ic_no_image_black_24dp);
         } else {
             //photoImageView.setImageBitmap(this.moodToView.getImage());
         }
+
+        // If a location is provided, add it. Else, let it take the default value in the resource layout.
         if (this.moodToView.getLocation() == null) {
             // draw "no location" image
+            locationImageView.setTag(R.drawable.ic_no_location_black_24dp);
         } else {
             //locationImageView.setImageBitmap("bitmap");
-            locationImageView.setTag(R.drawable.ic_placeholder_image_black_24dp);
         }
 
         mMapView = (MapView) view.findViewById(R.id.mapView);

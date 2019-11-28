@@ -61,6 +61,7 @@
     <string name="toast_error_user_dne">Sorry, that user does not exist.</string>
     <string name="toast_error_create_request">Sorry, we could not process your request. Either you already follow them, or your previous request still has not been accepted.</string>
 
+
     <string name="toast_success_registration">Registration successful.</string>
     <string name="toast_success_request_accept">Request successfully accepted.</string>
     <string name="toast_success_request_reject">Request successfully rejected.</string>
@@ -88,5 +89,8 @@
 
     <string name="title_user_maps">My Moods (Location)</string>
     <string name="title_following_maps">Following (Location)</string>
+    <string name="toast_error_mood_adapter_empty">Oops! There is no mood to show.</string>
+    <string name="toast_success_mood_marker_added">Numbers of mood location marker added: </string>
+
 
 </resources>

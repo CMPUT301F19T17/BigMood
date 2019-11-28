@@ -43,10 +43,6 @@ public class US040101Test {
 
         // Login with a user from the database using a specialized method in MockRepository
         US040101Test.appPreferences.login(US040101Test.mockRepository.getUser("user1"));
-
-        // Clear the user's mood list
-        US040101Test.mockRepository.deleteAllUserMoods(US040101Test.appPreferences.getCurrentUser());
-
     }
 
     @Rule
@@ -55,6 +51,9 @@ public class US040101Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
+        US040101Test.mockRepository.deleteAllUserMoods(US040101Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
     @Test
@@ -64,18 +63,24 @@ public class US040101Test {
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
 
         solo.clickOnView(fab);
+        //Add a slight the delay until the dialog has been opened (time may vary)
+        //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
+
         solo.pressSpinnerItem(0, EmotionalState.DISGUST.getStateCode()); //disgusted
-        //solo.enterText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "I am grossed out");
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time 0");
 
         solo.clickOnView(solo.getView(R.id.action_save));
 
         //wait for 10 second before adding another mood
-        // TODO: 2019-11-07 Cameron: Remove and find a better method to check this, perhaps by creating a specific testUser for this problem, and dont delete the moods after testing
         int wait_time = 10;
         solo.sleep(wait_time*1000);
 
         solo.clickOnView(fab);
+        //Add a slight the delay until the dialog has been opened (time may vary)
+        //Robotium might lag out if the delay is too low
+        solo.sleep(1000);
+
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), "at time +" + wait_time +"s");
 
@@ -89,11 +94,9 @@ public class US040101Test {
         solo.clickOnMenuItem("Happy");
         assertTrue(solo.searchText(Pattern.quote("at time +" + wait_time +"s")));
 
-        //I dont know how to press the X button in ViewMoodDialogFragment, so we will just press edit, and then close the fragment
-        solo.clickOnButton("EDIT");
-        solo.clickOnView(solo.getView(R.id.action_save));
+        //go back to user mood screen
+        solo.goBack();
 
-        solo.sleep(1000);
         //make sure the second item is the previously added item
         solo.clickOnMenuItem("Disgust");
         assertTrue(solo.searchText(Pattern.quote("at time 0")));
