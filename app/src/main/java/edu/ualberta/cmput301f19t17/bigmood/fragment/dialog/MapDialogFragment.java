@@ -297,7 +297,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
                 .position(moodLocation)
                 .icon(icon)
                 .title(moodDate)
-                .snippet(moodTime + " " + moodReason)
+                .snippet(mood.getState().toString() + "; " + moodTime + " " + moodReason)
+
         );
     }
 
