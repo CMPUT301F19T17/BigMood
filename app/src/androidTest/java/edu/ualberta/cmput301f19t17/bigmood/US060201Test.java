@@ -62,8 +62,7 @@ public class US060201Test {
 
         View userMap = solo.getCurrentActivity().findViewById(R.id.action_maps_user);
         solo.clickOnView(userMap);
-        assertTrue(solo.waitForLogMessage(InstrumentationRegistry.getInstrumentation().getTargetContext().getString(R.string.title_user_maps)));
-        assertTrue(solo.waitForLogMessage(InstrumentationRegistry.getInstrumentation().getTargetContext().getString(R.string.toast_error_mood_adapter_empty)));
+        assertTrue(solo.searchText(solo.getCurrentActivity().getText(R.string.toast_error_mood_adapter_empty).toString()));
         solo.goBack();
 
         //Add a Happy mood
@@ -76,8 +75,8 @@ public class US060201Test {
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.clickOnView(userMap);
-        assertTrue(solo.waitForLogMessage(InstrumentationRegistry.getInstrumentation().getTargetContext().getString(R.string.title_user_maps)));
-        assertTrue(solo.waitForLogMessage(InstrumentationRegistry.getInstrumentation().getTargetContext().getString(R.string.toast_success_mood_marker_added)+1));
+        assertTrue(solo.waitForLogMessage(solo.getCurrentActivity().getText(R.string.title_user_maps).toString()));
+        assertTrue(solo.waitForLogMessage(solo.getCurrentActivity().getText(R.string.toast_success_mood_marker_added).toString()+1));
 
     }
 }

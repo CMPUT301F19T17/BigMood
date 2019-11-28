@@ -236,6 +236,19 @@ public class Mood implements Parcelable {
         return 0;
     }
 
+    /**
+     * This method compares THIS mood with another mood to see if they have the same attributes.
+     * @param other the other mood
+     * @return Returns true if the two moods have the same attributes, and false otherwise
+     */
+    public boolean equals(Mood other) {
+        return (this.state == other.getState() &&
+                this.datetime == other.getDatetime() &&
+                this.situation == other.getSituation() &&
+                this.reason.equals(other.getReason()) &&
+                this.location == other.getLocation());
+        // TODO: 2019-11-27 Cameron: add image check
+    }
 
 }
 

@@ -87,7 +87,7 @@ public class US050301Test {
 
         //should be the second mood
         Calendar calendar2 = (Calendar) baseCalendar.clone();
-        Mood mood2 = new Mood(EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am happy.", new GeoPoint(53.5461, 113.4938), null);
+        Mood mood2 = new Mood(EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am mad.", new GeoPoint(53.5461, 113.4938), null);
         mockRepository.createMood(follow3, mood2, null, null);
 
 
