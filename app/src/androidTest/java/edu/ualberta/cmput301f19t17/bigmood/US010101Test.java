@@ -98,39 +98,6 @@ public class US010101Test {
 
     }
 
-    @Test
-    public void checkInvalidReasonWord() {
-        // Add a reason that consists of more than 3 words
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
-
-        String reasonMoreThan3Words = "I got puked on";
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), reasonMoreThan3Words);
-
-        solo.clickOnView(solo.getView(R.id.action_save));
-
-        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.error_reason_word_count),1,3000));
-    }
-
-    @Test
-    public void checkInvalidReasonChar() {
-        // Add a reason that has more than 20 characters
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
-
-        String reasonMoreThan20Char = "abcdefghijklmnopqrstuvwxyz";
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(), reasonMoreThan20Char);
-
-        solo.clickOnView(solo.getView(R.id.action_save));
-
-        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.error_reason_too_long),1,3000));
-
-    }
-
     /**
      * Closes the activity after each test
      * @throws Exception
@@ -139,7 +106,4 @@ public class US010101Test {
     public void tearDown() throws Exception{
         solo.finishOpenedActivities();
     }
-
-
-
 }
