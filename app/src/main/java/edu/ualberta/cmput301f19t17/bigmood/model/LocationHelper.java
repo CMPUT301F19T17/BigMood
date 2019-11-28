@@ -1,12 +1,10 @@
 package edu.ualberta.cmput301f19t17.bigmood.model;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
@@ -15,9 +13,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import java.text.DateFormat;
-import java.util.Date;
 
 public class LocationHelper implements
         GoogleApiClient.ConnectionCallbacks,
@@ -64,9 +59,9 @@ public class LocationHelper implements
             mGoogleApiClient.connect();
         }
 
-        if (getCurrentLocation() == null) {
-            Toast.makeText(context, "Waiting for location...", Toast.LENGTH_LONG).show();
-        }
+//        if (getCurrentLocation() == null) {
+//            Toast.makeText(context, "Waiting for location...", Toast.LENGTH_LONG).show();
+//        }
     }
 
     private void startLocationUpdates() {
