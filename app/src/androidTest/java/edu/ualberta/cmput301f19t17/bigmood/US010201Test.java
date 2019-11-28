@@ -58,29 +58,28 @@ public class US010201Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add a happy mood
+        EmotionalState emotionalStateHappy = EmotionalState.HAPPINESS;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //Add a slight the delay until the dialog has been opened (time may vary)
-        //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.HAPPINESS.toString());
+        solo.clickOnText(emotionalStateHappy.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(EmotionalState.HAPPINESS.getDrawableId() == listItemDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString(), 1, 2000));
+        assertTrue(emotionalStateHappy.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(emotionalStateHappy.toString(), 1, 2000));
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.HAPPINESS.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString(), 1, 2000));
+        assertTrue(emotionalStateHappy.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalStateHappy.toString(), 1, 2000));
 
     }
 
@@ -89,29 +88,28 @@ public class US010201Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add a sad mood
+        EmotionalState emotionalStateSad = EmotionalState.SADNESS;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //Add a slight the delay until the dialog has been opened (time may vary)
-        //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.SADNESS.toString());
+        solo.clickOnText(emotionalStateSad.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(EmotionalState.SADNESS.getDrawableId() == listItemDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.SADNESS.toString(), 1, 2000));
+        assertTrue(emotionalStateSad.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(emotionalStateSad.toString(), 1, 2000));
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.SADNESS.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.SADNESS.toString(), 1, 2000));
+        assertTrue(emotionalStateSad.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalStateSad.toString(), 1, 2000));
     }
 
     @Test
@@ -119,29 +117,28 @@ public class US010201Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add an anger mood
+        EmotionalState emotionalStateAnger = EmotionalState.ANGER;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //Add a slight the delay until the dialog has been opened (time may vary)
-        //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.ANGER.toString());
+        solo.clickOnText(emotionalStateAnger.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(EmotionalState.ANGER.getDrawableId() == listItemDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.ANGER.toString(), 1, 2000));
+        assertTrue(emotionalStateAnger.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(emotionalStateAnger.toString(), 1, 2000));
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.ANGER.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.ANGER.toString(), 1, 2000));
+        assertTrue(emotionalStateAnger.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalStateAnger.toString(), 1, 2000));
     }
 
     @Test
@@ -149,29 +146,28 @@ public class US010201Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add a disgust mood
+        EmotionalState emotionalStateDisgust = EmotionalState.DISGUST;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //Add a slight the delay until the dialog has been opened (time may vary)
-        //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.DISGUST.toString());
+        solo.clickOnText(emotionalStateDisgust.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(EmotionalState.DISGUST.getDrawableId() == listItemDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString(), 1, 2000));
+        assertTrue(emotionalStateDisgust.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(emotionalStateDisgust.toString(), 1, 2000));
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.DISGUST.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.DISGUST.toString(), 1, 2000));
+        assertTrue(emotionalStateDisgust.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalStateDisgust.toString(), 1, 2000));
     }
 
     @Test
@@ -179,29 +175,28 @@ public class US010201Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add a fear mood
+        EmotionalState emotionalStateFear = EmotionalState.FEAR;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //Add a slight the delay until the dialog has been opened (time may vary)
-        //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.FEAR.toString());
+        solo.clickOnText(emotionalStateFear.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(EmotionalState.FEAR.getDrawableId() == listItemDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.FEAR.toString(), 1, 2000));
+        assertTrue(emotionalStateFear.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(emotionalStateFear.toString(), 1, 2000));
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.FEAR.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.FEAR.toString(), 1, 2000));
+        assertTrue(emotionalStateFear.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalStateFear.toString(), 1, 2000));
     }
 
     @Test
@@ -209,29 +204,28 @@ public class US010201Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add a surprise mood
+        EmotionalState emotionalStateSurprise = EmotionalState.SURPRISE;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        //Add a slight the delay until the dialog has been opened (time may vary)
-        //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
+        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
-        solo.clickOnText(EmotionalState.SURPRISE.toString());
+        solo.clickOnText(emotionalStateSurprise.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.waitForDialogToClose();
 
         // Check the mood list
         Integer listItemDrawableID = (Integer) solo.getView(R.id.mood_item_emoticon).getTag();
-        assertTrue(EmotionalState.SURPRISE.getDrawableId() == listItemDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.SURPRISE.toString(), 1, 2000));
+        assertTrue(emotionalStateSurprise.getDrawableId() == listItemDrawableID);
+        assertTrue(solo.waitForText(emotionalStateSurprise.toString(), 1, 2000));
 
         // Check the ViewMoodDialogFragment
         solo.clickInList(1, 0);
         Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(EmotionalState.SURPRISE.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(EmotionalState.SURPRISE.toString(), 1, 2000));
+        assertTrue(emotionalStateSurprise.getDrawableId() == imageViewDrawableID);
+        assertTrue(solo.waitForText(emotionalStateSurprise.toString(), 1, 2000));
     }
 
     /**

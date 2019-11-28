@@ -177,7 +177,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textview_title_image"
                 app:layout_constraintWidth_max="192dp"
-                app:srcCompat="@drawable/ic_placeholder_image_black_24dp" />
+                app:srcCompat="@drawable/ic_no_image_black_24dp" />
 
             <TextView
                 android:id="@+id/textview_title_location"

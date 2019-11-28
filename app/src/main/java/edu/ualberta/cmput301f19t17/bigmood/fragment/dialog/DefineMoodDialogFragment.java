@@ -742,7 +742,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
 
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            //imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            imageView.setImageURI(data.getData());
 
         }
     }
