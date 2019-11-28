@@ -94,7 +94,6 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         this.setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme_FullScreenDialog);
 
-        // TODO: 11/15 Tri, the idea is to pass in the moodAdapter, get the location of every mood in it => put the marker on the map
     }
 
     /**
@@ -238,9 +237,9 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
      * This method draws the markers on the map for all of the moods that come in from the mood adapter
      * @param googleMapView
      */
-    // TODO 11/15 Tri: draw from moodAdapter
     @Override
     public void onMapReady(GoogleMap googleMapView) {
+        Log.d(HomeActivity.LOG_TAG, getString(R.string.title_user_maps));
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
         //canned data
@@ -257,7 +256,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
          * THE CODE ABOVE IS A TEST OF THE MAP
          */
         if (moodAdapter.getCount() == 0) {
-            Toast.makeText(this.getContext(), "There is no mood to display!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_SHORT).show();
+            Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_error_mood_adapter_empty));
         } else {
             for (int i = 0; i < moodAdapter.getCount(); i++) {
                 Mood moodToMark = moodAdapter.getItem(i);
@@ -265,6 +265,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
                     makeMoodMarker(googleMap, moodToMark);
                 }
             }
+            Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_success_mood_marker_added) + moodAdapter.getCount());
             // Center the camera at the most recent mood (?)
             Mood recentMood = moodAdapter.getItem(0);
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(recentMood.getLocation().getLatitude(), recentMood.getLocation().getLongitude())));
