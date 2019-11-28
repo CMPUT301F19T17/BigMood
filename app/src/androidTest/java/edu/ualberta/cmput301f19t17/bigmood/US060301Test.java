@@ -3,17 +3,19 @@ package edu.ualberta.cmput301f19t17.bigmood;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.GeoPoint;
-import com.robotium.solo.Solo;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.Calendar;
 
@@ -25,11 +27,10 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
+@RunWith(AndroidJUnit4.class)
 public class US060301Test {
-    private Solo solo;
     private static AppPreferences appPreferences;
     private static MockRepository mockRepository;
-
 
     @BeforeClass //runs before anything else runs
     public static void setRepository() {
@@ -69,7 +70,6 @@ public class US060301Test {
 
     @Before //runs before every test
     public void setUp() {
-        solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
 
     @Test
@@ -77,14 +77,10 @@ public class US060301Test {
         //we are logged in as user1, which means we follow user2 and user3
 
         // switch to the Following tab
-        solo.clickOnText("Following");
 
         //go to the map view
-        solo.clickOnView(solo.getView(R.id.action_maps_following));
 
-        //solo.click
-        solo.waitForText("");
-        solo.sleep(10000);
+        //make sure there are 2 pins in the correct locations
 
     }
 }
