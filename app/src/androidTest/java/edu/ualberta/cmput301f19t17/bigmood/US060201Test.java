@@ -63,7 +63,6 @@ public class US060201Test {
         Calendar calendar1 = (Calendar) baseCalendar.clone();
         Mood mood1 = new Mood(null, EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "Games are fun", new GeoPoint(53.5184, -113.5023));
         mockRepository.createMood(currentUser, mood1, null, null);
-        Log.i(HomeActivity.LOG_TAG, "Debug time:" + mood1.getLocation().toString());
     }
 
     @Rule
