@@ -1,9 +1,13 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.firestore.GeoPoint;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -12,12 +16,22 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
+import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class US050201Test {
@@ -36,8 +50,33 @@ public class US050201Test {
         US050201Test.mockRepository = new MockRepository();
         US050201Test.appPreferences.setRepository(US050201Test.mockRepository);
 
-        // Login with a user from the database using a specialized method in MockRepository
+        // Login as user2 from the database using a specialized method in MockRepository
         US050201Test.appPreferences.login(US050201Test.mockRepository.getUser("user2"));
+
+        //clear all user's mood and add some new ones
+        User follow1 = mockRepository.getUser("user1");
+        User follow2 = mockRepository.getUser("user2");
+        User follow3 = mockRepository.getUser("user3");
+
+        mockRepository.deleteAllUserMoods(follow1);
+        mockRepository.deleteAllUserMoods(follow2);
+        mockRepository.deleteAllUserMoods(follow3);
+
+        // create a calendar on which we base the other calendars
+        Calendar baseCalendar = Calendar.getInstance();
+        baseCalendar.set(2019, 10, 23, 12, 0);
+
+        // add mood to user2
+        Calendar calendar1 = (Calendar) baseCalendar.clone();
+        calendar1.add(Calendar.MINUTE, 5);
+        Mood mood1 = new Mood(EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "I am happy.", new GeoPoint(53.5461, 113.4938), null);
+        mockRepository.createMood(follow2, mood1, null, null);
+
+        // add mood to user3
+        Calendar calendar2 = (Calendar) baseCalendar.clone();
+        Mood mood2 = new Mood(EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am mad.", new GeoPoint(53.5461, 113.4938), null);
+        mockRepository.createMood(follow3, mood2, null, null);
+
 
     }
 
@@ -65,10 +104,9 @@ public class US050201Test {
 
         // login as user3
         US050201Test.appPreferences.getInstance().login(requestedUser);
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
 
-        // Go to Requests and accept the request from user3
+        // Go to Requests and accept the request
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_requests));
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.label_request_accept));
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_success_request_accept), 1, 2000));
@@ -76,8 +114,20 @@ public class US050201Test {
         // login as user2, go to Following and check that user3's recent mood is there
         User followedUser =  US050201Test.mockRepository.getUser("user2");
         US050201Test.appPreferences.getInstance().login(followedUser);
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
+        solo.sleep(1000);
+
+        //switch to following tab
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_following));
+        solo.sleep(1000);
+
+        //make sure the second item is the previously added item
+        solo.clickOnMenuItem("Angry");
+
+        //ensure we have opened the item correctly
+        assertTrue(solo.waitForText(SocialSituation.CROWD.toString()));
         solo.sleep(5000);
+
 
     }
 
@@ -90,12 +140,21 @@ public class US050201Test {
         // Go to Requests and reject the request from user3
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_requests));
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.label_request_reject));
-
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_success_request_reject), 1, 2000));
 
-        // Go to Following and check that user3's recent mood is not there
+        // we clear all the moods, so the following list should be empty
         solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_following));
+
+        ListView moodList = (ListView) solo.getView(R.id.following_mood_list);
+        ListAdapter moodArrayAdapter = moodList.getAdapter();
+        assertEquals(0, moodArrayAdapter.getCount());
+
         solo.sleep(5000);
+
+
+
+
+
 
     }
 
