@@ -16,22 +16,17 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
-import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
-import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class US050201Test {
@@ -69,12 +64,12 @@ public class US050201Test {
         // add mood to user2
         Calendar calendar1 = (Calendar) baseCalendar.clone();
         calendar1.add(Calendar.MINUTE, 5);
-        Mood mood1 = new Mood(EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "I am happy.", new GeoPoint(53.5461, 113.4938), null);
+        Mood mood1 = new Mood(null, EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "I am happy.", new GeoPoint(53.5461, 113.4938));
         mockRepository.createMood(follow2, mood1, null, null);
 
         // add mood to user3
         Calendar calendar2 = (Calendar) baseCalendar.clone();
-        Mood mood2 = new Mood(EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am mad.", new GeoPoint(53.5461, 113.4938), null);
+        Mood mood2 = new Mood(null, EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am mad.", new GeoPoint(53.5461, 113.4938));
         mockRepository.createMood(follow3, mood2, null, null);
 
 
@@ -128,7 +123,6 @@ public class US050201Test {
         assertTrue(solo.waitForText(SocialSituation.CROWD.toString()));
         solo.sleep(5000);
 
-
     }
 
     @Test
@@ -150,11 +144,6 @@ public class US050201Test {
         assertEquals(0, moodArrayAdapter.getCount());
 
         solo.sleep(5000);
-
-
-
-
-
 
     }
 
