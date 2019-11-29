@@ -73,7 +73,7 @@ public class US060201Test {
 
 
     @Test
-    public void checkUserMap() throws UiObjectNotFoundException, InterruptedException {
+    public void checkUserMap() throws UiObjectNotFoundException {
 
         //go to the map view
         UiObject mapButton = device.findObject(new UiSelector()
@@ -81,8 +81,6 @@ public class US060201Test {
         if (mapButton.exists()) {
             mapButton.click(); //this will throw a UIObjectNotFoundException if we cannot click following
         }
-
-        Thread.sleep(100000);
 
         String user1MoodTime = "12:00";
 
