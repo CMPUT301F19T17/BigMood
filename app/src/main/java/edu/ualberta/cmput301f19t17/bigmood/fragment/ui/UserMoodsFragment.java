@@ -337,11 +337,6 @@ public class UserMoodsFragment extends Fragment {
 
                 // Set the onclick listener
                 this.menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    /**
-                     * This method is called when an item in the Filter list is clicked
-                     * @param item the item that was clicked
-                     * @return true // TODO: 2019-11-07 Cameron: not sure why it always returns true, investigate
-                     */
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
 
