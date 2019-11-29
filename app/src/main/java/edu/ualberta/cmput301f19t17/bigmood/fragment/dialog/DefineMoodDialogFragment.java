@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
@@ -98,8 +99,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     private GoogleMap googleMap;
     private MapView mapView;
 
-    private View placeholderLocation;
-    private View placeholderImage;
+    private TextView placeholderLocation;
+    private TextView buttonGetImage;
 
     private TextView buttonAttachImage;
     private TextView buttonAttachLocation;
@@ -113,6 +114,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     private Uri imageUri;
 
     private boolean saveButtonEnabled = true;
+    private boolean getImageButtonEnabled = true;
 
     // set up the locationUpdatesListener
     private LocationHelper.LocationRequestUpdatesListener locationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
@@ -288,7 +290,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         this.situationSpinnerAdapter = new SituationSpinnerAdapter(this.getContext());
 
         // Find and set the map container and add location label
-        this.placeholderImage = view.findViewById(R.id.label_no_image);
+        this.buttonGetImage = view.findViewById(R.id.label_no_image);
         this.placeholderLocation = view.findViewById(R.id.label_no_location);
 
         // Find and set the textview buttons
@@ -374,6 +376,91 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
             }
 
+            if (this.moodToEdit.getImageId() != null) {
+
+                this.buttonGetImage.setEnabled(true);
+                this.buttonGetImage.setText(R.string.label_get_image);
+                this.buttonGetImage.setTypeface(Typeface.DEFAULT_BOLD);
+
+                this.buttonGetImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (! DefineMoodDialogFragment.this.getImageButtonEnabled) {
+
+                            Toast.makeText(
+                                    DefineMoodDialogFragment.this.getContext(),
+                                    "Please wait until the current upload finishes.",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            return;
+
+                        }
+
+                        DefineMoodDialogFragment.this.getImageButtonEnabled = false;
+
+                        DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.VISIBLE);
+                        DefineMoodDialogFragment.this.progressBarImage.setProgress(25);
+
+                        AppPreferences preferences = AppPreferences.getInstance();
+
+                        preferences.getRepository()
+                                .downloadImage(
+
+                                        DefineMoodDialogFragment.this.moodToEdit.getImageId(),
+
+                                        new OnSuccessListener<Bitmap>() {
+                                            @Override
+                                            public void onSuccess(Bitmap bitmap) {
+
+                                                DefineMoodDialogFragment.this.imageView.setImageBitmap(bitmap);
+                                                DefineMoodDialogFragment.this.buttonGetImage.setEnabled(false);
+
+                                                DefineMoodDialogFragment.this.showImageView();
+
+                                                DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.INVISIBLE);
+
+                                            }
+                                        },
+
+                                        new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                                Toast.makeText(
+                                                        DefineMoodDialogFragment.this.getContext(),
+                                                        R.string.toast_error_image_download,
+                                                        Toast.LENGTH_SHORT
+                                                ).show();
+
+                                                DefineMoodDialogFragment.this.progressBarImage.setProgress(0);
+                                                DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.INVISIBLE);
+
+                                                DefineMoodDialogFragment.this.getImageButtonEnabled = true;
+
+
+                                            }
+                                        },
+
+                                        new ImageProgressListener() {
+                                            @Override
+                                            public void onProgress(int progress) {
+
+                                                Log.d(LOG_TAG, "PROGRESS (DMDF): " + progress);
+
+                                                DefineMoodDialogFragment.this.progressBarImage.setProgress(progress);
+
+                                            }
+                                        }
+
+                                );
+
+                    }
+                });
+
+            }
+
         } else {
 
             // Set Title
@@ -427,6 +514,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                 ));
         timeSpinner.setEnabled(false);
 
+        
+        
         // onClickListener for the attach location button
         this.buttonAttachLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -535,9 +624,15 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                     // If the user did not pick an image, don't do any of the following
                     if (imageUri == null) {
 
+                        String imageId = null;
+
+                        // If the user is editing a mood who didn't attach an image but previously had one.
+                        if (moodToEdit != null && moodToEdit.getImageId() != null)
+                            imageId = moodToEdit.getImageId();
+
                         DefineMoodDialogFragment.this.saveMoodAndReturn(
 
-                                null,
+                                imageId,
                                 emotionalState,
                                 calendar,
                                 socialSituation,
@@ -549,6 +644,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
                     }
 
+                    // We need to save the image first before we proceed, so we have to do all the logic below
+
                     // Disable the save button
                     DefineMoodDialogFragment.this.saveButtonEnabled = false;
 
@@ -559,81 +656,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                     // Disable the textview button
                     DefineMoodDialogFragment.this.disableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
 
-                    // Get app preferences
-                    AppPreferences preferences = AppPreferences.getInstance();
-
                     // Save image
-                    preferences
-                            .getRepository()
-                            .uploadNewImage(
-
-                                    preferences.getCurrentUser(),
-                                    DefineMoodDialogFragment.this.imageUri,
-                                    DefineMoodDialogFragment.IMAGE_FILE_EXTENSION,
-
-                                    new OnSuccessListener<String>() {
-                                        @Override
-                                        public void onSuccess(String s) {
-
-                                            // Call the save and return method, which will save our mood to the database. We know the image has been uploaded, which is pointed to by s.
-                                            DefineMoodDialogFragment.this.saveMoodAndReturn(
-
-                                                    s,
-                                                    emotionalState,
-                                                    calendar,
-                                                    socialSituation,
-                                                    reason
-
-                                            );
-
-                                        }
-                                    },
-
-                                    new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                            Toast.makeText(
-                                                    DefineMoodDialogFragment.this.getContext(),
-                                                    "Image failed to upload. Please try again.",
-                                                    Toast.LENGTH_LONG
-                                            ).show();
-
-                                            Handler handler = new Handler();
-                                            handler.postDelayed(
-
-                                                    new Runnable() {
-                                                        @Override
-                                                        public void run() {
-
-                                                            DefineMoodDialogFragment.this.progressBarImage.setProgress(0);
-                                                            DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.INVISIBLE);
-
-                                                            DefineMoodDialogFragment.this.saveButtonEnabled = true;
-
-                                                        }
-                                                    },
-
-                                                    1000
-
-                                            );
-
-                                            DefineMoodDialogFragment.this.enableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
-
-
-                                        }
-                                    },
-
-                                    new ImageProgressListener() {
-                                        @Override
-                                        public void onProgress(int progress) {
-
-                                            DefineMoodDialogFragment.this.progressBarImage.setProgress(progress);
-
-                                        }
-                                    }
-
-                            );
+                    DefineMoodDialogFragment.this.saveImage(emotionalState, calendar, socialSituation, reason);
 
                     return true;
 
@@ -668,6 +692,128 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     }
 
+    private void saveImage(final EmotionalState emotionalState, final Calendar calendar, final SocialSituation socialSituation, final String reason) {
+
+        // Get app preferences
+        AppPreferences preferences = AppPreferences.getInstance();
+
+        // Define general onFailureListener
+        OnFailureListener failureListener = new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                Toast.makeText(
+                        DefineMoodDialogFragment.this.getContext(),
+                        "Image failed to upload. Please try again.",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                Handler handler = new Handler();
+                handler.postDelayed(
+
+                        new Runnable() {
+                            @Override
+                            public void run() {
+
+                                DefineMoodDialogFragment.this.progressBarImage.setProgress(0);
+                                DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.INVISIBLE);
+
+                                DefineMoodDialogFragment.this.saveButtonEnabled = true;
+
+                            }
+                        },
+
+                        1000
+
+                );
+
+                DefineMoodDialogFragment.this.enableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
+
+            }
+        };
+
+        // Define general onProgressListener
+        ImageProgressListener progressListener = new ImageProgressListener() {
+            @Override
+            public void onProgress(int progress) {
+
+                DefineMoodDialogFragment.this.progressBarImage.setProgress(progress);
+
+            }
+        };
+
+        // If we're editing a mood AND the mood has an image ID, then replace that image in the DB.
+        if (moodToEdit != null && moodToEdit.getImageId() != null) {
+
+            // Save over old image
+            preferences
+                    .getRepository()
+                    .uploadReplaceImage(
+
+                            moodToEdit.getImageId(),
+                            DefineMoodDialogFragment.this.imageUri,
+
+                            new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+
+                                    // Call the save and return method, which will save our mood to the database. We know the image has been uploaded, which is pointed to by s.
+                                    DefineMoodDialogFragment.this.saveMoodAndReturn(
+
+                                            moodToEdit.getImageId(),
+                                            emotionalState,
+                                            calendar,
+                                            socialSituation,
+                                            reason
+
+                                    );
+
+                                }
+                            },
+
+                            failureListener,
+                            progressListener
+
+                    );
+
+        } else {
+
+            // Upload new image
+            preferences
+                    .getRepository()
+                    .uploadNewImage(
+
+                            preferences.getCurrentUser(),
+                            DefineMoodDialogFragment.this.imageUri,
+                            DefineMoodDialogFragment.IMAGE_FILE_EXTENSION,
+
+                            new OnSuccessListener<String>() {
+                                @Override
+                                public void onSuccess(String s) {
+
+                                    // Call the save and return method, which will save our mood to the database. We know the image has been uploaded, which is pointed to by s.
+                                    DefineMoodDialogFragment.this.saveMoodAndReturn(
+
+                                            s,
+                                            emotionalState,
+                                            calendar,
+                                            socialSituation,
+                                            reason
+
+                                    );
+
+                                }
+                            },
+
+                            failureListener,
+                            progressListener
+
+                    );
+
+        }
+
+
+    }
 
     private void saveMoodAndReturn(String imageId, EmotionalState emotionalState, Calendar calendar, SocialSituation socialSituation, String reason) {
 
@@ -835,7 +981,7 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     private void showImageView() {
 
-        this.placeholderImage.setVisibility(View.INVISIBLE);
+        this.buttonGetImage.setVisibility(View.INVISIBLE);
         this.imageView.setVisibility(View.VISIBLE);
 
     }

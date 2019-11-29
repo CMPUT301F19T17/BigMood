@@ -569,7 +569,40 @@ public class FirestoreRepository implements Repository {
      * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
      */
     @Override
-    public void uploadReplaceImage(String imageId, Uri imageUri, OnSuccessListener<Void> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+    public void uploadReplaceImage(String imageId, Uri imageUri, OnSuccessListener<Void> successListener, OnFailureListener failureListener, final ImageProgressListener imageProgressListener) {
+
+        // Create task reference
+        UploadTask task = this.storage
+                .getReference(FirestoreMapping.STORAGE_IMAGE_DIRECTORY)
+                .child(imageId)
+                .putFile(imageUri);
+
+        // Handle the success case. We create a continutation in order to return void in the successlistener.
+        task
+                .continueWith(new Continuation<UploadTask.TaskSnapshot, Void>() {
+                    @Override
+                    public Void then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        return null;
+                    }
+                })
+                .addOnSuccessListener(successListener);
+
+        // Delegate failure case
+        task.addOnFailureListener(failureListener);
+
+        // Handle progress case. We don't create a continuation because we are calling our own interface method.
+        task.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+
+                // Calculate percentage
+                double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+
+                // Call the callback method with the calculated casted integer
+                imageProgressListener.onProgress((int) progress);
+
+            }
+        });
 
     }
 
@@ -645,6 +678,8 @@ public class FirestoreRepository implements Repository {
 
                 // Calculate percentage
                 double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+
+                Log.d(LOG_TAG, "PROGRESS: " + progress);
 
                 // Call the callback method with the calculated casted integer
                 imageProgressListener.onProgress((int) progress);
