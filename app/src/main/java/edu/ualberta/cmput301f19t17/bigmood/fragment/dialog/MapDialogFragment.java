@@ -270,7 +270,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
             } else {
 
-                Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_SHORT).show();
                 Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_error_mood_adapter_empty));
 
             }
