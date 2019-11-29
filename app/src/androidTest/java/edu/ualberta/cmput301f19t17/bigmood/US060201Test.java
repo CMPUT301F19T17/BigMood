@@ -1,6 +1,9 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
 
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -58,7 +61,7 @@ public class US060201Test {
 
         //should be the first mood
         Calendar calendar1 = (Calendar) baseCalendar.clone();
-        Mood mood1 = new Mood(EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "Games are fun", new GeoPoint(53.5184, -113.5023), null);
+        Mood mood1 = new Mood(null, EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "Games are fun", new GeoPoint(53.5184, -113.5023));
         mockRepository.createMood(currentUser, mood1, null, null);
     }
 

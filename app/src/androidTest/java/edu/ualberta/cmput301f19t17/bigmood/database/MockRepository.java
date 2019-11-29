@@ -1,5 +1,9 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.util.Log;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.GeoPoint;
@@ -15,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.ImageProgressListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MockFollowingListenerRegistration;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MockFollowingMoodsListenerRegistration;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MockMoodsListenerRegistration;
@@ -25,6 +30,8 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
+
+import static edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity.LOG_TAG;
 
 public class MockRepository implements Repository {
 
@@ -118,10 +125,10 @@ public class MockRepository implements Repository {
                 "user1",
                 new ArrayList<>(Arrays.asList(
 
-                        new Mood("1", EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 1), SocialSituation.ALONE,   "user1 - mood1", new GeoPoint(1, 1), null),
-                        new Mood("2", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 2), SocialSituation.ONE,     "user1 - mood2", new GeoPoint(2, 2), null),
-                        new Mood("3", EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 3), SocialSituation.SEVERAL, "user1 - mood3", new GeoPoint(3, 3), null),
-                        new Mood("4", EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 4), SocialSituation.CROWD,   "user1 - mood4", new GeoPoint(4, 4), null)
+                        new Mood("1", null, EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 1), SocialSituation.ALONE,   "user1 - mood1", new GeoPoint(1, 1)),
+                        new Mood("2", null, EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 2), SocialSituation.ONE,     "user1 - mood2", new GeoPoint(2, 2)),
+                        new Mood("3", null, EmotionalState.HAPPINESS, MockRepository.incrementCalendar(baseCalendar, 3), SocialSituation.SEVERAL, "user1 - mood3", new GeoPoint(3, 3)),
+                        new Mood("4", null, EmotionalState.SADNESS,   MockRepository.incrementCalendar(baseCalendar, 4), SocialSituation.CROWD,   "user1 - mood4", new GeoPoint(4, 4))
 
                 ))
         );
@@ -131,10 +138,10 @@ public class MockRepository implements Repository {
                 "user2",
                 new ArrayList<>(Arrays.asList(
 
-                        new Mood("5", EmotionalState.FEAR,    MockRepository.incrementCalendar(baseCalendar, 5), SocialSituation.ALONE,   "user2 - mood5", new GeoPoint(5, 5), null),
-                        new Mood("6", EmotionalState.DISGUST, MockRepository.incrementCalendar(baseCalendar, 6), SocialSituation.ONE,     "user2 - mood6", new GeoPoint(6, 6), null),
-                        new Mood("7", EmotionalState.FEAR,    MockRepository.incrementCalendar(baseCalendar, 7), SocialSituation.SEVERAL, "user2 - mood7", new GeoPoint(7, 7), null),
-                        new Mood("8", EmotionalState.DISGUST, MockRepository.incrementCalendar(baseCalendar, 8), SocialSituation.CROWD,   "user2 - mood8", new GeoPoint(8, 8), null)
+                        new Mood("5", null, EmotionalState.FEAR,    MockRepository.incrementCalendar(baseCalendar, 5), SocialSituation.ALONE,   "user2 - mood5", new GeoPoint(5, 5)),
+                        new Mood("6", null, EmotionalState.DISGUST, MockRepository.incrementCalendar(baseCalendar, 6), SocialSituation.ONE,     "user2 - mood6", new GeoPoint(6, 6)),
+                        new Mood("7", null, EmotionalState.FEAR,    MockRepository.incrementCalendar(baseCalendar, 7), SocialSituation.SEVERAL, "user2 - mood7", new GeoPoint(7, 7)),
+                        new Mood("8", null, EmotionalState.DISGUST, MockRepository.incrementCalendar(baseCalendar, 8), SocialSituation.CROWD,   "user2 - mood8", new GeoPoint(8, 8))
 
                 ))
         );
@@ -144,10 +151,10 @@ public class MockRepository implements Repository {
                 "user3",
                 new ArrayList<>(Arrays.asList(
 
-                        new Mood("9",  EmotionalState.ANGER,    MockRepository.incrementCalendar(baseCalendar, 9),  SocialSituation.ALONE,   "user3 - mood9",  new GeoPoint(9,   9), null),
-                        new Mood("10", EmotionalState.SURPRISE, MockRepository.incrementCalendar(baseCalendar, 10), SocialSituation.ONE,     "user3 - mood10", new GeoPoint(10, 10), null),
-                        new Mood("11", EmotionalState.ANGER,    MockRepository.incrementCalendar(baseCalendar, 11), SocialSituation.SEVERAL, "user3 - mood11", new GeoPoint(11, 11), null),
-                        new Mood("12", EmotionalState.SURPRISE, MockRepository.incrementCalendar(baseCalendar, 12), SocialSituation.CROWD,   "user3 - mood12", new GeoPoint(12, 12), null)
+                        new Mood("9", null, EmotionalState.ANGER,    MockRepository.incrementCalendar(baseCalendar, 9),  SocialSituation.ALONE,   "user3 - mood9",  new GeoPoint(9,   9)),
+                        new Mood("10", null, EmotionalState.SURPRISE, MockRepository.incrementCalendar(baseCalendar, 10), SocialSituation.ONE,     "user3 - mood10", new GeoPoint(10, 10)),
+                        new Mood("11", null, EmotionalState.ANGER,    MockRepository.incrementCalendar(baseCalendar, 11), SocialSituation.SEVERAL, "user3 - mood11", new GeoPoint(11, 11)),
+                        new Mood("12", null, EmotionalState.SURPRISE, MockRepository.incrementCalendar(baseCalendar, 12), SocialSituation.CROWD,   "user3 - mood12", new GeoPoint(12, 12))
 
                 ))
         );
@@ -528,12 +535,11 @@ public class MockRepository implements Repository {
         dbMoodList.add(new Mood(
 
                 this.globalAutoIndex.toString(),
-                mood.getState(),
+                mood.getImageId(), mood.getState(),
                 mood.getDatetime(),
                 mood.getSituation(),
                 mood.getReason(),
-                mood.getLocation(),
-                mood.getImage()
+                mood.getLocation()
 
         ));
 
@@ -650,6 +656,27 @@ public class MockRepository implements Repository {
 
         if (failureListener != null)
             failureListener.onFailure(new RuntimeException("Mood does not exist in the database"));
+
+    }
+
+    @Override
+    public void uploadNewImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+
+        Log.e(LOG_TAG, "", new UnsupportedOperationException("Not implemented yet"));
+
+    }
+
+    @Override
+    public void uploadReplaceImage(String imageId, Uri imageUri, OnSuccessListener<Void> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+
+        Log.e(LOG_TAG, "", new UnsupportedOperationException("Not implemented yet"));
+
+    }
+
+    @Override
+    public void downloadImage(String imageId, OnSuccessListener<Bitmap> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+
+        Log.e(LOG_TAG, "", new UnsupportedOperationException("Not implemented yet"));
 
     }
 

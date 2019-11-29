@@ -9,8 +9,8 @@ import java.util.Calendar;
 
 public class MoodTest {
     private Mood mockMood(Calendar calendar, GeoPoint location) {
-        return new Mood(EmotionalState.ANGER, calendar, SocialSituation.ALONE, "Angry cause alone",
-                location, null);
+        return new Mood(null, EmotionalState.ANGER, calendar, SocialSituation.ALONE, "Angry cause alone",
+                location);
     }
 
     @Test

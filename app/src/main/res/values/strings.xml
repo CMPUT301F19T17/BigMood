@@ -57,6 +57,7 @@
     <string name="label_attach_location">Attach Location</string>
     <string name="label_no_location">No Location</string>
     <string name="label_no_image">No Image</string>
+    <string name="label_get_image">Get Image</string>
 
     <string name="dialog_option_take_photo">Take Photo</string>
     <string name="dialog_option_gallery">Pick from Gallery</string>
@@ -71,6 +72,7 @@
     <string name="toast_error_login">Failed to log in. Please try again.</string>
     <string name="toast_error_user_dne">Sorry, that user does not exist.</string>
     <string name="toast_error_create_request">Sorry, we could not process your request. Either you already follow them, or your previous request still has not been accepted.</string>
+    <string name="toast_error_image_download">"Failed to retrieve image, please try again."</string>
 
     <string name="toast_success_registration">Registration successful.</string>
     <string name="toast_success_request_accept">Request successfully accepted.</string>
@@ -97,7 +99,7 @@
     <string name="error_empty_password">Password cannot be empty</string>
     <string name="toast_success_request_sent">Request successfully sent.</string>
 
-    <string name="toast_error_mood_adapter_empty">Oops! There is no mood to show.</string>
+    <string name="toast_error_mood_adapter_empty">There are no moods to show on the map</string>
     <string name="toast_success_mood_marker_added">Numbers of mood location marker added: </string>
 
 

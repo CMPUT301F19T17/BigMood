@@ -1,7 +1,5 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
-import android.graphics.Bitmap;
-
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
@@ -79,6 +77,9 @@ class FirestoreConversion {
         if (! document.exists())
             throw new IllegalArgumentException(String.format("The document with the document ID {%s} does not exist in the database. Please pass in a document that exists.", document.getId()));
 
+        // Get the image ID. This field can be null, but we don't have to check since we are not calling anything on the location.
+        String imageId = document.get(FirestoreMapping.FIELD_MOOD_IMAGEID, String.class);
+
         // Get emotional state by doing a reverse lookup on the code
         // Since the integers stored in FS are 64 bit (long) we have to narrow the long to an integer. This can result in overflow, but since this is our enumeration and the security rules are set so that the number is in between a very short range this cannot happen.
         Integer stateCode = document.get(FirestoreMapping.FIELD_MOOD_STATE, Integer.class);
@@ -121,13 +122,8 @@ class FirestoreConversion {
         // Get the GeoPoint (long, lat). This is a Firestore type so we can convert it directly. This field can be null, but we don't have to check since we are not calling anything on the location.
         GeoPoint location = document.getGeoPoint(FirestoreMapping.FIELD_MOOD_LOCATION);
 
-        // TODO: 2019-11-01 Nectarios: IMAGE STORAGE
-        // Get the image. This field can be null, but we don't have to check since we are not calling anything on the location.
-        Bitmap image = (Bitmap) document.get(FirestoreMapping.FIELD_MOOD_IMAGE);
-
         // Since we are getting a new mood from the database, we have to associate an ID with it in order to edit or delete it at a different time. So we have to use the constructor that has the firestoreId
-        // TODO: 2019-11-01 Nectarios: Replace with factory?
-        return new Mood(document.getId(), state, datetime, situation, reason, location, image);
+        return new Mood(document.getId(), imageId, state, datetime, situation, reason, location);
 
     }
 
@@ -183,6 +179,8 @@ class FirestoreConversion {
         // We need to put this owner field here since it is required to be set in the database for the getFollowingMoods() function in the FirestoreRepository. However, it is not required by our model because we always know the user of a mood that we are saving/editing. In other words, we set the owner here but we never retrieve it.
         data.put( FirestoreMapping.FIELD_MOOD_OWNER, user.getUsername() );
 
+        data.put( FirestoreMapping.FIELD_MOOD_IMAGEID, mood.getImageId() );
+
         // These fields always exist, so we don't have to check if they are null.
         data.put( FirestoreMapping.FIELD_MOOD_STATE, mood.getState().getStateCode() );
         data.put( FirestoreMapping.FIELD_MOOD_DATETIME, new Timestamp( mood.getDatetime().getTime() ) );
@@ -203,9 +201,6 @@ class FirestoreConversion {
 
         // Location is either a GeoPoint or null, and both are allowed in the database. We don't check for null here because we don't have to access an instance method of that type.
         data.put( FirestoreMapping.FIELD_MOOD_LOCATION, mood.getLocation() );
-
-        // TODO: 2019-10-27 IMAGE STORAGE
-        data.put( FirestoreMapping.FIELD_MOOD_IMAGE, null );
 
         return data;
 

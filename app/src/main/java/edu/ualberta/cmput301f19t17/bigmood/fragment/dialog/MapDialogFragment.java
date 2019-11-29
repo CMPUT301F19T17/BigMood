@@ -36,39 +36,19 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 /**
  * MapDialogFragment holds the MapView that is used to select the user's location when they choose to add an image to
  * their mood. This is currently not implemented yet.
- * */
+ */
 public class MapDialogFragment extends DialogFragment implements OnMapReadyCallback {
 
     private static final String MAP_VIEW_BUNDLE_KEY = "edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapViewBundleKey";
-
-    public enum Title {
-
-        USER(R.string.title_user_maps),
-        FOLLOWER(R.string.title_following_maps)
-        ;
-
-        private int stringId;
-
-        Title(int stringId) {
-            this.stringId = stringId;
-        }
-
-        public int getStringId() {
-            return stringId;
-        }
-    }
-
     private Title title;
-
     private Toolbar toolbar;
-
     private MoodAdapter moodAdapter;
-
     private MapView mapView;
     private GoogleMap googleMap;
 
     /**
      * This is the constructor. We pass in a moodAdapter then show the map with the marker being the mood in the adapter
+     *
      * @param moodAdapter
      */
     public MapDialogFragment(MoodAdapter moodAdapter, Title title) {
@@ -86,6 +66,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * of the on*()methods, this is the first. When we first want to create the dialog we set the theme to the fullscreen theme so that the edges match the parent. Here we also check for the existence of a mood in the arguments bundle and set it to our instance variable.
+     *
      * @param savedInstanceState a bundle that holds the state of the fragment
      */
     @Override
@@ -99,10 +80,11 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
      * This is where we inflate all the views and *if applicable* populate all the fields.
+     *
      * @param inflater           View inflater service
      * @param container          Container that the inflater is housed in
      * @param savedInstanceState A bundle that holds the state of the fragment
-     * @return                   Returns the inflated view
+     * @return Returns the inflated view
      */
     @Nullable
     @Override
@@ -129,6 +111,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * of the on*()methods, this is the third. This is executed when the view is created. Here we set onClickListeners, etc. This is where we will actually error check all the views and
+     *
      * @param view               The view that was created and inflated
      * @param savedInstanceState A bundle that holds the state of the fragment
      */
@@ -172,6 +155,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * Create a bundle that will save the state of the map view if the app is switched out
+     *
      * @param outState
      */
     @Override
@@ -235,6 +219,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * This method draws the markers on the map for all of the moods that come in from the mood adapter
+     *
      * @param googleMapView
      */
     @Override
@@ -244,38 +229,59 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         Log.d(HomeActivity.LOG_TAG, getString(R.string.title_user_maps));
         googleMap = googleMapView;
         googleMap.setMinZoomPreference(15);
-        //canned data
-/*      LatLng ny = new LatLng(40.7143528, -74.0059731);
-        googleMap.addMarker(new MarkerOptions().position(ny)
-                .icon(BitmapDescriptorFactory.defaultMarker(mood.getState().getMarkerColor()))
-                .title("Marker in NY")
-                .snippet("Test marker!"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ny));*/
 
-        /*
-         * DO NOT DELETE CODE BELOW
-         * WILL IMPLEMENT THIS CODE AFTER WE FIGURE HOW TO GET THE LOCATION OF A MOOD
-         * THE CODE ABOVE IS A TEST OF THE MAP
-         */
         if (moodAdapter.getCount() == 0) {
+
             Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_LONG).show();
             Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_error_mood_adapter_empty));
+
         } else {
+
             for (int i = 0; i < moodAdapter.getCount(); i++) {
+
                 Mood moodToMark = moodAdapter.getItem(i);
-                if (moodToMark != null) {
+
+                if (moodToMark != null && moodToMark.getLocation() != null)
                     makeMoodMarker(googleMap, moodToMark);
-                }
+
             }
+
             Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_success_mood_marker_added) + moodAdapter.getCount());
-            // Center the camera at the most recent mood (?)
-            Mood recentMood = moodAdapter.getItem(0);
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(recentMood.getLocation().getLatitude(), recentMood.getLocation().getLongitude())));
+
+            // Center the camera at the most recent mood
+
+            Mood recentMood = null;
+
+            for (int i = 0; i < moodAdapter.getCount(); i++) {
+
+                Mood moodToMark = moodAdapter.getItem(i);
+
+                if (moodToMark != null && moodToMark.getLocation() != null) {
+                    recentMood = moodToMark;
+                    break;
+                }
+
+            }
+
+            // If this is still null then there must be no moods for which have locations
+            if (recentMood != null) {
+
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(recentMood.getLocation().getLatitude(), recentMood.getLocation().getLongitude())));
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+
+            } else {
+
+                Toast.makeText(this.getContext(), this.getString(R.string.toast_error_mood_adapter_empty), Toast.LENGTH_SHORT).show();
+                Log.d(HomeActivity.LOG_TAG, this.getString(R.string.toast_error_mood_adapter_empty));
+
+            }
+
         }
     }
 
     /**
      * This method takes in a mood and create a custom marker for it
+     *
      * @param googleMap
      * @param mood
      */
@@ -302,6 +308,22 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
                 .snippet(mood.getState().toString() + "; " + moodTime + " " + moodReason)
 
         );
+    }
+
+    public enum Title {
+
+        USER(R.string.title_user_maps),
+        FOLLOWER(R.string.title_following_maps);
+
+        private int stringId;
+
+        Title(int stringId) {
+            this.stringId = stringId;
+        }
+
+        public int getStringId() {
+            return stringId;
+        }
     }
 
 }
