@@ -128,7 +128,6 @@ public class US050201Test {
         assertTrue(solo.waitForText(SocialSituation.CROWD.toString()));
         solo.sleep(5000);
 
-
     }
 
     @Test
@@ -150,11 +149,6 @@ public class US050201Test {
         assertEquals(0, moodArrayAdapter.getCount());
 
         solo.sleep(5000);
-
-
-
-
-
 
     }
 
