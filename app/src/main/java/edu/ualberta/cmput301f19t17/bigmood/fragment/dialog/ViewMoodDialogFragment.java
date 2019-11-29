@@ -339,6 +339,11 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
     }
 
+    /**
+     * of the on*()methods, this is the third. This is executed when the view is created. Here we set onClickListeners, etc. This is where we will actually error check all the views and
+     * @param view               The view that was created and inflated
+     * @param savedInstanceState A bundle that holds the state of the fragment
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -346,6 +351,10 @@ public class ViewMoodDialogFragment extends DialogFragment {
 
     }
 
+    /**
+     * This method puts a marker on the instance of the googleMap that ViewMoodDialogFragment holds.
+     * @param latLng the location of the marker we want to add
+     */
     private void addMarkerAtLocation(LatLng latLng) {
         if (googleMap != null) {
             googleMap.clear();
