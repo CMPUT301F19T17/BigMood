@@ -83,7 +83,6 @@ public class US010301Test {
 
     }
 
-    // NOT DONE: check photograph and map
     @Test // A full mood refers to a mood where the state, social situation, reason, photograph, and map are all provided
     public void testDisplayFullMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
