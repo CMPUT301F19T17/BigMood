@@ -5,7 +5,6 @@ import android.widget.EditText;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
 import com.robotium.solo.Solo;
 
@@ -19,7 +18,6 @@ import java.util.Calendar;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
-import edu.ualberta.cmput301f19t17.bigmood.activity.SignUpActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.User;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
@@ -67,12 +65,12 @@ public class US030101Test {
         // add mood to user2
         Calendar calendar1 = (Calendar) baseCalendar.clone();
         calendar1.add(Calendar.MINUTE, 5);
-        Mood mood1 = new Mood(EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "I am happy.", new GeoPoint(53.5461, 113.4938), null);
+        Mood mood1 = new Mood(null, EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "I am happy.", new GeoPoint(53.5461, 113.4938));
         mockRepository.createMood(follow2, mood1, null, null);
 
         // add mood to user3
         Calendar calendar2 = (Calendar) baseCalendar.clone();
-        Mood mood2 = new Mood(EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am mad.", new GeoPoint(53.5461, 113.4938), null);
+        Mood mood2 = new Mood(null, EmotionalState.ANGER, calendar2, SocialSituation.CROWD, "I am mad.", new GeoPoint(53.5461, 113.4938));
         mockRepository.createMood(follow3, mood2, null, null);
 
 
