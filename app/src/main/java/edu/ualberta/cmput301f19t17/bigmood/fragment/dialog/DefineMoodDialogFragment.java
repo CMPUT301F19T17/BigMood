@@ -58,8 +58,8 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.SituationSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.ImageProgressListener;
+import edu.ualberta.cmput301f19t17.bigmood.helper.LocationHelper;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
-import edu.ualberta.cmput301f19t17.bigmood.model.LocationHelper;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 

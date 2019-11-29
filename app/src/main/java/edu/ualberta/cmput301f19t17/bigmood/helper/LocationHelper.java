@@ -1,4 +1,4 @@
-package edu.ualberta.cmput301f19t17.bigmood.model;
+package edu.ualberta.cmput301f19t17.bigmood.helper;
 
 import android.Manifest;
 import android.content.Context;
