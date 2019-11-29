@@ -1236,4 +1236,5 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         );
 
     }
+
 }
