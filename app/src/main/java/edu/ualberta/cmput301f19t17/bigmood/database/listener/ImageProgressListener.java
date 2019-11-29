@@ -1,5 +1,8 @@
 package edu.ualberta.cmput301f19t17.bigmood.database.listener;
 
+/**
+ * This interface defines a callback method for live image updates from the database the repository pulls from.
+ */
 public interface ImageProgressListener {
 
     /**

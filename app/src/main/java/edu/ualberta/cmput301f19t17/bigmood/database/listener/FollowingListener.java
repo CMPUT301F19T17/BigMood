@@ -3,7 +3,7 @@ package edu.ualberta.cmput301f19t17.bigmood.database.listener;
 import java.util.List;
 
 /**
- * This interface defines a callback method for live mood updates from the database the repository pulls from.
+ * This interface defines a callback method for live follower updates from the database the repository pulls from.
  */
 public interface FollowingListener {
     /**

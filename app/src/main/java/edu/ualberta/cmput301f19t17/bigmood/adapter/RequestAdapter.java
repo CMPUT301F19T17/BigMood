@@ -22,6 +22,12 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
 
+/**
+ * This class serves as a custom ArrayAdapter specifically for Requests.
+ * This Adapter does the following:
+ * 1) Stores a collection of Request objects in tandem with the ArrayList passed into its constructor.
+ * 2) Inflates the different aspects of the row layout that are defined.
+ */
 public class RequestAdapter extends ArrayAdapter<Request> {
     private AppPreferences appPreferences;
     private int resource;

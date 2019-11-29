@@ -29,7 +29,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 /**
  * This class serves as a custom ArrayAdapter specifically for Moods.
  * This Adapter does the following:
- * 1) Stores a collection of Ride objects in tandem with the ArrayList passed into its constructor.
+ * 1) Stores a collection of Mood objects in tandem with the ArrayList passed into its constructor.
  * 2) Inflates the different aspects of the row layout that are defined.
  */
 public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {

@@ -15,7 +15,6 @@ public class User {
      * @param firstName First name of user
      * @param lastName  Last name of user
      */
-
     User(String username, String firstName, String lastName) {
 
         if (username == null || firstName == null || lastName == null)

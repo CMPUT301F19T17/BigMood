@@ -692,6 +692,14 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     }
 
+    /**
+     * This method saves an image in Firestore.
+     * It calls the saveMoodAndReturn method if the image saving is correct.
+     * @param emotionalState the emotionalState of the Mood we want to save an image in
+     * @param calendar the calendar of the Mood we want to save an image in
+     * @param socialSituation the socialSituation of the Mood we want to save an image in
+     * @param reason the reason of the Mood we want to save an image in
+     */
     private void saveImage(final EmotionalState emotionalState, final Calendar calendar, final SocialSituation socialSituation, final String reason) {
 
         // Get app preferences
@@ -815,6 +823,15 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     }
 
+    /**
+     * This method saves a mood in Firestore.
+     * It is called by the saveImage method if it is successful, and it is called when the save button is pressed if there is no image.
+     * @param imageId the ID of the image of the mood we want to save
+     * @param emotionalState the emotionalState of the mood we want to save
+     * @param calendar the calendar of the mood we want to save
+     * @param socialSituation the socialSituation of the mood we want to save
+     * @param reason the reason of the mood we want to save
+     */
     private void saveMoodAndReturn(String imageId, EmotionalState emotionalState, Calendar calendar, SocialSituation socialSituation, String reason) {
 
         // Declare mood. Can be initialized as an "old" mood (with firestoreId) or a "new" mood (without firestoreId).
@@ -946,8 +963,13 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         }
     }
 
-    // TODO: 2019-11-23 Ranajay: Add comments, javadoc, and finish photograph implementation
-
+    /**
+     * This method is called when the activity is finished.
+     * @param requestCode the code that is calling the end of the activity. What we care about is whether it is requesting that we switch
+     *                    to the camera, or switch to the gallery
+     * @param resultCode the code that is ending the activity
+     * @param data the data of the app's state
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -979,6 +1001,9 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         }
     }
 
+    /**
+     * This method switches the visibilty of the imageview
+     */
     private void showImageView() {
 
         this.buttonGetImage.setVisibility(View.INVISIBLE);
@@ -1145,6 +1170,9 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     }
 
+    /**
+     * Creates the intent to select a picture. Adapted from https://developer.android.com/training/camera/photobasics.html#java
+     */
     private void dispatchPickImageIntent() {
         Intent i = new Intent(
                 Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -1179,6 +1207,10 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
         return image;
     }
 
+    /**
+     * This method disables a TextView button
+     * @param button the button we want to disable the user from clicking
+     */
     private void disableTextViewButton(TextView button) {
 
         button.setEnabled(false);
@@ -1190,6 +1222,10 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     }
 
+    /**
+     * This method enables a TextView button
+     * @param button the button we want to enable the user to be able to click
+     */
     private void enableTextViewButton(TextView button) {
 
         button.setEnabled(true);

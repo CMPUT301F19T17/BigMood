@@ -155,8 +155,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * Create a bundle that will save the state of the map view if the app is switched out
-     *
-     * @param outState
+     * @param outState the state of the app, so that we can save it when we switch apps
      */
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -219,8 +218,7 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * This method draws the markers on the map for all of the moods that come in from the mood adapter
-     *
-     * @param googleMapView
+     * @param googleMapView the GoogleMap that we want to draw moods onto
      */
     @Override
     public void onMapReady(GoogleMap googleMapView) {
@@ -281,9 +279,8 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
 
     /**
      * This method takes in a mood and create a custom marker for it
-     *
-     * @param googleMap
-     * @param mood
+     * @param googleMap the GoogleMap that we want to draw the mood onto
+     * @param mood the mood we want to make a marker for
      */
     public void makeMoodMarker(GoogleMap googleMap, Mood mood) {
         GeoPoint geoPoint = mood.getLocation();
@@ -310,6 +307,9 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         );
     }
 
+    /**
+     * This enum is for the title of the Map, either USER or FOLLOWER
+     */
     public enum Title {
 
         USER(R.string.title_user_maps),
