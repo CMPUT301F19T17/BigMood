@@ -105,7 +105,4 @@ public class US010101Test {
     public void tearDown() throws Exception{
         solo.finishOpenedActivities();
     }
-
-
-
 }

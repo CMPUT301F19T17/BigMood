@@ -1,22 +1,15 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.test.core.app.ApplicationProvider;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
-import androidx.test.uiautomator.Until;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.GeoPoint;
 
 import org.junit.Before;
@@ -24,7 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.util.Calendar;
 
@@ -36,18 +28,12 @@ import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class US060301Test {
     private static AppPreferences appPreferences;
     private static MockRepository mockRepository;
-    private static final String BASIC_SAMPLE_PACKAGE
-            = "edu.ualberta.cmput301f19t17.bigmood";
-    private static final int LAUNCH_TIMEOUT = 5000;
-    private static final String STRING_TO_BE_TYPED = "UiAutomator";
     private UiDevice device;
 
 

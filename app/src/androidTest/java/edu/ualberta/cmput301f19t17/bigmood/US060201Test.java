@@ -1,34 +1,42 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
-import android.view.View;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiObject;
+import androidx.test.uiautomator.UiObjectNotFoundException;
+import androidx.test.uiautomator.UiSelector;
 
-import com.google.android.material.textfield.TextInputLayout;
-import com.robotium.solo.Solo;
+import com.google.firebase.firestore.GeoPoint;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import java.util.Map;
+import java.util.Calendar;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
-import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.database.User;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
+import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertTrue;
 
+@RunWith(AndroidJUnit4.class)
 public class US060201Test {
-    private Solo solo;
     private static AppPreferences appPreferences;
     private static MockRepository mockRepository;
+    private UiDevice device;
 
-    @BeforeClass
+
+    @BeforeClass //runs before anything else runs
     public static void setRepository() {
 
         // Set app preferences
@@ -38,45 +46,47 @@ public class US060201Test {
         US060201Test.mockRepository = new MockRepository();
         US060201Test.appPreferences.setRepository(US060201Test.mockRepository);
 
-        // Login with a user from the database using a specialized method in MockRepository
-        US060201Test.appPreferences.login(US060201Test.mockRepository.getUser("user1"));
+        User currentUser = mockRepository.getUser("user1");
+
+        // Login with user 1 from the database using a specialized method in MockRepository
+        US060201Test.appPreferences.login(currentUser);
+        mockRepository.deleteAllUserMoods(currentUser);
+
+        //create a calendar on which we base the other calendars
+        Calendar baseCalendar = Calendar.getInstance();
+        baseCalendar.set(2019, 10, 23, 12, 0);
+
+        //should be the first mood
+        Calendar calendar1 = (Calendar) baseCalendar.clone();
+        Mood mood1 = new Mood(EmotionalState.HAPPINESS, calendar1, SocialSituation.ALONE, "Games are fun", new GeoPoint(53.5184, -113.5023), null);
+        mockRepository.createMood(currentUser, mood1, null, null);
     }
 
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);
 
     @Before
-    public void setUp() throws Exception {
-        solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        // Clear the user's mood list
-        US060201Test.mockRepository.deleteAllUserMoods(US060201Test.appPreferences.getCurrentUser());
-        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
-        solo.sleep(1500);
+    public void initUIDevice() {
+        // Initialize UiDevice instance
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
     }
 
+
     @Test
-    public void testUserMoodMap() {
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+    public void checkUserMap() throws UiObjectNotFoundException {
 
-        //No mood added
+        //go to the map view
+        UiObject mapButton = device.findObject(new UiSelector()
+                .description("User Maps"));
+        if (mapButton.exists()) {
+            mapButton.click(); //this will throw a UIObjectNotFoundException if we cannot click following
+        }
 
-        View userMap = solo.getCurrentActivity().findViewById(R.id.action_maps_user);
-        solo.clickOnView(userMap);
-        assertTrue(solo.searchText(solo.getCurrentActivity().getText(R.string.toast_error_mood_adapter_empty).toString()));
-        solo.goBack();
+        String user1MoodTime = "12:00";
 
-        //Add a Happy mood
-
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
-            //Add a slight the delay until the dialog has been opened (time may vary)
-            //Robotium might lag out if the delay is too low
-        solo.sleep(1000);
-        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.clickOnView(userMap);
-        assertTrue(solo.waitForLogMessage(solo.getCurrentActivity().getText(R.string.title_user_maps).toString()));
-        assertTrue(solo.waitForLogMessage(solo.getCurrentActivity().getText(R.string.toast_success_mood_marker_added).toString()+1));
-
+        //now check if there's a mood
+        UiObject user1MoodPin1 = device.findObject(new UiSelector()
+                .descriptionContains(user1MoodTime));
+        assertTrue(user1MoodPin1.exists());
     }
 }
