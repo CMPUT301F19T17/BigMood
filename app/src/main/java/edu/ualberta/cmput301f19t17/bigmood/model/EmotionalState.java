@@ -3,33 +3,44 @@ package edu.ualberta.cmput301f19t17.bigmood.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
 import edu.ualberta.cmput301f19t17.bigmood.R;
+
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_AZURE;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_GREEN;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_MAGENTA;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_RED;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_VIOLET;
+import static com.google.android.gms.maps.model.BitmapDescriptorFactory.HUE_YELLOW;
 
 /**
  * This Enumeration defines the categories for an emotional state. It also is associated with a state code, a display name, and a drawable ID.
  */
 public enum EmotionalState {
 
-    HAPPINESS (0, "Happy", R.drawable.ic_emoticon_happy),
-    SADNESS (1, "Sad", R.drawable.ic_emoticon_sad),
-    FEAR (2, "Afraid", R.drawable.ic_emoticon_fear),
-    DISGUST (3, "Disgusted", R.drawable.ic_emoticon_disgust),
-    ANGER (4, "Angry", R.drawable.ic_emoticon_anger),
-    SURPRISE (5, "Surprised", R.drawable.ic_emoticon_surprise),
+    HAPPINESS (0, "Happy", R.drawable.ic_emoticon_happy, HUE_YELLOW),
+    SADNESS (1, "Sad", R.drawable.ic_emoticon_sad, HUE_AZURE),
+    FEAR (2, "Afraid", R.drawable.ic_emoticon_fear, HUE_VIOLET),
+    DISGUST (3, "Disgusted", R.drawable.ic_emoticon_disgust, HUE_GREEN),
+    ANGER (4, "Angry", R.drawable.ic_emoticon_anger, HUE_RED),
+    SURPRISE (5, "Surprised", R.drawable.ic_emoticon_surprise, HUE_MAGENTA),
     ;
 
     private int stateCode;
     private String displayName;
     private int drawableId;
+    private float markerColor;
 
     /**
      * Constructor that allows each state to be associated with a code.
      * @param stateCode The stateCode the EmotionalState should be associated with
      */
-    EmotionalState(int stateCode, String displayName, int drawableId) {
+    EmotionalState(int stateCode, String displayName, int drawableId, float markerColor) {
         this.stateCode = stateCode;
         this.displayName = displayName;
         this.drawableId = drawableId;
+        this.markerColor = markerColor;
     }
 
     /**
@@ -47,6 +58,12 @@ public enum EmotionalState {
     public int getDrawableId() {
         return this.drawableId;
     }
+
+    /**
+     * Returns the float value of the marker color on the Map
+     * @return float for color
+     */
+    public float getMarkerColor() {return this.markerColor;}
 
     /**
      * This method converts an EmotionalState into a string

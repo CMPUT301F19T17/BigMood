@@ -7,17 +7,40 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.firestore.ListenerRegistration;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.cmput301f19t17.bigmood.R;
+import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
+import edu.ualberta.cmput301f19t17.bigmood.adapter.MoodAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.MapDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.fragment.dialog.ViewMoodDialogFragment;
+import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 
 /**
  * FollowingFragment houses the logic for viewing the moods of users that the logged in user follows.
  */
 public class FollowingFragment extends Fragment {
+
+    private AppPreferences appPreferences;
+
+    private ArrayList<Mood> moodList;
+    private MoodAdapter moodAdapter;
+
+    private ListenerRegistration listenerRegistration;
+
+    private View menuItemFilter = null;
+    private PopupMenu menu = null;
 
     /**
      * of the on*()methods, this is the second. After the dialog has been started we want to inflate the dialog.
@@ -34,7 +57,61 @@ public class FollowingFragment extends Fragment {
         // Enable options menu
         this.setHasOptionsMenu(true);
 
+        this.appPreferences = AppPreferences.getInstance();
+
+        // Initialize a new ArrayList
+        this.moodList = new ArrayList<>();
+
+        this.moodAdapter = new MoodAdapter(root.getContext(), R.layout.list_item_mood, moodList);
+        moodAdapter.notifyDataSetChanged();
+
+        //set up a reference to the listview we will be populating
+        ListView moodListView = root.findViewById(R.id.following_mood_list);
+        moodListView.setAdapter(moodAdapter);
+
+        // Set up the MoodsListener to listen to updates in FireStore
+        this.listenerRegistration = this.appPreferences
+                .getRepository()
+                .getFollowingMoods(
+                        this.appPreferences.getCurrentUser(),
+                        new MoodsListener() {
+
+                            @Override
+                            public void onUpdate(List<Mood> moodList) {
+
+                                FollowingFragment.this.moodList.clear();
+                                FollowingFragment.this.moodList.addAll(moodList);
+                                FollowingFragment.this.moodAdapter.notifyDataSetChanged();
+
+                                // This refresh the filter with the updated data
+                                FollowingFragment.this.moodAdapter.applyFilter(menuItemFilter, menu);
+
+                            }
+                        });
+
+        // set the onItemClickListener for the mood list items. This will be called anytime a mood is clicked on in the lis
+        moodListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                // Create dialog and set the button press listener for delete and edit
+                ViewMoodDialogFragment viewUserFragment = ViewMoodDialogFragment.newInstance(moodAdapter.getItem(i));
+                // Show the view Dialog
+                viewUserFragment.show(getFragmentManager(), "FRAGMENT_VIEW_MOOD");
+            }
+        });
+
         return root;
+    }
+
+    /**
+     * We need to unbind the ListenerRegistration so that updates do not occur in the background, so we have to make sure we do that upon exit only.
+     */
+    @Override
+    public void onDestroyView() {
+
+        this.listenerRegistration.remove();
+
+        super.onDestroyView();
 
     }
 
@@ -60,12 +137,14 @@ public class FollowingFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.action_maps_following)
-            Toast.makeText(this.getContext(), "Display Maps", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.action_maps_following) {
 
+            MapDialogFragment mapDialogFragment = new MapDialogFragment(moodAdapter, MapDialogFragment.Title.FOLLOWER);
+            mapDialogFragment.show(getFragmentManager(), "FRAGMENT_VIEW_USER_MAP");
+
+        }
         return super.onOptionsItemSelected(item);
 
     }
-
 
 }

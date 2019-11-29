@@ -49,6 +49,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/mood_item_state"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mood_item_date"
-        app:srcCompat="@drawable/ic_placeholder_image_black_24dp" />
+        app:srcCompat="@drawable/ic_no_image_black_24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,17 +14,30 @@ import org.junit.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
+import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
+import edu.ualberta.cmput301f19t17.bigmood.database.User;
 
 import static org.junit.Assert.assertTrue;
 
 public class US050101Test {
     private Solo solo;
-    private AppPreferences appPreferences;
+    private static AppPreferences appPreferences;
+    private static MockRepository mockRepository;
 
-    @BeforeClass //runs before anything else runs
-    public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
+    @BeforeClass
+    public static void setRepository() {
+
+        // Set app preferences
+        US050101Test.appPreferences = AppPreferences.getInstance();
+
+        // Create new in-memory database and set the app preferences to use it
+        US050101Test.mockRepository = new MockRepository();
+        US050101Test.appPreferences.setRepository(US050101Test.mockRepository);
+
+        // Login with a user from the database using a specialized method in MockRepository
+        US050101Test.appPreferences.login(US050101Test.mockRepository.getUser("user3"));
+
     }
 
     @Rule
@@ -33,37 +46,64 @@ public class US050101Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance(); // used to call deleteAllMoods method
     }
 
     @Test
-    public void checkUserDoesNotExist() {
+    public void TestUserDoesNotExist() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-        solo.clickOnText("Profile");
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), "SuperMario");
-        solo.clickOnButton("REQUEST");
-        assertTrue(solo.waitForText("User does not exist", 1, 2000));
-        solo.sleep(2000);
-    }
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
 
-    @Test
-    public void checkRequestCreated() {
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-        solo.clickOnText("Profile");
-        String requester_username = "CMPUT301";
-        String requested_username = "apple";
+        String requested_username = "SuperMario"; // SuperMario will not be in the database
         solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), requested_username);
-        solo.clickOnButton("REQUEST");
-        assertTrue(solo.waitForText("Request sent", 1, 2000));
+        solo.clickOnView(solo.getCurrentActivity().findViewById(R.id.button_request));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_error_user_dne), 1, 2000));
 
-        solo.clickOnText("My Moods");
+        solo.sleep(5000);
+    }
+
+    @Test
+    public void TestAlreadyFollowing() {
+        US050101Test.appPreferences.getInstance().login(US050101Test.mockRepository.getUser("user1"));
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
+        User requestedUser = US050101Test.mockRepository.getUser("user2");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), requestedUser.getUsername());
+        solo.clickOnView(solo.getCurrentActivity().findViewById(R.id.button_request));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_error_create_request), 1, 2000));
         solo.sleep(2000);
-        appPreferences.getInstance().login(new MockUser(requested_username, "Bob", "Smith"));
-        solo.clickOnText("Profile");
+    }
+
+    @Test
+    public void TestRequestAlreadyExists() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
+        User requestedUser = US050101Test.mockRepository.getUser("user2");
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), requestedUser.getUsername());
+        solo.clickOnView(solo.getCurrentActivity().findViewById(R.id.button_request));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_error_create_request), 1, 2000));
         solo.sleep(2000);
-        solo.clickOnText("Requests");
+    }
+
+    @Test
+    public void TestRequestCreated() {
+        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
+
+        String requester_username = US050101Test.appPreferences.getCurrentUser().getUsername();
+        User requestedUser =  US050101Test.mockRepository.getUser("user1");
+
+        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_username)).getEditText(), requestedUser.getUsername());
+        solo.clickOnView(solo.getCurrentActivity().findViewById(R.id.button_request));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.toast_success_request_sent), 1, 2000));
+
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_user_moods));
         solo.sleep(2000);
+        US050101Test.appPreferences.getInstance().login(requestedUser);
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_profile));
+        assertTrue(solo.waitForText(requestedUser.getUsername(), 1, 2000));
+        solo.clickOnText(solo.getCurrentActivity().getResources().getString(R.string.title_requests));
         assertTrue(solo.waitForText(requester_username, 1, 2000));
+        solo.sleep(5000);
     }
 
     /**
@@ -72,6 +112,7 @@ public class US050101Test {
      */
     @After
     public void tearDown() throws Exception{
+
         solo.finishOpenedActivities();
     }
 

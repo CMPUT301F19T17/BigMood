@@ -9,7 +9,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -17,46 +17,47 @@ import org.junit.Test;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
-import edu.ualberta.cmput301f19t17.bigmood.database.MockUser;
+import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 import static org.junit.Assert.assertEquals;
 
 public class US040201Test {
     private Solo solo;
-    private AppPreferences appPreferences;
+    private static AppPreferences appPreferences;
+    private static MockRepository mockRepository;
 
-    @BeforeClass //runs before anything else runs
-    public static void setUpAppPrefs() throws Exception {
-        AppPreferences.getInstance().login(new MockUser("CMPUT301", "CMPUT", "301"));
+    @BeforeClass
+    public static void setRepository() {
+
+        // Set app preferences
+        US040201Test.appPreferences = AppPreferences.getInstance();
+
+        // Create new in-memory database and set the app preferences to use it
+        US040201Test.mockRepository = new MockRepository();
+        US040201Test.appPreferences.setRepository(US040201Test.mockRepository);
+
+        // Login with a user from the database using a specialized method in MockRepository
+        US040201Test.appPreferences.login(US040201Test.mockRepository.getUser("user1"));
     }
-
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);
 
-    @Before //runs before every test
+    @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-
-//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-        // TODO: 2019-11-06 Cameron:
-        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
-    }
-
-    @AfterClass //runs after all tests have run
-    public static void cleanUp() {
-//        AppPreferences.getInstance().getRepository().deleteAllMoods(AppPreferences.getInstance().getCurrentUser());
+        // Clear the user's mood list
+        US040201Test.mockRepository.deleteAllUserMoods(US040201Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
 
     @Test
     public void checkFilterMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+        solo.sleep(1000);
 
-
-        //get message from async update before checking number of items in list
-        solo.waitForText("HillyBillyBobTesterino", 0, 2000);
 
         ListView moodList = (ListView) solo.getView(R.id.mood_list);
         ListAdapter moodArrayAdapter = moodList.getAdapter();
@@ -76,8 +77,10 @@ public class US040201Test {
             }
         }
         // This assert also guarantees the filter at startup stay at None
-        // Call sleep for 1 second every time we count the number of Mood on the screen
-        solo.sleep(1000);
+        // Call sleep for 3 second every time we count the number of Mood on the screen
+        // The time of sleep may vary between each system's processor power
+
+        solo.sleep(3000);
         assertEquals(mood_quantity*state_quantity, moodArrayAdapter.getCount());
 
         View filter = solo.getCurrentActivity().findViewById(R.id.action_filter);
@@ -105,13 +108,13 @@ public class US040201Test {
         solo.clickOnView(fab);
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.sleep(1000);
+        solo.sleep(3000);
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
         // 2) Try to delete that Mood
         solo.clickOnMenuItem("Happy");
         solo.clickOnButton("DELETE");
-        solo.sleep(1000);
+        solo.sleep(3000);
         assertEquals(mood_quantity, moodArrayAdapter.getCount());
 
         // 3) Edit a mood
@@ -119,18 +122,23 @@ public class US040201Test {
         solo.clickOnButton("EDIT");
         solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
-        solo.sleep(1000);
+        solo.sleep(3000);
         // The number of Happy Mood should be decrease by 1
         assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
         // Check if our Happy turn into Sad
         solo.clickOnView(filter);
         solo.clickOnMenuItem("Sad");
-        solo.sleep(1000);
+        solo.sleep(3000);
         // The number of Sad Mood should increase by 1
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
-
-//        appPreferences.getRepository().deleteAllMoods(appPreferences.getCurrentUser());
-
     }
 
+    /**
+     * Closes the activity after each test
+     * @throws Exception
+     */
+    @After
+    public void tearDown() throws Exception{
+        solo.finishOpenedActivities();
+    }
 } 
