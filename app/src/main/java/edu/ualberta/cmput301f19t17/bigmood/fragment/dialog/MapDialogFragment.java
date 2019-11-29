@@ -228,7 +228,6 @@ public class MapDialogFragment extends DialogFragment implements OnMapReadyCallb
         this.getView().setContentDescription("MAP READY");
         Log.d(HomeActivity.LOG_TAG, getString(R.string.title_user_maps));
         googleMap = googleMapView;
-        googleMap.setMinZoomPreference(15);
 
         if (moodAdapter.getCount() == 0) {
 
