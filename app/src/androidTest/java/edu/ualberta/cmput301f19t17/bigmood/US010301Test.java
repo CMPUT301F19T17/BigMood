@@ -55,15 +55,15 @@ public class US010301Test {
         solo.sleep(1500);
     }
 
-    @Test // A basic mood refers to a mood where only the state is provided and the social situation, reason, photograph, and map are not provided
-    public void testDisplayBasicMood() {
+    @Test
+    public void testDisplayMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
 
         // Add a surprise mood
         EmotionalState emotionalState = EmotionalState.SURPRISE;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
+        solo.sleep(2000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
         solo.clickOnText(emotionalState.toString());
@@ -78,55 +78,20 @@ public class US010301Test {
         assertTrue(solo.waitForText(emotionalState.toString(), 1, 2000));
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.placeholder_situation), 1, 2000));
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.placeholder_reason), 1, 2000));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.label_no_image),1, 2000));
+        assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.label_no_location),1, 2000));
 
-        Integer photographImageViewTag = (Integer) solo.getView(R.id.image_view_placeholder_photo).getTag();
-        assertTrue(photographImageViewTag == R.drawable.ic_no_image_black_24dp);
-
-        // Needs to be refactored b/c at the time this was written the location is hardcoded to [32.32 N, 142.22 E] and not null
-        // When refactoring go to ViewMoodDialogFragment and reposition setTag for map image view
-        Integer mapImageViewTag = (Integer) solo.getView(R.id.image_view_placeholder_location).getTag();
-        assertTrue(mapImageViewTag == R.drawable.ic_no_image_black_24dp);
-
-
-    }
-
-    // NOT DONE: check photograph and map
-    @Test // A full mood refers to a mood where the state, social situation, reason, photograph, and map are all provided
-    public void testDisplayFullMood() {
-        solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
-
-        // Add an anger mood
-        EmotionalState emotionalState = EmotionalState.ANGER;
-        SocialSituation socialSituation = SocialSituation.CROWD;
-        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
-        solo.clickOnView(fab);
-        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
-
-        View stateSpinner = solo.getView(R.id.spinner_state);
-        solo.clickOnView(stateSpinner);
-        solo.clickOnText(emotionalState.toString());
-
-        View situationSpinner = solo.getView(R.id.situation_spinner);
-        solo.clickOnView(situationSpinner);
-        solo.clickOnText(socialSituation.toString());
-
-        solo.typeText(((TextInputLayout) solo.getView(R.id.text_input_reason)).getEditText(),"some reason");
-        solo.clickOnView(solo.getView(R.id.action_save));
-        solo.waitForDialogToClose();
-
-        // Check the ViewMoodDialogFragment
-        solo.clickInList(1, 0);
-        Integer imageViewDrawableID = (Integer) solo.getView(R.id.image_view_placeholder_emote).getTag();
-        assertTrue(emotionalState.getDrawableId() == imageViewDrawableID);
-        assertTrue(solo.waitForText(emotionalState.toString(), 1, 2000));
-        assertTrue(solo.waitForText(socialSituation.toString(), 1, 2000));
-        assertTrue(solo.waitForText("some reason", 1, 2000));
-        // missing photograph and map check
     }
 
     @Test
     public void testViewUserMood() {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
+
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+        solo.clickOnView(fab);
+        solo.sleep(1000);
+        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
+        solo.clickOnView(solo.getView(R.id.action_save));
 
         solo.clickInList(1, 0);
         assertTrue(solo.waitForText(solo.getCurrentActivity().getResources().getString(R.string.menu_option_edit), 1, 2000));

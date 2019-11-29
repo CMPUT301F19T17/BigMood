@@ -61,7 +61,7 @@ public class US010201Test {
         EmotionalState emotionalStateHappy = EmotionalState.HAPPINESS;
         View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
         solo.clickOnView(fab);
-        solo.sleep(5000); // Wait 5s for the dialog fragment to come up, otherwise the wrong thing will be clicked.
+        solo.sleep(1000); // Wait for the dialog fragment to come up, otherwise the wrong thing will be clicked.
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);

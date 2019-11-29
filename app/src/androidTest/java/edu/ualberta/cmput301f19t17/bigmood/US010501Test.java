@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
+import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -17,6 +18,7 @@ import org.junit.Test;
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.database.MockRepository;
+import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,8 +48,11 @@ public class US010501Test {
     @Before //Clears the mood list before each test
     public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
-        appPreferences = AppPreferences.getInstance();
-        solo.sleep(1000);
+
+        // Clear the user's mood list
+        US010501Test.mockRepository.deleteAllUserMoods(US010501Test.appPreferences.getCurrentUser());
+        solo.clickOnText(solo.getCurrentActivity().getText(R.string.title_user_moods).toString(), 2);
+        solo.sleep(1500);
     }
 
     @Test
@@ -55,17 +60,24 @@ public class US010501Test {
         solo.assertCurrentActivity("Wrong Activity", HomeActivity.class);
         solo.sleep(1000);
 
+        View fab = solo.getCurrentActivity().findViewById(R.id.floatingActionButton);
+        solo.clickOnView(fab);
+        solo.sleep(1000);
+        solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
+        solo.clickOnView(solo.getView(R.id.action_save));
+
+        solo.sleep(2000);
+
         ListView moodList = (ListView) solo.getView(R.id.mood_list);
         ListAdapter moodArrayAdapter = moodList.getAdapter();
 
         int originalNumListItems = moodArrayAdapter.getCount();
 
-        //select mood3
         solo.clickOnMenuItem("Happy");
         solo.clickOnButton("DELETE");
 
         //wait for 1 seconds
-        solo.sleep(1000);
+        solo.sleep(2000);
 
         //make sure there are no new elements in the list (ie, after we added the mood, it was deleted)
         assertEquals(originalNumListItems-1, moodArrayAdapter.getCount());

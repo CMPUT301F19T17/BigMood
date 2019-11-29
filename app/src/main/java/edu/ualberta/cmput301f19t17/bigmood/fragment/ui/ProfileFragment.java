@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.fragment.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +79,8 @@ public class ProfileFragment extends Fragment {
         this.buttonRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ProfileFragment.this.closeKeyboard();
 
                 // Get trimmed string of username.
                 final String username = ProfileFragment.this.textInputUsername
@@ -249,4 +253,25 @@ public class ProfileFragment extends Fragment {
         }
 
     }
+
+    /**
+     * This method closes the soft keyboard whenever called.
+     */
+    private void closeKeyboard() {
+
+        View view = null;
+
+        if (this.getActivity() != null)
+            view = this.getActivity().getCurrentFocus();
+
+        if (view != null) {
+
+            InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+        }
+
+
+    }
+
 }

@@ -20,7 +20,11 @@ import edu.ualberta.cmput301f19t17.bigmood.R;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 
 /**
- * This class provides a ArrayAdapter for the mood/state spinner so that it can display the mood emoticons.
+ * This class serves as a custom ArrayAdapter specifically for EmotionalStates.
+ * This Adapter does the following:
+ * 1) Stores a collection of EmotionalState objects in tandem with the ArrayList passed into its constructor.
+ *    The first entry in the list is null, so that we can store a "Not Defined" SocialSituation, since this field is optional
+ * 2) Inflates the different aspects of the row layout that are defined.
  */
 public class StateSpinnerAdapter extends ArrayAdapter<EmotionalState> {
 

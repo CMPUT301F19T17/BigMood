@@ -29,7 +29,7 @@ import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 /**
  * This class serves as a custom ArrayAdapter specifically for Moods.
  * This Adapter does the following:
- * 1) Stores a collection of Ride objects in tandem with the ArrayList passed into its constructor.
+ * 1) Stores a collection of Mood objects in tandem with the ArrayList passed into its constructor.
  * 2) Inflates the different aspects of the row layout that are defined.
  */
 public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
@@ -77,7 +77,7 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
      * Since findViewByIds can be expensive especially in a large list,
      * we cache the TextView objects in a small holder class we've defined below.
      *
-     * @param position    the position of the view we are creating? TODO Cameron 10-26-2019 research position
+     * @param position    The position in the list. i.e the item we're trying to render.
      * @param convertView this is the view that we receive if the view is being recycled
      * @param parent      the parent ViewGroup that the view is contained within (Eg. LinearLayout)
      * @return convertView, which is either the recycled view, or the newly created/inflated view
@@ -247,7 +247,6 @@ public class MoodAdapter extends ArrayAdapter<Mood> implements Filterable {
      * It just holds TextView resources we'll get and set in this class only.
      */
     private static class MoodHolder {
-        //TODO Cameron 10-26-2019 implement location and image?
         TextView date;
         TextView time;
         TextView state;

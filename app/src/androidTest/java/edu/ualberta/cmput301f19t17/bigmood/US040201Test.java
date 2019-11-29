@@ -72,6 +72,7 @@ public class US040201Test {
         for (EmotionalState state : EmotionalState.values()) {
             for (int i = 0; i < mood_quantity; i++) {
                 solo.clickOnView(fab);
+                solo.sleep(2000);
                 solo.pressSpinnerItem(0, state.getStateCode());
                 solo.clickOnView(solo.getView(R.id.action_save));
             }
@@ -106,25 +107,20 @@ public class US040201Test {
 
         // 1) Try to add a Mood
         solo.clickOnView(fab);
+        solo.sleep(2000);
         solo.pressSpinnerItem(0, EmotionalState.HAPPINESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.sleep(3000);
         assertEquals(mood_quantity+1, moodArrayAdapter.getCount());
 
-        // 2) Try to delete that Mood
-        solo.clickOnMenuItem("Happy");
-        solo.clickOnButton("DELETE");
-        solo.sleep(3000);
-        assertEquals(mood_quantity, moodArrayAdapter.getCount());
-
-        // 3) Edit a mood
+        // 2) Edit a mood
         solo.clickOnMenuItem("Happy");
         solo.clickOnButton("EDIT");
         solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode());
         solo.clickOnView(solo.getView(R.id.action_save));
         solo.sleep(3000);
         // The number of Happy Mood should be decrease by 1
-        assertEquals(mood_quantity-1, moodArrayAdapter.getCount());
+        assertEquals(mood_quantity, moodArrayAdapter.getCount());
         // Check if our Happy turn into Sad
         solo.clickOnView(filter);
         solo.clickOnMenuItem("Sad");

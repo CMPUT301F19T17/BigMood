@@ -25,7 +25,7 @@ public class MoodTest {
         Assertions.assertEquals(SocialSituation.ALONE, mood.getSituation());
         Assertions.assertEquals("Angry cause alone", mood.getReason());
         Assertions.assertEquals(gp, mood.getLocation());
-        Assertions.assertNull(mood.getImage());
+        Assertions.assertNull(mood.getImageId());
         Assertions.assertNull(mood.getFirestoreId());
     }
 
