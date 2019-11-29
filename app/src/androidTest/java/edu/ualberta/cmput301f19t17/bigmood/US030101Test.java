@@ -95,7 +95,6 @@ public class US030101Test {
         //click on user2's most recent mood
         solo.clickOnMenuItem("Happy");
 
-        // Not done. also need to check location and image matches.
         //ensure we have opened the item correctly
         assertTrue(solo.waitForText(EmotionalState.HAPPINESS.toString()));
         assertTrue(solo.searchText("I am happy."));
@@ -122,7 +121,6 @@ public class US030101Test {
         //click on user3's most recent mood
         solo.clickOnMenuItem("Angry");
 
-        // Not done. Also need to check location and image matches.
         //ensure we have opened the item correctly
         assertTrue(solo.waitForText(EmotionalState.ANGER.toString()));
         assertTrue(solo.searchText("I am mad."));

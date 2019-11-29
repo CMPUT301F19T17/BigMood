@@ -41,7 +41,6 @@ public class US010501Test {
         // Login with a user from the database using a specialized method in MockRepository
         US010501Test.appPreferences.login(US010501Test.mockRepository.getUser("user1"));
 
-
     }
     @Rule
     public ActivityTestRule<HomeActivity> rule = new ActivityTestRule<>(HomeActivity.class, true, true);

@@ -163,7 +163,7 @@ public class ViewMoodDialogFragment extends DialogFragment {
         Resources res = this.getContext().getResources();
         Drawable emoticon = res.getDrawable(this.moodToView.getState().getDrawableId());
         emoteImageView.setImageDrawable(emoticon);
-        emoteImageView.setTag(this.moodToView.getState().getDrawableId());
+        emoteImageView.setTag(this.moodToView.getState().getDrawableId()); // set tag was used for testing purposes to check the correct image is displayed, since there's no way to do it using robotium.
 
         // Set date and time
         Calendar calendar = this.moodToView.getDatetime();

@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood;
 
+import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -57,19 +58,29 @@ public class US010401Test {
         ListAdapter moodArrayAdapter = ((ListView) solo.getView(R.id.mood_list)).getAdapter();
         int originalNumListItems = moodArrayAdapter.getCount();
 
-        //select mood3
-        solo.clickOnMenuItem("Happy");
+        solo.clickInList(1, 0);
 
-        solo.clickOnButton("EDIT");
+        solo.clickOnButton(solo.getCurrentActivity().getResources().getString(R.string.menu_option_edit));
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
 
-        solo.pressSpinnerItem(0, EmotionalState.SADNESS.getStateCode()); //sad
-        solo.pressSpinnerItem(3, SocialSituation.CROWD.getSituationCode()+1); //crowd
+        EmotionalState emotionalState = EmotionalState.ANGER;
+        SocialSituation socialSituation = SocialSituation.CROWD;
+
+        View stateSpinner = solo.getView(R.id.spinner_state);
+        solo.clickOnView(stateSpinner);
+        solo.clickOnText(emotionalState.toString());
+
+        View situationSpinner = solo.getView(R.id.situation_spinner);
+        solo.clickOnView(situationSpinner);
+        solo.clickOnText(socialSituation.toString());
 
         solo.clickOnView(solo.getView(R.id.action_save));
 
-        //make sure the edit worked by checking that the SADNESS shows up
-        assertTrue(solo.waitForText(EmotionalState.SADNESS.toString(), 1, 1000));
+        //make sure the edit worked by checking that the ANGER shows up
+        assertTrue(solo.waitForText(emotionalState.toString(), 1, 1000));
+        solo.clickInList(1, 0);
+        assertTrue(solo.waitForText(emotionalState.toString(), 1, 1000));
+        assertTrue(solo.waitForText(socialSituation.toString(), 1, 1000));
 
         //make sure no new items were added, and no items deleted
         solo.sleep(2000);

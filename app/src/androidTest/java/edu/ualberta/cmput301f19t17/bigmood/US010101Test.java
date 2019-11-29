@@ -22,7 +22,6 @@ import edu.ualberta.cmput301f19t17.bigmood.model.SocialSituation;
 
 import static org.junit.Assert.assertTrue;
 
-// TODO: 2019-11-06 Cameron: remove waits (replace with MockRepository calls)
 /**
  * Test class for DefineMoodDialogFragment. All the UI tests are written here. Robotium test framework is used.
  */
