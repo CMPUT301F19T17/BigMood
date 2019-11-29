@@ -15,7 +15,7 @@ class SocialSituationTest {
     @Test
     void testGetSituationCode() {
         SocialSituation situation = mockSocialSituation();
-        assertEquals(1, situation.getSituationCode());
+        assertEquals(SocialSituation.ALONE.getSituationCode(), situation.getSituationCode());
     }
 
     @Test
@@ -27,6 +27,6 @@ class SocialSituationTest {
     @Test
     void testFindBySituationCode() {
         SocialSituation situation = mockSocialSituation();
-        assertEquals(situation, situation.findBySituationCode(1));
+        assertEquals(situation.findBySituationCode(situation.getSituationCode()), SocialSituation.ALONE);
     }
 }
