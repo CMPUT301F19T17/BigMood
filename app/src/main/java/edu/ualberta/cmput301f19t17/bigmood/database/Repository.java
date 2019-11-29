@@ -1,14 +1,14 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.UploadTask;
 
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.ImageProgressListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -99,13 +99,35 @@ public interface Repository {
     /**
      * This method attempts to upload an image pointed to the Uri to Firebase storage
      *
-     * @param user               The user to which to save the image under
-     * @param imageUri           The URI of the image to save
-     * @param successListener    A SuccessListener of type <code>UploadTask.TaskSnapshot</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request).
-     * @param failureListener    A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
-     * @param onProgressListener An OnProgressListener of type <code>UploadTask.TaskSnapshot</code>. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     * @param user                  The user to which to save the image under
+     * @param imageUri              The URI of the image to save
+     * @param fileExtension         The file extension of the image to save.
+     * @param successListener       A SuccessListener of type <code>String</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request). The string is the unique imageId it calculated.
+     * @param failureListener       A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
      */
-    void uploadImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, OnProgressListener<UploadTask.TaskSnapshot> onProgressListener);
+    void uploadNewImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener);
+
+    /**
+     * This method attempts to replace an image on the remote server pointed to by the imageId with an image pointed to by the URI.
+     *
+     * @param imageId               The unique imageId calculated beforehand and stored in the database.
+     * @param imageUri              The URI of the image to save
+     * @param successListener       A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request).
+     * @param failureListener       A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     */
+    void uploadReplaceImage(String imageId, Uri imageUri, OnSuccessListener<Void> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener);
+
+    /**
+     * This method attempts to download an image from the Firebase storage server given an imageId.
+     *
+     * @param imageId               The unique imageId calculated beforehand and stored in the database.
+     * @param successListener       A SuccessListener of type <code>Bitmap</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request). The Bitmap is the actual image you can draw.
+     * @param failureListener       A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     */
+    void downloadImage(String imageId, OnSuccessListener<Bitmap> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener);
 
     /**
      * This method gets as a List the set of all Requests belonging to a particular User.

@@ -41,8 +41,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.UploadTask;
 import com.master.permissionhelper.PermissionHelper;
 
 import java.io.File;
@@ -58,6 +56,7 @@ import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.SituationSpinnerAdapter;
 import edu.ualberta.cmput301f19t17.bigmood.adapter.StateSpinnerAdapter;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.ImageProgressListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState;
 import edu.ualberta.cmput301f19t17.bigmood.model.LocationHelper;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
@@ -74,7 +73,6 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_PICK_IMAGE = 2;
     private static final String IMAGE_FILE_EXTENSION = "jpg";
-
 
     private Toolbar toolbar;
 
@@ -113,6 +111,8 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
     private String currentPhotoPath;
     private Uri imageUri;
+
+    private boolean saveButtonEnabled = true;
 
     // set up the locationUpdatesListener
     private LocationHelper.LocationRequestUpdatesListener locationUpdatesListener = new LocationHelper.LocationRequestUpdatesListener() {
@@ -479,6 +479,20 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_save) {
 
+                    // If the save button is DISABLED
+                    if (! DefineMoodDialogFragment.this.saveButtonEnabled) {
+
+                        // Show toast
+                        Toast.makeText(
+                                DefineMoodDialogFragment.this.getContext(),
+                                "Please wait until the image finishes uploading.",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        return true;
+
+                    }
+
                     // Get emotional state from state spinner
                     final EmotionalState emotionalState = DefineMoodDialogFragment.this.stateSpinnerAdapter
                             .getItem(stateSpinner.getSelectedItemPosition());
@@ -535,16 +549,23 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
 
                     }
 
+                    // Disable the save button
+                    DefineMoodDialogFragment.this.saveButtonEnabled = false;
+
+                    // Show the progress bar and set it to 0
                     DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.VISIBLE);
                     DefineMoodDialogFragment.this.progressBarImage.setProgress(0);
 
+                    // Disable the textview button
                     DefineMoodDialogFragment.this.disableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
 
+                    // Get app preferences
                     AppPreferences preferences = AppPreferences.getInstance();
 
+                    // Save image
                     preferences
                             .getRepository()
-                            .uploadImage(
+                            .uploadNewImage(
 
                                     preferences.getCurrentUser(),
                                     DefineMoodDialogFragment.this.imageUri,
@@ -578,18 +599,36 @@ public class DefineMoodDialogFragment extends DialogFragment implements OnMapRea
                                                     Toast.LENGTH_LONG
                                             ).show();
 
+                                            Handler handler = new Handler();
+                                            handler.postDelayed(
+
+                                                    new Runnable() {
+                                                        @Override
+                                                        public void run() {
+
+                                                            DefineMoodDialogFragment.this.progressBarImage.setProgress(0);
+                                                            DefineMoodDialogFragment.this.progressBarImage.setVisibility(View.INVISIBLE);
+
+                                                            DefineMoodDialogFragment.this.saveButtonEnabled = true;
+
+                                                        }
+                                                    },
+
+                                                    1000
+
+                                            );
+
                                             DefineMoodDialogFragment.this.enableTextViewButton(DefineMoodDialogFragment.this.buttonAttachImage);
+
 
                                         }
                                     },
 
-                                    new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                    new ImageProgressListener() {
                                         @Override
-                                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                                        public void onProgress(int progress) {
 
-                                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-
-                                            DefineMoodDialogFragment.this.progressBarImage.setProgress((int) progress);
+                                            DefineMoodDialogFragment.this.progressBarImage.setProgress(progress);
 
                                         }
                                     }

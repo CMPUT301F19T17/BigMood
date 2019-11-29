@@ -18,7 +18,7 @@ public class Mood implements Parcelable {
 
     // Tag for Parceling
     public static final String TAG_MOOD_OBJECT = "edu.ualberta.cmput301f19t17.bigmood.model.MOOD_OBJECT";
-    private static final int PARCELABLE_NULL_SITUATION = -78934865;
+    private static final double PARCELABLE_NULL_LOCATION = -78934865.0f;
 
     // Stored because it is required for deletion. Once we pull the data from the DB there is no way to distinguish it from other Mood objects, so we have to store this information.
     private final String firestoreId;
@@ -98,6 +98,15 @@ public class Mood implements Parcelable {
     }
 
     /**
+     * Gets the imageId associated with the mood. This is optional, so this call can return a null.
+     * @return Returns the imageId as a <code>String</code>, or a <code>null</code> if the information was not included.
+     */
+    @Nullable
+    public String getImageId() {
+        return imageId;
+    }
+
+    /**
      * Gets the emotional state associated with the mood. This should not be null.
      * @return Returns one of the elements defined in {@see edu.ualberta.cmput301f19t17.bigmood.model.EmotionalState}
      */
@@ -146,15 +155,6 @@ public class Mood implements Parcelable {
     }
 
     /**
-     * Gets the image associated with the mood. This is optional, so this call can return a null.
-     * @return Returns the image as a <code>Bitmap</code> or a <code>null</code> if the information was not included.
-     */
-    @Nullable
-    public String getImageId() {
-        return imageId;
-    }
-
-    /**
      * This method compares THIS mood with another mood to see if they have the same attributes.
      * @param other the other mood
      * @return Returns true if the two moods have the same attributes, and false otherwise
@@ -194,24 +194,35 @@ public class Mood implements Parcelable {
     private Mood(Parcel in) {
 
         this.firestoreId = in.readString();
+
         this.imageId = in.readString();
 
-        this.state = EmotionalState.findByStateCode(in.readInt());
+        this.state = EmotionalState.valueOf(in.readString());
+
 
         this.datetime = Calendar.getInstance(TimeZone.getTimeZone(in.readString()));
         this.datetime.setTimeInMillis(in.readLong());
 
-        int situationCode = in.readInt();
+        String situationName = in.readString();
 
-        // Remember this could have been null, which in that case would be set to the special int value. If it is, we know that it should be null. Otherwise we leave it up to the situation to find the EmotionalState
-        if (situationCode == Mood.PARCELABLE_NULL_SITUATION)
-            this.situation = null;
+        // Remember that this value could have been null. In that case we have to assign it as such or in the case that there is a string we would find the value of it.
+        if (situationName != null)
+            this.situation = SocialSituation.valueOf(situationName);
         else
-            this.situation = SocialSituation.findBySituationCode(situationCode);
+            this.situation = null;
 
-        // get reason and geopoint
+        // Get reason. This cannot be null, but it can be an empty string.
         this.reason = in.readString();
-        this.location = new GeoPoint(in.readLong(), in.readLong());
+
+        // Get Longitude and latitude
+        long longitude = in.readLong();
+        long latitude = in.readLong();
+
+        // If the longitude was the "null value" actually set it to null
+        if (longitude != Mood.PARCELABLE_NULL_LOCATION && latitude != Mood.PARCELABLE_NULL_LOCATION)
+            this.location = new GeoPoint(in.readLong(), in.readLong());
+        else
+            this.location = null;
 
     }
 
@@ -230,7 +241,7 @@ public class Mood implements Parcelable {
         out.writeString(this.imageId);
 
         // Write the state as a string (from the enumeration). This cannot be null.
-        out.writeInt(this.state.getStateCode());
+        out.writeString(this.state.name());
 
         // Write timestamp and time zone ID. This cannot be null.
         out.writeString(this.datetime.getTimeZone().getID());
@@ -238,19 +249,25 @@ public class Mood implements Parcelable {
 
         // Write the situation as a string (from the enumeration). We have to handle the else case because of the order-sensitive nature of the parcel writing. We also cannot write an enumeration directly so while this value can be null, we can't just call .getSituationCode() or else we risk a NullPointerException.
         if (this.situation != null)
-            out.writeInt(this.situation.getSituationCode());
+            out.writeString(this.situation.name());
         else
-            out.writeInt(Mood.PARCELABLE_NULL_SITUATION);
+            out.writeString(null);
 
-        // Write the reason as a string
+        // Write the reason as a string. This cannot be null, but the string can be empty.
         out.writeString(this.reason);
 
-        // Write the longitude and latitude
-        out.writeDouble(location.getLatitude());
-        out.writeDouble(location.getLongitude());
+        // Write the longitude and latitude. The Geopoint itself can be null (representing no location) so we have to handle that case. In that case, we write a special number that represents a "null" value
+        if (this.location != null) {
 
-        // TODO write image to parcelable, need to do more research for how to do this
-//        out.writeParcelable(image);
+            out.writeDouble(location.getLatitude());
+            out.writeDouble(location.getLongitude());
+
+        } else {
+
+            out.writeDouble(Mood.PARCELABLE_NULL_LOCATION);
+            out.writeDouble(Mood.PARCELABLE_NULL_LOCATION);
+
+        }
 
     }
 

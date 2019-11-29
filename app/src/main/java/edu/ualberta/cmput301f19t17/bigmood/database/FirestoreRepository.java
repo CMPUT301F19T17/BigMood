@@ -1,6 +1,9 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,8 +27,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StreamDownloadTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +39,13 @@ import java.util.Map;
 
 import edu.ualberta.cmput301f19t17.bigmood.activity.AppPreferences;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.ImageProgressListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MoodsListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.RequestsListener;
 import edu.ualberta.cmput301f19t17.bigmood.model.Mood;
 import edu.ualberta.cmput301f19t17.bigmood.model.Request;
+
+import static edu.ualberta.cmput301f19t17.bigmood.activity.HomeActivity.LOG_TAG;
 
 /**
  * This class handles all the database requests coming from the application. It implements methods for interacting with the collections and documents that this application should need. Most methods return a Task<T>, where T is the applicable return type. Since these are asynchronous you must make sure to add an OnSuccessListener() and/or an OnFailureListener() to the tasks you get back so that you can give feedback to the user. For the tasks that return a ListenerRegistration, this defines a live callback routine so you must make sure to detach it whenever the activity is out of view as to not waste network resources.
@@ -497,16 +506,17 @@ public class FirestoreRepository implements Repository {
     /**
      * This method attempts to upload an image pointed to the Uri to Firebase storage
      *
-     * @param user               The user to which to save the image under
-     * @param imageUri           The URI of the image to save
-     * @param fileExtension      The file extension of the image. Should always be .jpg.
-     * @param successListener    A SuccessListener of type <code>String</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request). The result of this task will have the string containing the unique ID of the uploaded file.
-     * @param failureListener    A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
-     * @param onProgressListener An OnProgressListener of type <code>UploadTask.TaskSnapshot</code>. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     * @param user                  The user to which to save the image under
+     * @param imageUri              The URI of the image to save
+     * @param fileExtension         The file extension of the image to save.
+     * @param successListener       A SuccessListener of type <code>String</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request). The string is the unique imageId it calculated.
+     * @param failureListener       A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
      */
     @Override
-    public void uploadImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, OnProgressListener<UploadTask.TaskSnapshot> onProgressListener) {
+    public void uploadNewImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, final ImageProgressListener imageProgressListener) {
 
+        // Assemble unique image Id. THis is comprised of the username, followed by the current time in miliseconds, followed by the extension.
         final String imageId = String.format(
                 "%s_%s.%s",
                 user.getUsername(),
@@ -514,12 +524,14 @@ public class FirestoreRepository implements Repository {
                 fileExtension
         );
 
-        this.storage
+        // Create task reference
+        UploadTask task = this.storage
                 .getReference(FirestoreMapping.STORAGE_IMAGE_DIRECTORY)
                 .child(imageId)
-                .putFile(imageUri)
-                .addOnFailureListener(failureListener)
-                .addOnProgressListener(onProgressListener)
+                .putFile(imageUri);
+
+        // Handle the success case. We create a continutation in order to return the string in the successlistener.
+        task
                 .continueWith(new Continuation<UploadTask.TaskSnapshot, String>() {
                     @Override
                     public String then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -528,9 +540,119 @@ public class FirestoreRepository implements Repository {
                 })
                 .addOnSuccessListener(successListener);
 
+        // Delegate failure case
+        task.addOnFailureListener(failureListener);
+
+        // Handle progress case. We don't create a continuation because we are calling our own interface method.
+        task.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+
+                // Calculate percentage
+                double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+
+                // Call the callback method with the calculated casted integer
+                imageProgressListener.onProgress((int) progress);
+
+            }
+        });
+
     }
 
-    // REQUEST RELATED METHODS //
+    /**
+     * This method attempts to replace an image on the remote server pointed to by the imageId with an image pointed to by the URI.
+     *
+     * @param imageId               The unique imageId calculated beforehand and stored in the database.
+     * @param imageUri              The URI of the image to save
+     * @param successListener       A SuccessListener of type <code>Void</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request).
+     * @param failureListener       A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     */
+    @Override
+    public void uploadReplaceImage(String imageId, Uri imageUri, OnSuccessListener<Void> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+
+    }
+
+    /**
+     * This method attempts to download an image from the Firebase storage server given an imageId.
+     *
+     * @param imageId               The unique imageId calculated beforehand and stored in the database.
+     * @param successListener       A SuccessListener of type <code>Bitmap</code>. This will be called when the task succeeds (can connect to the DB and security rules allow the request). The Bitmap is the actual image you can draw.
+     * @param failureListener       A FailureListener for the Task. This will be called when the task fails (likely when the security rules prevent a certain request).
+     * @param imageProgressListener An ImageProgressListener (our own interface callback. This will be called every time there is some sort of progress report. This is meant for controlling some kind of progress bar.
+     */
+    @Override
+    public void downloadImage(String imageId, OnSuccessListener<Bitmap> successListener, OnFailureListener failureListener, final ImageProgressListener imageProgressListener) {
+
+        final StreamDownloadTask task = this.storage
+                .getReference(FirestoreMapping.STORAGE_IMAGE_DIRECTORY)
+                .child(imageId)
+                .getStream();
+
+        // Handle success case. We want to take the input stream and decode it into a bitmap to pass back to the caller.
+        task
+                .continueWith(new Continuation<StreamDownloadTask.TaskSnapshot, Bitmap>() {
+                    @Override
+                    public Bitmap then(@NonNull Task<StreamDownloadTask.TaskSnapshot> task) throws Exception {
+
+                        // Will propagate error
+                        StreamDownloadTask.TaskSnapshot taskSnapshot = task.getResult();
+
+                        // Double check for task
+                        if (taskSnapshot == null)
+                            throw new IllegalStateException("Task result is null, cannot convert to Bitmap");
+
+                        // Get stream
+                        InputStream stream = taskSnapshot.getStream();
+
+                        // Decode Bitmap
+                        Bitmap bitmap = BitmapFactory.decodeStream(taskSnapshot.getStream());
+
+                        // Close stream
+                        stream.close();
+
+                        // Return bitmap
+                        return bitmap;
+
+                    }
+                })
+                .addOnSuccessListener(successListener);
+
+        // Handle failure case. We must close the input stream as per the Android documentation
+        task
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        try {
+
+                            task.getResult().getStream().close();
+
+                        } catch (IOException ioError) {
+
+                            Log.e(LOG_TAG, "COULD NOT CLOSE INPUT STREAM", ioError);
+
+                        }
+
+                    }
+                })
+                .addOnFailureListener(failureListener);
+
+        // Handle on progress case
+        task.addOnProgressListener(new OnProgressListener<StreamDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull StreamDownloadTask.TaskSnapshot taskSnapshot) {
+
+                // Calculate percentage
+                double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+
+                // Call the callback method with the calculated casted integer
+                imageProgressListener.onProgress((int) progress);
+
+            }
+        });
+
+    }
 
     /**
      * This method gets as a List the set of all Requests belonging to a particular User.

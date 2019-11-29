@@ -113,7 +113,6 @@ public class ViewMoodDialogFragment extends DialogFragment {
             }
         });
 
-        // TODO: 2019-10-31 add location and image
         // Find all views and inflate them with the info
         TextView stateTextView = view.findViewById(R.id.textview_placeholder_state);
         ImageView emoteImageView = view.findViewById(R.id.image_view_placeholder_emote);

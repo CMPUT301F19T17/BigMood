@@ -1,5 +1,6 @@
 package edu.ualberta.cmput301f19t17.bigmood.database;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
@@ -7,8 +8,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.FollowingListener;
+import edu.ualberta.cmput301f19t17.bigmood.database.listener.ImageProgressListener;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MockFollowingListenerRegistration;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MockFollowingMoodsListenerRegistration;
 import edu.ualberta.cmput301f19t17.bigmood.database.listener.MockMoodsListenerRegistration;
@@ -660,7 +660,21 @@ public class MockRepository implements Repository {
     }
 
     @Override
-    public void uploadImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, OnProgressListener<UploadTask.TaskSnapshot> onProgressListener) {
+    public void uploadNewImage(User user, Uri imageUri, String fileExtension, OnSuccessListener<String> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+
+        Log.e(LOG_TAG, "", new UnsupportedOperationException("Not implemented yet"));
+
+    }
+
+    @Override
+    public void uploadReplaceImage(String imageId, Uri imageUri, OnSuccessListener<Void> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
+
+        Log.e(LOG_TAG, "", new UnsupportedOperationException("Not implemented yet"));
+
+    }
+
+    @Override
+    public void downloadImage(String imageId, OnSuccessListener<Bitmap> successListener, OnFailureListener failureListener, ImageProgressListener imageProgressListener) {
 
         Log.e(LOG_TAG, "", new UnsupportedOperationException("Not implemented yet"));
 
