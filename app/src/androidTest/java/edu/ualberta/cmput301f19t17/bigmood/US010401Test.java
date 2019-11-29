@@ -64,7 +64,7 @@ public class US010401Test {
         solo.waitForText("Edit Mood", 1, 1000); //make sure DefineMoodDialogFragment opens itself correctly as a "Edit" rather than "Add"
 
         EmotionalState emotionalState = EmotionalState.ANGER;
-        SocialSituation socialSituation = SocialSituation.CROWD;
+        SocialSituation socialSituation = SocialSituation.ALONE;
 
         View stateSpinner = solo.getView(R.id.spinner_state);
         solo.clickOnView(stateSpinner);
